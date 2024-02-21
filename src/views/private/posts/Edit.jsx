@@ -24,7 +24,7 @@ export default function Edit() {
     const formData = new FormData();
     // formData.append('_method', 'put');
     formData.append('body', post.data.body);
-    post.data.image_url && formData.append('image_url', post.data.image_url);
+    if (post.data.image_url) formData.append('image_url', post.data.image_url);
     post.data.video_url && formData.append('video_url', post.data.video_url);
 
     // console.log(post.data.body)
@@ -50,59 +50,73 @@ export default function Edit() {
         
         <div className="mb-1 d-flex flex-column row-gap-2" id='update-post'>
             <form onSubmit={submitPostUpdate}>
-                <div>
-                    <input 
-                        name="body" 
-                        id="body" 
-                        type='text'
-                        value={ post.data.body ?? '' }
-                        onChange={ event => post.setData({
-                            ...post.data,
-                            body: event.target.value,
-                        }) }
-                        className="form-control border-bottom-0 rounded-0" 
-                        rows="3" 
-                        placeholder="Update post ..." />
-                    {/* <textarea 
-                        name="body" 
-                        id="body" 
-                        value={ post.data.body ?? '' }
-                        onChange={ event => post.setData({
-                            ...post.data,
-                            body: event.target.value,
-                        }) }
-                        className="form-control border-bottom-0 rounded-0" 
-                        rows="3" 
-                        placeholder="Update post ..."></textarea> */}
+                <div className="mb-3 d-flex flex-column row-gap-2">
+                    <section className="mb-3 d-flex flex-column row-gap-2">
+                        <div className='border-bottom'>
+                            <textarea 
+                                name="body" 
+                                id="body" 
+                                value={ post.data.body ?? '' }
+                                onChange={ event => post.setData({
+                                    ...post.data,
+                                    body: event.target.value,
+                                }) }
+                                className="form-control border-bottom-0 rounded-0" 
+                                rows="3" 
+                                placeholder="Update post ..."
+                                required></textarea>
+                            {/* <textarea 
+                                type="text" 
+                                name="body" 
+                                id="body" 
+                                className='form-control' 
+                                rows="3"
+                                value={ body } 
+                                onChange={e => setBody(e.target.value)}
+                                placeholder="Body" 
+                                required >
+                            </textarea> */}
+                        </div>
+                        
+                        <div>
+                            <input 
+                                type="file" 
+                                accept="video/*"
+                                name="video_url" 
+                                id="video_url" 
+                                placeholder={ post.data.video_url }
+                                onChange={ event => post.setData({
+                                    ...post.data,
+                                    video_url: event.target.files[0],
+                                }) } 
+                                className='form-control' />
+                            <small><small className='ps-3'>*Upload a video file (mp4, avi)</small></small>
+                        </div>
 
-                    <input 
-                        type="file" 
-                        accept="video/*"
-                        name="video_url" 
-                        id="video_url" 
-                        placeholder={ post.data.video_url }
-                        onChange={ event => post.setData({
-                            ...post.data,
-                            video_url: event.target.files[0],
-                        }) } />
-
-                    <input 
-                        type="file" 
-                        accept="image/*"
-                        name="image_url" 
-                        id="image_url" 
-                        placeholder={ post.data.image_url }
-                        onChange={ event => post.setData({
-                            ...post.data,
-                            image_url: event.target.files[0],
-                        }) } />
+                        <div>
+                            <input 
+                                type="file" 
+                                accept="image/*"
+                                name="image_url" 
+                                id="image_url" 
+                                placeholder={ post.data.image_url }
+                                onChange={ event => post.setData({
+                                    ...post.data,
+                                    image_url: event.target.files[0],
+                                }) } 
+                                className='form-control' />
+                                <small><small className='ps-3'>*Upload an image file (jpeg, png)</small></small>
+                        </div>
+                    </section>
                 </div>
 
                 <div>
-                    <button 
-                        type='submit' 
-                        className='btn btn-sm btn-faansy-red text-light'>Update Post
-                    </button>
+                    <div className='d-flex justify-content-end'>
+                        <button 
+                            type='submit' 
+                            className='btn btn-sm btn-faansy-red text-light mx-3'>Update Post
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

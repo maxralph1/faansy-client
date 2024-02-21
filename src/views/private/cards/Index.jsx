@@ -39,11 +39,11 @@ export default function Index() {
           <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
               <h2 className="text-uppercase fs-5 fw-bold">Cards</h2>
               <span className="mb-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-three-dots-vertical"
+                  {/* <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-three-dots-vertical"
                       viewBox="0 0 16 16">
                       <path
                           d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                  </svg>
+                  </svg> */}
               </span>
           </div>
 
@@ -150,7 +150,7 @@ export default function Index() {
                                 data-bs-target={`#cardModal${card?.id}`} 
                                 data-bs-whatever=""
                                 className="card-body d-flex flex-column">
-                                  <span className='card-text fs-6 fw-semibold mb-1'>Default</span>
+                                  { card?.default == false && <span className='card-text fs-6 fw-semibold mb-1'>Default</span>}
                                   <div className='column-gap-2'>
                                       <p className='card-text fs-6'>Card number: <span className='fw-semibold'> { card.card_number} </span></p>
                                   </div>
@@ -190,12 +190,14 @@ export default function Index() {
                           </article>
                       )
                     }) : (cards?.data?.length < 1) ? (
-                      <section className='vh-100 d-flex justify-content-center align-items-center'>
-                        <span className='h-50 text-center fw-semibold'>You do not yet have saved cards.</span>
+                      <section className='vh-100 d-flex justify-content-center align-items-center px-5'>
+                        <span className='h-50 text-center fw-semibold px-5'>You do not yet have saved cards.</span>
                       </section>
                     ) : (
-                      <section className='vh-50 pt-5 mt-2'>
-                        <Loading />
+                      <section className='vh-100 pt-5 mt-2 px-5'>
+                          <div className='h-50 px-5'>
+                              <Loading />
+                          </div>
                       </section>
                     )}
                   </section>

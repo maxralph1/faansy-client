@@ -28,7 +28,11 @@ export function useWallet(user_id = null) {
         // return axios.get(`${ Constants.serverURL }/api/wallets/${user_id}`, { signal })
         return axiosInstance.get(`wallets/${user_id}`, { signal })
             .then(response => setData(response.data.data))
-            .catch(() => {})
+            .catch((error) => {
+                if (error?.response?.status == 401) {
+                    navigate(route('index'))
+                }
+            })
             .finally(() => setLoading(false));
     }
 

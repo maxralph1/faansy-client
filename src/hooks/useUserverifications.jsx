@@ -18,7 +18,10 @@ export function useUserverifications(page = 1) {
 
     async function getUserVerifications(page, { signal } = {}) {
         return axiosInstance.get(`user-verifications?page=${page}`, { signal })
-            .then(response => setUserVerifications(response?.data))
+            .then(response => {
+                console.log(response?.data);
+                setUserVerifications(response?.data);
+            })
             .catch((error) => {console.log(error)});
     }
 

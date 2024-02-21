@@ -8,32 +8,33 @@ import MissingUserImage from '@/assets/images/icon.png';
 
 export default function SideBar() {
     const { user, logoutUser } = useContext(AuthContext);
+    console.log(user)
 
     return (
-        <aside className="col-md-3 vh-100 position-sticky top-0 start-0 card rounded-0 d-flex flex-column row-gap-4 align-items-start py-4 ps-3 pe-5 overflow-y-auto sidenav">
+        <aside className="col-md-3 vh-100 position-sticky top-0 start-0 card rounded-0 d-flex flex-column row-gap-4 align-items-start py-4 ps-3 pe-3 overflow-y-auto sidenav">
 
-        <div className='d-flex gap-2 flex-wrap'>
-            <span href="" className="text-decoration-none text-light">
-                <div className="d-flex align-items-center column-gap-3 bg-dark rounded-pill py-1 ps-2 pe-4 d-none d-md-block">
-                    <img src={ user.user_image_url ? `${ Constants.serverURL }/${ user.user_image_url }` : MissingUserImage } alt="" width="25" />
-                    <small className="fw-semibold text-light text-uppercase ms-2">{ user.first_name }</small>
-                </div>
-                <div className="d-block d-md-none">
-                    <span className="text-bg-dark text-light rounded-circle py-1 px-2">{ user.first_name.slice(0, 1) }</span>
-                </div>
-            </span>
-{/* 
-            { user.verified != true &&
-            <span className="sidebar-item border border-success rounded ps-1 pe-2 py-1" title='Verify your ID'>
-                <Link to={ route('home.my-profile') + '#verify-id' } className="text-decoration-none text-secondary d-flex align-items-center column-gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="green" className="bi bi-patch-check-fill" viewBox="0 0 16 16">
-                        <path d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708"/>
-                    </svg>
-                    <span className="d-none d-md-block fs-6 fw-bold">Verify Your ID</span>
-                </Link>
-            </span>
-            } */}
-        </div>
+            <div className='d-flex gap-2 flex-wrap'>
+                <span href="" className="text-decoration-none text-light">
+                    <div className="d-flex align-items-center column-gap-3 bg-dark rounded-pill py-1 ps-2 pe-4 d-none d-md-block">
+                        <img src={ user.user_image_url ? `${ Constants.serverURL }/${ user.user_image_url }` : MissingUserImage } alt="" width="25" />
+                        <small className="fw-semibold text-light text-uppercase ms-2">{ user.first_name }</small>
+                    </div>
+                    <div className="d-block d-md-none">
+                        <span className="text-bg-dark text-light rounded-circle py-1 px-2" style={{ marginLeft: '-7px'}}>{ user.first_name.slice(0, 1) }</span>
+                    </div>
+                </span>
+    {/* 
+                { user.verified != true &&
+                <span className="sidebar-item border border-success rounded ps-1 pe-2 py-1" title='Verify your ID'>
+                    <Link to={ route('home.my-profile') + '#verify-id' } className="text-decoration-none text-secondary d-flex align-items-center column-gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="green" className="bi bi-patch-check-fill" viewBox="0 0 16 16">
+                            <path d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708"/>
+                        </svg>
+                        <span className="d-none d-md-block fs-6 fw-bold">Verify Your ID</span>
+                    </Link>
+                </span>
+                } */}
+            </div>
             
             <span className="sidebar-item">
                 <Link to={ route('home.index') } className="text-decoration-none text-secondary d-flex align-items-center column-gap-3">
@@ -157,15 +158,19 @@ export default function SideBar() {
                     <span className="d-none d-md-block fs-6 fw-semibold">My profile</span>
                 </Link>
             </span>
-            <span className="sidebar-item">
-                <Link to={ route('home.user-verifications.index') } className="text-decoration-none text-secondary d-flex align-items-center column-gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="#4c5661" className="bi bi-person-check" viewBox="0 0 16 16">
-                        <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
-                        <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
-                    </svg>
-                    <span className="d-none d-md-block fs-6 fw-semibold">User Verifications</span>
-                </Link>
-            </span>
+
+            { (user.role.title == 'super-admin' || user.role.title == 'admin') &&
+                <span className="sidebar-item">
+                    <Link to={ route('home.user-verifications.index') } className="text-decoration-none text-secondary d-flex align-items-center column-gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="#4c5661" className="bi bi-person-check" viewBox="0 0 16 16">
+                            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                            <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
+                        </svg>
+                        <span className="d-none d-md-block fs-6 fw-semibold">User Verifications</span>
+                    </Link>
+                </span>
+            }
+
             <span className="align-self-stretch">
                 <Link to={ route('home.index') + '#new-post' } className="text-decoration-none text-light">
                     <div className="d-flex align-items-center column-gap-3 bg-dark rounded-pill py-1 px-2 d-none d-md-block">
@@ -176,7 +181,7 @@ export default function SideBar() {
                         <small className="fw-semibold text-light text-uppercase">New Post</small>
                     </div>
                     <div className="d-block d-md-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#4c5661" className="bi bi-plus-circle-fill"
+                        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="#4c5661" className="bi bi-plus-circle-fill"
                             viewBox="0 0 16 16">
                             <path
                                 d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z" />
@@ -184,7 +189,6 @@ export default function SideBar() {
                     </div>
                 </Link>
             </span>
-            
 
             <span className="sidebar-item mt-3" style={{ marginLeft: '-4px' }}>
                 <button onClick={ logoutUser } className="text-decoration-none text-secondary border-0 bg-transparent d-flex align-items-center column-gap-3">

@@ -22,12 +22,12 @@ export function usePoll(id = null) {
         }
     }, [id]);
 
-    async function createPoll(user_id, questionnaire, close_time) {
+    async function createPoll(questionnaire, close_time, poll_option_1, poll_option_2, poll_option_3, poll_option_4) {
         setLoading(true);
         setErrors({});
 
-        console.log(user_id, questionnaire, close_time)
-        return axiosInstance.post('polls', {user_id, questionnaire, close_time})
+        console.log(questionnaire, close_time, poll_option_1, poll_option_2, poll_option_3, poll_option_4)
+        return axiosInstance.post('polls', {questionnaire, close_time, poll_option_1, poll_option_2, poll_option_3, poll_option_4})
             .then(response => setData(response.data))
             .catch(error => {
                 console.log(error.response);

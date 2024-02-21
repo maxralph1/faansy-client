@@ -27,7 +27,7 @@ export default function PasswordlessSigninRequest() {
                             type="text" 
                             className="form-control py-2 mb-4" 
                             placeholder="Username" aria-label="Username" />
-                        <button className="btn btn-sm btn-faansy-red text-light rounded-pill fw-bold py-2">REQUEST PASSWORDLESS TOKEN</button>
+                        <button className="btn btn-sm btn-faansy-red text-light rounded-pill fw-bold py-2">REQUEST LINK</button>
                     </div>
                 </form>
 

@@ -82,13 +82,17 @@ export default function FeaturedPosts() {
                             </>
                         </div>
                     </article>
-                )}) : (
-                    <>
-                        <section className='vh-50 py-5'>
-                            <Loading />
-                        </section>
-                    </>
-            )}
+                )})  : (posts?.data?.length < 1) ? (
+                                <section className='my-5 py-5 d-flex justify-content-center align-items-center'>
+                                    <span className='h-50 text-center fw-semibold'>No featured posts yet.</span>
+                                </section>
+                        ) : (
+                                <section className='my-5 py-5 mt-2'>
+                                    <div className='h-50'>
+                                        <Loading />
+                                    </div>
+                                </section>
+                        )}
 
             { ((posts?.data?.length > 0) && ((posts?.meta?.current_page < posts?.meta?.last_page))) 
                 &&

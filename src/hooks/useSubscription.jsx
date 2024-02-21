@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { route } from '@/routes';
 import axios from 'axios';
 import useAxios from '@/utils/useAxios.jsx';
+import swal from 'sweetalert2';
 
 
 export function useSubscription(id = null) {
@@ -22,13 +23,21 @@ export function useSubscription(id = null) {
         }
     }, [id]);
 
-    async function createSubscription(subscriber_id, subscribed_id, subscription_amount_paid) {
+    async function createSubscription(subscribed_id) {
         setLoading(true);
         setErrors({});
 
-        console.log(subscriber_id, subscribed_id, subscription_amount_paid)
-        return axiosInstance.post('subscriptions', {subscriber_id, subscribed_id, subscription_amount_paid})
-            .then(() => {})
+        console.log(subscribed_id)
+        return axiosInstance.post('subscriptions', {subscribed_id})
+            .then(() => {
+                swal.fire({
+                    text: 'Subscribed',
+                    color: "#820303",
+                    width: 200,
+                    position: 'top',
+                    showConfirmButton: false,
+                });
+            })
             .catch(error => {
                 // console.log(error.response);
                 console.log(error);
@@ -37,6 +46,16 @@ export function useSubscription(id = null) {
 
                 if (error.response.status == 401) {
                     navigate(route('index'))
+                }
+
+                if (error.response.status == 403) {
+                    swal.fire({
+                        text: error.response.data.message,
+                        color: "#820303",
+                        width: 300,
+                        position: 'top',
+                        showConfirmButton: false,
+                    });
                 }
             })
             .finally(() => setLoading(false));

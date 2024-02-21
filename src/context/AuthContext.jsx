@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import swal from 'sweetalert2';
 import { route } from '@/routes';
+import Constants from '@/utils/Constants.jsx';
 
 const AuthContext = createContext();
 
@@ -26,10 +27,11 @@ export const AuthProvider = ({children}) => {
 
 
     const registerUser = async (email, firstname, lastname, username, password) => {
-        const response = await fetch('http://127.0.0.1:8000/api/register', {
+        const response = await fetch(`${ Constants.serverURL }/api/register`, {
             method: 'POST', 
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json', 
+                'Access-Control-Allow-Origin': 'http://localhost:5173'
             }, 
             body: JSON.stringify({
                 email, 
@@ -41,20 +43,28 @@ export const AuthProvider = ({children}) => {
         })
 
         if (response.status == 201) {
-            navigate(route('index'))
-            // navigate(route('home.index'));
-            console.log('Registration Successful, Login Now')
+            navigate(route('index'));
+            swal.fire({
+                text: 'Registration successful, you can now sign in',
+                color: "#820303",
+                width: 325,
+                position: 'top',
+                showConfirmButton: false,
+            });
         } else {
-            console.log(response.status);
-            console.log(response);
-            // console.log('Something went wrong!');
-            // console.log(`'An Error Occured ' + ${response.status} + ': Check the password (ensure alphanumeric password not less than 15 characters). You should also check the other details you entered.'`)
+            swal.fire({
+                text: 'Something went wrong. Retry registration.',
+                color: "#820303",
+                width: 325,
+                position: 'top',
+                showConfirmButton: false,
+            });
         }
     }
 
 
     const loginUser = async (username, password) => {
-        const response = await fetch('http://127.0.0.1:8000/api/login', {
+        const response = await fetch(`${ Constants.serverURL }/api/login`, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
@@ -68,33 +78,25 @@ export const AuthProvider = ({children}) => {
         console.log(data)
 
         if (response.status == 200) {
-            console.log('Logged in');
             setAuthTokens(data);
-            setUser(jwtDecode(data.authorization.token));
+            setUser(jwtDecode(data?.authorization?.token));
             localStorage.setItem('authTokens', JSON.stringify(data));
             navigate(route('home.index'));
-            // console.log('Login successful');
-            swal.fire({
-                // title: 'Login Successful',
-                text: 'Login Successful',
-                // width: '50%',
-                color: "#820303",
-                position: 'top-end',
-                showConfirmButton: false,
-            })
         } else {
-            // console.log(response.status);
-            // console.log(response);
-            console.log(error);
-            console.log('Something went wrong!');
-            console.log('Username or password does not exist!');
+            swal.fire({
+                text: 'Error: Username or password incorrect',
+                color: "#820303",
+                width: 325,
+                position: 'top',
+                showConfirmButton: false,
+            });
         }
     }
 
 
     
     const passwordlessSigninRequest = async (username) => {
-        const response = await fetch('http://127.0.0.1:8000/api/passwordless-signin-request', {
+        const response = await fetch(`${ Constants.serverURL }/api/passwordless-signin-request`, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
@@ -105,27 +107,31 @@ export const AuthProvider = ({children}) => {
         })
 
         if (response.status == 200) {
-            console.log('Email notification with sign in token sent to your email.')
+            swal.fire({
+                text: 'Email notification with sign in token sent to your email.',
+                color: "#820303",
+                width: 350,
+                position: 'top',
+                showConfirmButton: false,
+            });
         } else {
-            console.log(response.status);
-            console.log(response);
-            // console.log('Something went wrong!');
-            // console.log(`'An Error Occured ' + ${response.status} + ': Check the password (ensure alphanumeric password not less than 15 characters). You should also check the other details you entered.'`)
+            swal.fire({
+                text: 'Error: Something went wrong.',
+                color: "#820303",
+                width: 300,
+                position: 'top',
+                showConfirmButton: false,
+            });
         }
     }
 
 
     const passwordlessSignin = async (username, token) => {
-        const response = await fetch(`http://127.0.0.1:8000/api/passwordless-signin/${ username }/${ token }`, {
+        const response = await fetch(`${ Constants.serverURL }/api/passwordless-signin/${ username }/${ token }`, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
-            }, 
-            // body: JSON.stringify({
-            //     email,
-            //     password, 
-            //     token
-            // })
+            }
         })
 
         const data = await response.json()
@@ -139,11 +145,13 @@ export const AuthProvider = ({children}) => {
             navigate(route('home.index'));
             console.log('Login successful');
         } else {
-            console.log(error);
-            console.log('Something went wrong!');
-            console.log('Username or password does not exist!');
-            // console.log('Something went wrong!');
-            // console.log(`'An Error Occured ' + ${response.status} + ': Check the password (ensure alphanumeric password not less than 15 characters). You should also check the other details you entered.'`)
+            swal.fire({
+                text: 'Error: Something went wrong.',
+                color: "#820303",
+                width: 300,
+                position: 'top',
+                showConfirmButton: false,
+            });
         }
     }
 
@@ -152,22 +160,25 @@ export const AuthProvider = ({children}) => {
         setAuthTokens(null);
         setUser(null);
         localStorage.removeItem('authTokens'); 
-        await fetch('http://127.0.0.1:8000/api/logout', {
+        await fetch(`${ Constants.serverURL }/api/logout`, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
-            }, 
-            // body: JSON.stringify({
-            //     refresh: authTokens?.refresh, 
-            // })
+            }
         })
         navigate(route('index'));
-        console.log('You have been logged out.')
+        swal.fire({
+            text: 'You have been logged out',
+            color: "#820303",
+            width: 300,
+            position: 'top',
+            showConfirmButton: false,
+        });
     }
 
 
     const resetPasswordRequest = async (email) => {
-        const response = await fetch('http://127.0.0.1:8000/api/password-reset-request', {
+        const response = await fetch(`${ Constants.serverURL }/api/password-reset-request`, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
@@ -178,18 +189,27 @@ export const AuthProvider = ({children}) => {
         })
 
         if (response.status == 200) {
-            console.log('Email notification with reset token sent to your email.')
+            swal.fire({
+                text: 'Email notification with reset token sent to your email',
+                color: "#820303",
+                width: 325,
+                position: 'top',
+                showConfirmButton: false,
+            });
         } else {
-            console.log(response.status);
-            console.log(response);
-            // console.log('Something went wrong!');
-            // console.log(`'An Error Occured ' + ${response.status} + ': Check the password (ensure alphanumeric password not less than 15 characters). You should also check the other details you entered.'`)
+            swal.fire({
+                text: 'Error: Something went wrong.',
+                color: "#820303",
+                width: 300,
+                position: 'top',
+                showConfirmButton: false,
+            });
         }
     }
 
     
     const resetPassword = async (email, password, token) => {
-        const response = await fetch('http://127.0.0.1:8000/api/password-reset', {
+        const response = await fetch(`${ Constants.serverURL }/api/password-reset`, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
@@ -202,13 +222,22 @@ export const AuthProvider = ({children}) => {
         })
 
         if (response.status == 200) {
-            console.log('Password reset.');
             navigate(route('home.index'));
+            swal.fire({
+                text: 'Password reset.',
+                color: "#820303",
+                width: 325,
+                position: 'top',
+                showConfirmButton: false,
+            });
         } else {
-            console.log(response.status);
-            console.log(response);
-            // console.log('Something went wrong!');
-            // console.log(`'An Error Occured ' + ${response.status} + ': Check the password (ensure alphanumeric password not less than 15 characters). You should also check the other details you entered.'`)
+            swal.fire({
+                text: 'Registration successful, you can now sign in',
+                color: "#820303",
+                width: 325,
+                position: 'top',
+                showConfirmButton: false,
+            });
         }
     }
 

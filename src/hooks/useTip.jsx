@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import Constants from '@/utils/Constants.jsx';
 import { useNavigate } from 'react-router-dom';
 import { route } from '@/routes';
-import axios from 'axios'
-import useAxios from '@/utils/useAxios'
+import axios from 'axios';
+import useAxios from '@/utils/useAxios.jsx';
+import swal from 'sweetalert2';
 
 
 export function useTip(id = null) {
@@ -22,14 +23,21 @@ export function useTip(id = null) {
         }
     }, [id]);
 
-    async function createTip(recipient_id, donor_id, amount) {
+    async function createTip(recipient_id, amount) {
         setLoading(true);
         setErrors({});
 
-        console.log(recipient_id, donor_id, amount)
-        return axiosInstance.post('tips', {recipient_id, donor_id, amount})
-            .then(() => navigate(route('home.index')))
-            // .then(() => window.location.href = (route('home.stats.index')))
+        console.log(recipient_id, amount)
+        return axiosInstance.post('tips', {recipient_id, amount})
+            .then(() => {
+                swal.fire({
+                    text: `You just gave a tip of ${amount}$`,
+                    color: "#820303",
+                    width: 300,
+                    position: 'top',
+                    showConfirmButton: false,
+                });
+            })
             .catch(error => {
                 console.log(error.response);
                 // console.log(error.response.data.errors);
@@ -37,6 +45,16 @@ export function useTip(id = null) {
 
                 if (error.response.status == 401) {
                     navigate(route('index'))
+                }
+
+                if (error.response.status == 409) {
+                    swal.fire({
+                        text: `${error.response.data.message}`,
+                        color: "#820303",
+                        width: 300,
+                        position: 'top',
+                        showConfirmButton: false,
+                    });
                 }
             })
             .finally(() => setLoading(false));

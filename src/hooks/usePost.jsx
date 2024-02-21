@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { route } from '@/routes';
 import Constants from '@/utils/Constants.jsx';
-import swal from 'sweetalert2';
 import axios from 'axios';
 import useAxios from '@/utils/useAxios.jsx';
+import swal from 'sweetalert2';
 
 
 export function usePost(id = null) {
@@ -40,10 +40,18 @@ export function usePost(id = null) {
             })
             .catch(error => {
                 console.log(error);
-                setErrors(error.response);
-                // swalUnauthAlert(error);
-                if (error.response.status == 401) {
+                // setErrors(error.response);
+                if (error?.response?.status == 401) {
                     navigate(route('index'))
+                }
+                if (error.response.status == 413) {
+                    swal.fire({
+                        text: `${error.response.statusText}`,
+                        color: "#820303",
+                        width: 300,
+                        position: 'top',
+                        showConfirmButton: false,
+                    });
                 }
             })
             .finally(() => setLoading(false));
@@ -84,8 +92,26 @@ export function usePost(id = null) {
             .catch(error => {
                 console.log(error);
                 setErrors(error.response);
-                if (error.response.status == 401) {
+                if (error?.response?.status == 401) {
                     navigate(route('index'))
+                }
+                if (error?.response?.status == 403) {
+                    swal.fire({
+                        text: 'Access Denied: You can only update posts that you own.',
+                        color: "#820303",
+                        width: 350,
+                        position: 'top',
+                        showConfirmButton: false,
+                    });
+                }
+                if (error?.response?.status == 422) {
+                    swal.fire({
+                        text: 'Error: Ensure you filled out all fields with the appropriate values.',
+                        color: "#820303",
+                        width: 350,
+                        position: 'top',
+                        showConfirmButton: false,
+                    });
                 }
             })
             .finally(() => setLoading(false));
@@ -103,10 +129,19 @@ export function usePost(id = null) {
                 });
             })
             .catch(error => {
-                // console.log(error);
+                console.log(error);
                 setErrors(error.response);
-                if (error.response.status == 401) {
+                if (error?.response?.status == 401) {
                     navigate(route('index'))
+                }
+                if (error?.response?.status == 403) {
+                    swal.fire({
+                        text: 'Access Denied: You can only delete posts that you own.',
+                        color: "#820303",
+                        width: 350,
+                        position: 'top',
+                        showConfirmButton: false,
+                    });
                 }
             })
             .finally(() => setLoading(false));

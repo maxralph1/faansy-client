@@ -3,7 +3,8 @@ import Constants from '@/utils/Constants.jsx';
 import { useNavigate } from 'react-router-dom';
 import { route } from '@/routes';
 import axios from 'axios'
-import useAxios from '@/utils/useAxios'
+import useAxios from '@/utils/useAxios.jsx';
+import swal from 'sweetalert2';
 
 
 export function usePollresponse(id = null) {
@@ -22,64 +23,71 @@ export function usePollresponse(id = null) {
         }
     }, [id]);
 
-    async function createPollresponse(user_id, post_id) {
+    async function createPollresponse(polloption_id, poll_id) {
         setLoading(true);
         setErrors({});
 
-        console.log(user_id, post_id)
-        return axiosInstance.post('pollresponses', {user_id, post_id})
-            .then(() => navigate(route('home.index')))
+        console.log(polloption_id, poll_id)
+        return axiosInstance.post('pollresponses', {polloption_id, poll_id})
+            .then(() => {
+                swal.fire({
+                    text: 'Participated in poll!',
+                    color: "#820303",
+                    width: 275,
+                    position: 'top',
+                    showConfirmButton: false,
+                });
+            })
             .catch(error => {
                 console.log(error.response);
-                // console.log(error.response.data.errors);
                 setErrors(error.response);
 
-                if (error.response.status == 401) {
+                if (error && error.response.status == 401) {
                     navigate(route('index'))
                 }
             })
             .finally(() => setLoading(false));
     }
 
-    async function getPollresponse(id, { signal } = {}) {
-        setLoading(true);
+    // async function getPollresponse(id, { signal } = {}) {
+    //     setLoading(true);
 
-        return axios.get(`${ Constants.serverURL }/api/pollresponses/${id}`, { signal })
-            .then(response => setData(response.data))
-            .catch(() => {})
-            .finally(() => setLoading(false));
-    }
+    //     return axios.get(`${ Constants.serverURL }/api/pollresponses/${id}`, { signal })
+    //         .then(response => setData(response.data))
+    //         .catch(() => {})
+    //         .finally(() => setLoading(false));
+    // }
 
-    async function updatePollresponse(pollresponse) {
-        setLoading(true);
-        setErrors({});
+    // async function updatePollresponse(pollresponse) {
+    //     setLoading(true);
+    //     setErrors({});
 
-        return axiosInstance.put(`pollresponses/${pollresponse.id}/`, pollresponse)
-            .then(() => navigate(route('home.index')))
-            .catch(error => {
-                console.log(error);
-                setErrors(error.response);
-                swalUnauthAlert(error);
-            })
-            .finally(() => setLoading(false));
-    }
+    //     return axiosInstance.put(`pollresponses/${pollresponse.id}/`, pollresponse)
+    //         .then(() => navigate(route('home.index')))
+    //         .catch(error => {
+    //             console.log(error);
+    //             setErrors(error.response);
+    //             swalUnauthAlert(error);
+    //         })
+    //         .finally(() => setLoading(false));
+    // }
 
-    async function destroyPollresponse(pollresponse) {
-        return axiosInstance.delete(`pollresponses/${pollresponse.id}/`)
-            .then(() => navigate(route('home.index')))
-            .catch(error => {
-                console.log(error);
-                setErrors(error.response);
-                swalUnauthAlert(error);
-            })
-            .finally(() => setLoading(false));
-    }
+    // async function destroyPollresponse(pollresponse) {
+    //     return axiosInstance.delete(`pollresponses/${pollresponse.id}/`)
+    //         .then(() => navigate(route('home.index')))
+    //         .catch(error => {
+    //             console.log(error);
+    //             setErrors(error.response);
+    //             swalUnauthAlert(error);
+    //         })
+    //         .finally(() => setLoading(false));
+    // }
 
     return {
         pollresponse: { data, setData, errors, loading }, 
-        getPollresponse, 
+        // getPollresponse, 
         createPollresponse, 
-        updatePollresponse, 
-        destroyPollresponse
+        // updatePollresponse, 
+        // destroyPollresponse
     }
 }

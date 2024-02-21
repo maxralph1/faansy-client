@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import Constants from '@/utils/Constants.jsx';
 import { useNavigate } from 'react-router-dom';
 import { route } from '@/routes';
-import axios from 'axios'
-import useAxios from '@/utils/useAxios'
+import axios from 'axios';
+import useAxios from '@/utils/useAxios.jsx';
+import swal from 'sweetalert2';
 
 
 export function useMessage(id = null) {
@@ -28,9 +29,15 @@ export function useMessage(id = null) {
 
         console.log(body, participator_1_id, participator_2_id)
         return axiosInstance.post('messages/new-message', {body, participator_1_id, participator_2_id})
-            .then(() => {})
-            // .then(() => navigate(route('home.chats.index')))
-            // .then(() => window.location.href = (route('home.chats.index')))
+            .then(() => {
+                swal.fire({
+                    text: 'You sent a message',
+                    color: "#820303",
+                    width: 275,
+                    position: 'top',
+                    showConfirmButton: false,
+                });
+            })
             .catch(error => {
                 console.log(error.response);
                 // console.log(error.response.data.errors);

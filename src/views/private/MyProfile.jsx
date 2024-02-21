@@ -11,9 +11,12 @@ import { Link, useParams } from 'react-router-dom';
 import { route } from '@/routes';
 import Constants from '@/utils/Constants.jsx';
 import { useCreator } from '@/hooks/useCreator.jsx';
-import { useMyPosts } from '@/hooks/useMyPosts.jsx';
-import { usePolls } from '@/hooks/usePolls.jsx';
 import { usePoll } from '@/hooks/usePoll.jsx';
+import { useUserverification } from '@/hooks/useUserverification.jsx';
+import { useMyPosts } from '@/hooks/useMyPosts.jsx';
+import { usePost } from '@/hooks/usePost.jsx';
+import { usePostcomment } from '@/hooks/usePostcomment.jsx';
+import { usePostlike } from '@/hooks/usePostlike.jsx';
 import { useBookmark } from '@/hooks/useBookmark.jsx';
 import Layout from '@/components/private/Layout.jsx';
 import Loading from '@/components/Loading.jsx';
@@ -25,42 +28,170 @@ import MissingUserImage from '@/assets/images/faansy_icon_non_transparent.png';
 
 export default function MyProfile() {
     const { user } = useContext(AuthContext);
-    const { creator, getCreator } = useCreator(user.username);
+    const { creator, getCreator, updateCreator } = useCreator(user.username);
     const { posts, getPosts } = useMyPosts();
-    const { polls, getPolls } = usePolls();
+    const { destroyPost } = usePost();
+    // const { polls, getPolls } = usePolls();
     const { poll, getPoll, createPoll, updatePoll, destroyPoll } = usePoll();
-    const { bookmark, createBookmark, destroyBookmark } = useBookmark();
+    const { createBookmark, destroyBookmark } = useBookmark();
+    const { userverification, createUserverification } = useUserverification();
+    const { createPostcomment, destroyPostcomment } = usePostcomment();
+    const { createPostlike, destroyPostlike } = usePostlike();
 
-    console.log(user.username)
+    // console.log(user)
+    // console.log(user.username)
+    // console.log(creator)
+
+    /* Poll add states*/
+    const [questionnaire, setQuestionnaire] = useState();
+    const [closingTime, setClosingTime] = useState();
+    const [pollOption1, setPollOption1] = useState();
+    const [pollOption2, setPollOption2] = useState();
+    const [pollOption3, setPollOption3] = useState();
+    const [pollOption4, setPollOption4] = useState();
+
+    /* User Profile Update states*/
+    const [firstName, setFirstName] = useState();
+    const [lastName, setLastName] = useState();
+    const [username, setUsername] = useState();
+    const [email, setEmail] = useState();
+    const [userImageUrl, setUserImageUrl] = useState();
+    const [userBackgroundImageUrl, setUserBackgroundImageUrl] = useState();
+    const [showActivityStatus, setShowActivityStatus] = useState();
+    const [usersMustBeSubscribedToViewMyContent, setUsersMustBeSubscribedToViewMyContent] = useState();
+    const [freeSubscription, setFreeSubscription] = useState();
+    const [subscriptionAmount, setSubscriptionAmount] = useState();
+    const [showSubscriptionOffers, setShowSubscriptionOffers] = useState();
+    const [bio, setBio] = useState();
+    const [address, setAddress] = useState();
+    const [phoneNumber, setPhoneNumber] = useState();
+    const [websiteUrl, setWebsiteUrl] = useState();
+    const [twitterAccount, setTwitterAccount] = useState();
+    const [googleAccount, setGoogleAccount] = useState();
+    const [language, setLanguage] = useState();
+    const [darkMode, setDarkMode] = useState();
+
+    /* Verify Profile state*/
+    const [userVerificationImageUrl, setUserVerificationImageUrl] = useState();
 
     /* Post comment state*/
     const [postCommentBody, setPostCommentBody] = useState();
+    
 
-    console.log(creator);
-    console.log(posts);
+    async function addPoll(event) {
+        event.preventDefault();
+
+        // console.log(questionnaire, closingTime, pollOption1, pollOption2, pollOption3, pollOption4)
+
+        const questionnaire = event.target.questionnaire.value;
+        const closingTime = event.target.closingTime.value;
+        const pollOption1 = event.target.pollOption1.value;
+        const pollOption2 = event.target.pollOption2.value;
+        const pollOption3 = event.target.pollOption3.value;
+        const pollOption4 = event.target.pollOption4.value;
+
+        await createPoll(questionnaire, closingTime, pollOption1, pollOption2, pollOption3, pollOption4);
+
+        setQuestionnaire('');
+        setPollOption1('');
+        setPollOption2('');
+        setPollOption3('');
+        setPollOption4('');
+
+        await getCreator();
+    }
+
+    async function updateProfile(event) {
+        event.preventDefault();
+
+        console.log(event.target.showActivityStatus.value);
+        console.log(event.target.usersMustBeSubscribedToViewMyContent.value);
+        console.log(event.target.freeSubscription.value);
+        console.log(event.target.subscriptionAmount.value);
+        console.log(event.target.showSubscriptionOffers.value);
+
+        const formData = new FormData();
+        formData.append('firstName', event.target.firstName.value);
+        formData.append('lastName', event.target.lastName.value);
+        formData.append('username', event.target.username.value);
+        formData.append('email', event.target.email.value);
+        event.target.userImageUrl.value && formData.append('userImageUrl', event.target.userImageUrl.value);
+        event.target.userBackgroundImageUrl.value && formData.append('userBackgroundImageUrl', event.target.userBackgroundImageUrl.value);
+        formData.append('showActivityStatus', event.target.showActivityStatus.value);
+        formData.append('usersMustBeSubscribedToViewMyContent', event.target.usersMustBeSubscribedToViewMyContent.value);
+        formData.append('freeSubscription', event.target.freeSubscription.value);
+        formData.append('subscriptionAmount', event.target.subscriptionAmount.value);
+        formData.append('showSubscriptionOffers', event.target.showSubscriptionOffers.value);
+
+        /* Profile Section */ 
+        formData.append('bio', event.target.bio.value);
+        formData.append('address', event.target.address.value);
+        formData.append('phoneNumber', event.target.phoneNumber.value);
+        formData.append('websiterUrl', event.target.websiterUrl.value);
+        formData.append('twitterAccount', event.target.twitterAccount.value);
+        formData.append('googleAccount', event.target.googleAccount.value);
+        formData.append('language', event.target.language.value);
+        formData.append('darkMode', event.target.darkMode.value);
+
+        await updateCreator(formData);
+
+        setFirstName('');
+        setLastName('');
+        setUsername('');
+        setEmail('');
+        setUserImageUrl('');
+        setUserBackgroundImageUrl('');
+        setLastSeen('');
+        setShowActivityStatus('');
+        setUsersMustBeSubscribedToViewMyContent('');
+        setFreeSubscription('');
+        setSubscriptionAmount('');
+        setShowSubscriptionOffers('');
+        setBio('');
+        setAddress('');
+        setPhoneNumber('');
+        setWebsiteUrl('');
+        setTwitterAccount('');
+        setGoogleAccount('');
+        setLanguage('');
+        setDarkMode('');
+
+        await getCreator();
+    }
+
+    async function verifyProfile(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('verification_material_image_url', userverification.data.verification_material_image_url);
+
+        await createUserverification(formData);
+
+        await getCreator(user.username);
+    }
 
     async function commentOnPost(event) {
         event.preventDefault();
 
-        const user_id = event.target.user_id.value;
         const post_id = event.target.post_id.value;
         const body = postCommentBody;
 
-        await createPostcomment(user_id, post_id, body);
+        console.log(post_id, body);
+        await createPostcomment(post_id, body);
         setPostCommentBody('');
         await getPosts();
     }
 
-    async function sendTip(event) {
-        event.preventDefault();
+    // async function sendTip(event) {
+    //     event.preventDefault();
 
-        const recipient_id = event.target.recipient_id.value;
-        const donor_id = event.target.donor_id.value;
-        const amount = event.target.amount.value;
+    //     const recipient_id = event.target.recipient_id.value;
+    //     const donor_id = event.target.donor_id.value;
+    //     const amount = event.target.amount.value;
 
-        await createTip(recipient_id, donor_id, amount);
-        await getPosts();
-    }
+    //     await createTip(recipient_id, donor_id, amount);
+    //     await getPosts();
+    // }
 
     return (
         <Layout>
@@ -113,16 +244,20 @@ export default function MyProfile() {
                             </svg>
                             <ul className="dropdown-menu">
                                 <li>
-                                    <Link 
-                                        to={ route('home.polls.create')}
+                                    <div 
+                                        type="button"
                                         className="dropdown-item fw-bold" 
-                                        href="#subscribe">
+                                        href="#polls" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#pollsModal" 
+                                        data-bs-whatever="polls">
                                             <small>Polls&nbsp;
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" className="bi bi-bar-chart-fill mb-1" viewBox="0 0 16 16">
-                                                    <path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" className="bi bi-clipboard-data-fill mb-1" viewBox="0 0 16 16">
+                                                    <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z"/>
+                                                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5zM10 8a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0zm-6 4a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0zm4-3a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1"/>
                                                 </svg>
                                             </small>
-                                    </Link>
+                                    </div>
                                 </li>
                                 <li>
                                     <div 
@@ -180,51 +315,59 @@ export default function MyProfile() {
                     <img src={ creator?.data?.user_background_image_url ? `${ Constants.serverURL }/storage/${creator.user_background_image_url}` : MissingUserBackgroundImage } className="card-img object-fit-cover" style={{ maxHeight: '150px' }} alt="..." />
                     <div className="card-img-overlay fw-semibold">
                         <div className="d-flex justify-content-between align-items-center px-3">
-                            <div className="icons d-flex align-items-center column-gap-2">
-                                <div className="d-flex align-items-center column-gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-image" viewBox="0 0 16 16">
-                                        <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                                        <path
-                                            d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z" />
-                                    </svg>
-                                    <small style={{ textShadow: '7px 7px 10px #000000' }}>
-                                        { creator?.data?.posts?.filter((post => post.image_url != null)).length }
-                                    </small>
-                                </div>
-                                <span>-</span>
-                                <div className="d-flex align-items-center column-gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-camera-video" viewBox="0 0 16 16">
-                                        <path fillRule="evenodd"
-                                            d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2zm11.5 5.175 3.5 1.556V4.269l-3.5 1.556zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z" />
-                                    </svg>
-                                    <small style={{ textShadow: '7px 7px 10px #000000' }}>
-                                        { creator?.data?.posts?.filter((post => post.video_url != null)).length }
-                                    </small>
-                                </div>
-                                <span>-</span>
-                                <div className="d-flex align-items-center column-gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-mic" viewBox="0 0 16 16">
-                                        <path
-                                            d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5" />
-                                        <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3" />
-                                    </svg>
-                                    <small style={{ textShadow: '7px 7px 10px #000000' }}>{ creator?.data?.livestreams?.length }</small>
-                                </div>
-                                <span>-</span>
-                                <div className="d-flex align-items-center column-gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-heart"  viewBox="0 0 16 16">
-                                        <path
-                                            d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
-                                    </svg>
-                                    <small style={{ textShadow: '7px 7px 10px #000000' }}>{ creator?.data?.userlikers?.length }</small>
-                                </div>
+                            <div className="icons d-flex align-items-center column-gap-3">
+                                { (creator?.data?.posts?.filter((post => post.image_url != null)).length > 0) &&
+                                    <div className="d-flex align-items-center column-gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-image" viewBox="0 0 16 16">
+                                            <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                                            <path
+                                                d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z" />
+                                        </svg>
+                                        <small style={{ textShadow: '7px 7px 10px #000000' }}>
+                                            { creator?.data?.posts?.filter((post => post.image_url != null)).length }
+                                        </small>
+                                    </div>
+                                }
+                                
+                                { creator?.data?.posts?.filter((post => post.video_url != null)).length > 0 &&
+                                    <div className="d-flex align-items-center column-gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-camera-video" viewBox="0 0 16 16">
+                                            <path fillRule="evenodd"
+                                                d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2zm11.5 5.175 3.5 1.556V4.269l-3.5 1.556zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z" />
+                                        </svg>
+                                        <small style={{ textShadow: '7px 7px 10px #000000' }}>
+                                            { creator?.data?.posts?.filter((post => post.video_url != null)).length }
+                                        </small>
+                                    </div>
+                                }
+                                
+                                { creator?.data?.livestreams?.length  > 0 &&
+                                    <div className="d-flex align-items-center column-gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-mic" viewBox="0 0 16 16">
+                                            <path
+                                                d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5" />
+                                            <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3" />
+                                        </svg>
+                                        <small style={{ textShadow: '7px 7px 10px #000000' }}>{ creator?.data?.livestreams?.length }</small>
+                                    </div>
+                                }
+                                
+                                { creator?.data?.userlikers?.length > 0 &&
+                                    <div className="d-flex align-items-center column-gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-heart"  viewBox="0 0 16 16">
+                                            <path
+                                                d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
+                                        </svg>
+                                        <small style={{ textShadow: '7px 7px 10px #000000' }}>{ creator?.data?.userlikers?.length }</small>
+                                    </div>
+                                }
                             </div>
 
                             <div className="options">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-three-dots-vertical"  viewBox="0 0 16 16">
+                                {/* <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-three-dots-vertical"  viewBox="0 0 16 16">
                                     <path
                                         d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                                </svg>
+                                </svg> */}
                             </div>
                         </div>
                     </div>
@@ -267,15 +410,41 @@ export default function MyProfile() {
                     </div>
                 </section>
 
-                <section className="mt-1 p-3 border-top rounded-0">
-                  <div className='d-flex justify-content-between align-items-center'>
-                    <h4 className='fs-6 fw-semibold'>Polls</h4>
-                    <div className='d-flex gap-3'>
-                      <button className='btn btn-sm btn-faansy-red text-light fw-semibold'>All Polls</button>
-                      <button className='btn btn-sm btn-faansy-red text-light fw-semibold'>New Poll</button>
-                    </div>
-                  </div>
-                </section>
+                { (creator?.data?.polls?.length > 0) && 
+                    <section className="mt-1 p-3 border-top rounded-0">
+                        <div className='d-flex flex-column justify-content-between align-items-start'>
+                            <h4 className='fs-6 fw-semibold margin-bottom mb-3'>Polls</h4>
+                            <div className='d-flex flex-column gap-3'>
+                                { creator?.data?.polls?.map(poll => {
+                                    return (
+                                        <article key={ poll.id } className='border-bottom mb-2'>
+                                            <div className='d-flex align-items-start gap-2 border-bottom'>
+                                                <h5 className='fs-6'>Questionnaire: <span className='fw-semibold'>{ poll.questionnaire }</span></h5>
+                                                <small>({ `${(poll?.responses?.filter(response => response?.poll_id == poll?.id)).length}` } Vote{ `${((poll?.responses?.filter(response => response?.poll_id == poll?.id)).length > 1) ? 's' : ''}` })</small>
+                                            </div>
+                                            
+                                            { poll?.options?.map(option => {
+                                                return (
+                                                    <div key={ option.id }>
+                                                        <span 
+                                                            className='d-flex gap-2'>
+                                                                <span>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" className="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                                                    </svg>
+                                                                </span>
+                                                                <span><small>{ option.option }</small></span>
+                                                        </span>
+                                                    </div>
+                                                )
+                                            })}
+                                        </article>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    </section>
+                }
 
                 <section className="mt-1 border-top card rounded-0">
                     <h4 className='fs-6 fw-semibold p-3 d-none'>Posts</h4>
@@ -341,18 +510,40 @@ export default function MyProfile() {
                                             <div className="d-flex column-gap-3">
                                                 {/* <span className="text-body-secondary">{dayjs.utc(post.created_at).format('MMM D, YYYY HH:mm')}</span> */}
                                                 <span className="text-body-secondary">
-                                                    { post.repost_original_post_timestamp != null 
-                                                        ? dayjs.utc(post.repost_original_post_timestamp).fromNow() 
-                                                        : dayjs.utc(post.created_at).fromNow()}
+                                                    { post?.repost_original_post_timestamp != null 
+                                                        ? dayjs.utc(post?.repost_original_post_timestamp).fromNow() 
+                                                        : dayjs.utc(post?.created_at).fromNow()}
                                                 </span>
                                                 {/* <span className="text-body-secondary">9 hours ago</span> */}
-                                                <span>
-                                                    {/* <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
-                                                        viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                                                    </svg> */}
-                                                </span>
+                                                
+                                                { post?.user?.id == user?.id && 
+                                                    <span className='mb-1 dropstart z-3'>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
+                                                            viewBox="0 0 16 16" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <path
+                                                                d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                                                        </svg>
+                                                        <ul className="dropdown-menu">
+                                                            <li>
+                                                                <Link 
+                                                                    to={ route('home.posts.edit', { id: post.id})}
+                                                                    className="dropdown-item fw-bold" 
+                                                                    href="#edit-post"><small>Edit Post</small>
+                                                                </Link>
+                                                            </li>
+                                                            <li>
+                                                                <button 
+                                                                    onClick={ async () => {
+                                                                        await destroyPost(post);
+                                                                        await getPosts();
+                                                                    } }
+                                                                    type='button' 
+                                                                    className="dropdown-item fw-bold text-secondary" href="#delete-post"><small>Delete Post</small>
+                                                                </button>
+                                                            </li>
+                                                        </ul>
+                                                    </span>
+                                                }
                                             </div>
                                         </div>
                             
@@ -478,7 +669,7 @@ export default function MyProfile() {
                                                     :
                                                     <button 
                                                         onClick={ async () => {
-                                                            await createPostlike(user?.id, post?.id);
+                                                            await createPostlike(post?.id);
                                                             await getPosts();
                                                         } }
                                                         className="text-decoration-none text-secondary d-flex align-items-center border-0 bg-transparent">
@@ -596,12 +787,6 @@ export default function MyProfile() {
                                                                     <div className="d-none">
                                                                         <input 
                                                                             type="text" 
-                                                                            name="user_id" 
-                                                                            id="user_id" 
-                                                                            defaultValue={ user?.id } 
-                                                                            hidden="hidden" />
-                                                                        <input 
-                                                                            type="text" 
                                                                             name="post_id" 
                                                                             id="post_id" 
                                                                             defaultValue={ post?.id } 
@@ -660,7 +845,7 @@ export default function MyProfile() {
                                                 </div>
                                             </span>
 
-                                            <span className='tip-section'>
+                                            {/* <span className='tip-section'>
                                                 <button 
                                                     href="" 
                                                     type='button' 
@@ -713,7 +898,7 @@ export default function MyProfile() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </span>
+                                            </span> */}
                                         </div>
 
                                         <div>
@@ -732,7 +917,7 @@ export default function MyProfile() {
                                                 :
                                                 <button 
                                                     onClick={ async () => {
-                                                        await createBookmark(user?.id, post?.id);
+                                                        await createBookmark(post?.id);
                                                         await getPosts();
                                                     } }
                                                     className="text-decoration-none text-secondary d-flex align-items-center border-0 bg-transparent">
@@ -775,96 +960,397 @@ export default function MyProfile() {
 
                 <section className='modal-section'>
                     <div 
-                        class="modal fade" 
+                        className="modal fade" 
+                        id="pollsModal" 
+                        tabIndex="-1" 
+                        aria-labelledby="pollsModalLabel" 
+                        aria-hidden="true">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="pollsModalLabel">Polls</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div className="modal-body">
+                                    <section className=''>
+                                        {(creator?.data?.polls?.length > 0) ? creator?.data?.polls?.map(poll => {
+                                            return (
+                                                <article key={ poll.id } className='border-bottom mb-4'>
+                                                    <div className='d-flex align-items-start gap-2 border-bottom'>
+                                                        <h5 className='fs-6'>Questionnaire: <span className='fw-semibold'>{ poll.questionnaire }</span></h5>
+                                                        <small>({ `${(poll?.responses?.filter(response => response?.poll_id == poll?.id)).length}` } Vote{ `${((poll?.responses?.filter(response => response?.poll_id == poll?.id)).length > 1) ? 's' : ''}` })</small>
+                                                    </div>
+                                                    
+                                                    { (poll?.options?.length > 0) ? poll?.options?.map(option => {
+                                                        return (
+                                                            <div key={ option.id }>
+                                                                <span 
+                                                                    className='d-flex gap-2'>
+                                                                        <span>
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" className="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                                                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                                                            </svg>
+                                                                        </span>
+                                                                        <span><small>{ option.option }</small></span>
+                                                                </span>
+                                                            </div>
+                                                        )
+                                                    }) : (
+                                                        <span className='d-flex justify-content-center py-3'>No polls yet.</span>
+                                                    )}
+                                                </article>
+                                            )
+                                        }) : (
+                                            <span className='d-flex justify-content-center py-3'>No polls yet.</span>
+                                        )}
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div 
+                        className="modal fade" 
                         id="addPollModal" 
-                        tabindex="-1" 
+                        tabIndex="-1" 
                         aria-labelledby="addPollModalLabel" 
                         aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h3 class="modal-title fs-5" id="addPollModalLabel">Add Poll</h3>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="addPollModalLabel">Add Poll</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body">
-                                    <form>
-                                    <div class="mb-3">
-                                        <label for="recipient-name" class="col-form-label">Recipient:</label>
-                                        <input type="text" class="form-control" id="recipient-name" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="message-text" class="col-form-label">Message:</label>
-                                        <textarea class="form-control" id="message-text"></textarea>
-                                    </div>
+                                <div className="modal-body">
+                                    <form onSubmit={ addPoll }>
+                                        <div className="mb-3 d-flex flex-column row-gap-2">
+                                            <section className="mb-3 d-flex flex-column row-gap-2">
+                                                <textarea 
+                                                    type="text" 
+                                                    name="questionnaire" 
+                                                    id="questionnaire" 
+                                                    className='form-control'
+                                                    value={ questionnaire } 
+                                                    onChange={e => setQuestionnaire(e.target.value)}
+                                                    placeholder="Questionnaire" 
+                                                    required >
+                                                </textarea>
+                                                <input 
+                                                    type="datetime-local" 
+                                                    name="closingTime" 
+                                                    id="closingTime" 
+                                                    className='form-control'
+                                                    value={ closingTime } 
+                                                    onChange={e => setClosingTime(e.target.value)}
+                                                    placeholder="Poll Option 1" 
+                                                    required />
+                                                    <small><small>*Closing time (if applicable)</small></small>
+                                            </section>
+
+                                            <hr />
+                                            <section className="mb-3 d-flex flex-column row-gap-2">
+                                                <input 
+                                                    type="text" 
+                                                    name="pollOption1" 
+                                                    id="pollOption1" 
+                                                    className='form-control'
+                                                    value={ pollOption1 } 
+                                                    onChange={e => setPollOption1(e.target.value)}
+                                                    placeholder="Poll Option 1" 
+                                                    required />
+                                                <input 
+                                                    type="text" 
+                                                    name="pollOption2" 
+                                                    id="pollOption2" 
+                                                    className='form-control'
+                                                    value={ pollOption2 } 
+                                                    onChange={e => setPollOption2(e.target.value)}
+                                                    placeholder="Poll Option 2" 
+                                                    required />
+                                                <input 
+                                                    type="text" 
+                                                    name="pollOption3" 
+                                                    id="pollOption3" 
+                                                    className='form-control'
+                                                    value={ pollOption3 } 
+                                                    onChange={e => setPollOption3(e.target.value)}
+                                                    placeholder="Poll Option 3 (if applicable)" />
+                                                <input 
+                                                    type="text" 
+                                                    name="pollOption4" 
+                                                    id="pollOption4" 
+                                                    className='form-control'
+                                                    value={ pollOption4 } 
+                                                    onChange={e => setPollOption4(e.target.value)}
+                                                    placeholder="Poll Option 4 (if applicable)" />
+                                            </section>
+                                        </div>
+                                        <div className="modal-footer">
+                                            <button type="submit" className="btn btn-sm btn-faansy-red text-light">Add Poll</button>
+                                        </div>
                                     </form>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary">Send message</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div 
-                        class="modal fade" 
+                        className="modal fade" 
                         id="updateProfileModal" 
-                        tabindex="-1" 
+                        tabIndex="-1" 
                         aria-labelledby="updateProfileModalLabel" 
                         aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h3 class="modal-title fs-5" id="updateProfileModalLabel">Update Profile</h3>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="updateProfileModalLabel">Update Profile</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body">
-                                    <form>
-                                    <div class="mb-3">
-                                        <label for="recipient-name" class="col-form-label">Recipient:</label>
-                                        <input type="text" class="form-control" id="recipient-name" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="message-text" class="col-form-label">Message:</label>
-                                        <textarea class="form-control" id="message-text"></textarea>
-                                    </div>
+                                <div className="modal-body">
+                                    <form onSubmit={ updateProfile }>
+                                        <div className="mb-3 d-flex flex-column row-gap-2">
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*" 
+                                                        name="userImageUrl" 
+                                                        id="userImageUrl" 
+                                                        className='form-control'
+                                                        value={ userImageUrl } 
+                                                        onChange={e => setUserImageUrl(e.target.value)}
+                                                        placeholder="User Image" />
+                                                </div>
+                                                <small><small>*Upload your profile image</small></small>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*"
+                                                        name="userBackgroundImageUrl" 
+                                                        id="userBackgroundImageUrl" 
+                                                        className='form-control'
+                                                        value={ userBackgroundImageUrl } 
+                                                        onChange={e => setUserBackgroundImageUrl(e.target.value)}
+                                                        placeholder="User Profile Background Image" />
+                                                </div>
+                                                <small><small>*Upload your profile background image</small></small>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="text" 
+                                                        name="firstName" 
+                                                        id="firstName" 
+                                                        className='form-control'
+                                                        value={ firstName } 
+                                                        onChange={e => setFirstName(e.target.value)}
+                                                        placeholder="First Name" />
+                                                </div>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="text" 
+                                                        name="lastName" 
+                                                        id="lastName" 
+                                                        className='form-control'
+                                                        value={ lastName } 
+                                                        onChange={e => setLastName(e.target.value)}
+                                                        placeholder="Last Name" />
+                                                </div>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="text" 
+                                                        name="username" 
+                                                        id="username" 
+                                                        className='form-control'
+                                                        value={ username } 
+                                                        onChange={e => setUsername(e.target.value)}
+                                                        placeholder="Userame" />
+                                                </div>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="text" 
+                                                        name="email" 
+                                                        id="email" 
+                                                        className='form-control'
+                                                        value={ email } 
+                                                        onChange={e => setEmail(e.target.value)}
+                                                        placeholder="Email" />
+                                                </div>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <textarea 
+                                                        type="text" 
+                                                        name="bio" 
+                                                        id="bio" 
+                                                        className='form-control'
+                                                        value={ bio } 
+                                                        onChange={e => setBio(e.target.value)}
+                                                        placeholder="Bio"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="text" 
+                                                        name="address" 
+                                                        id="address" 
+                                                        className='form-control'
+                                                        value={ address } 
+                                                        onChange={e => setAddress(e.target.value)}
+                                                        placeholder="Address" />
+                                                </div>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="text" 
+                                                        name="twitterAccount" 
+                                                        id="twitterAccount" 
+                                                        className='form-control'
+                                                        value={ twitterAccount } 
+                                                        onChange={e => setTwitterAccount(e.target.value)}
+                                                        placeholder="Twitter Account" />
+                                                </div>
+
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="text" 
+                                                        name="googleAccount" 
+                                                        id="googleAccount" 
+                                                        className='form-control'
+                                                        value={ googleAccount } 
+                                                        onChange={e => setGoogleAccount(e.target.value)}
+                                                        placeholder="Google Account" />
+                                                </div>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <div class="form-check form-switch">
+                                                        <input 
+                                                            class="form-check-input" 
+                                                            type="checkbox" 
+                                                            role="switch" 
+                                                            id="showActivityStatus" />
+                                                        <small class="form-check-label" for="showActivityStatus">Show Activity Status</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <div class="form-check form-switch">
+                                                        <input 
+                                                            class="form-check-input" 
+                                                            type="checkbox" 
+                                                            role="switch" 
+                                                            id="usersMustBeSubscribedToViewMyContent" />
+                                                        <small class="form-check-label" for="usersMustBeSubscribedToViewMyContent">Users Must Be Subscribed To View My Content</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className='row row-gap-2 align-items-center'>
+                                                <div className='col-md'>
+                                                    <div class="form-check form-switch">
+                                                        <input 
+                                                            type="checkbox" 
+                                                            name="freeSubscription"
+                                                            id="freeSubscription" 
+                                                            value={ freeSubscription } 
+                                                            onChange={e => setFreeSubscription(e.target.value)}
+                                                            class="form-check-input" 
+                                                            role="switch" />
+                                                        <small class="form-check-label" for="freeSubscription">Free Subscription</small>
+                                                    </div>
+                                                </div>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="text" 
+                                                        name="subscriptionAmount" 
+                                                        id="subscriptionAmount" 
+                                                        className='form-control'
+                                                        value={ subscriptionAmount } 
+                                                        onChange={e => setSubscriptionAmount(e.target.value)}
+                                                        placeholder="Subscription Amount" />
+                                                </div>
+                                            </div>
+
+                                            <div className='row row-gap-2 align-items-center'>
+                                                <div className='col-md'>
+                                                    <div class="form-check form-switch">
+                                                        <input 
+                                                            type="checkbox" 
+                                                            name="showSubscriptionOffers"
+                                                            id="showSubscriptionOffers" 
+                                                            value={ showSubscriptionOffers } 
+                                                            onChange={e => setShowSubscriptionOffers(e.target.value)}
+                                                            class="form-check-input" 
+                                                            role="switch" />
+                                                        <small class="form-check-label" for="showSubscriptionOffers">Show Subscription Offers</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div className="modal-footer pe-0 me-0">
+                                            <button type="submit" className="btn btn-sm btn-faansy-red text-light">Update Profile</button>
+                                        </div>
                                     </form>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary">Send message</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div 
-                        class="modal fade" 
+                        className="modal fade" 
                         id="getVerifiedModal" 
-                        tabindex="-1" 
+                        tabIndex="-1" 
                         aria-labelledby="getVerifiedModalLabel" 
                         aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h3 class="modal-title fs-5" id="getVerifiedModalLabel">User Verification</h3>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="getVerifiedModalLabel">User Verification (Upload ID)</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body">
-                                    <form>
-                                    <div class="mb-3">
-                                        <label for="recipient-name" class="col-form-label">Recipient:</label>
-                                        <input type="text" class="form-control" id="recipient-name" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="message-text" class="col-form-label">Message:</label>
-                                        <textarea class="form-control" id="message-text"></textarea>
-                                    </div>
+                                <div className="modal-body">
+                                    <form onSubmit={ verifyProfile } encType='multipart/form-data'>
+                                        <div className="mb-3 d-flex flex-column row-gap-2">
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*"
+                                                        name="verification_material_image_url" 
+                                                        id="verification_material_image_url" 
+                                                        className='form-control'
+                                                        onChange={ event => userverification.setData({
+                                                            ...userverification.data,
+                                                            verification_material_image_url: event.target.files[0],
+                                                        }) }
+                                                        placeholder="User Verification Image" />
+                                                </div>
+                                                <small>
+                                                    <small>*Could be an international passport, national ID card</small>
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div className="modal-footer me-0 pe-0">
+                                            <button type="submit" className="btn btn-sm btn-faansy-red text-light">Verify Profile</button>
+                                        </div>
                                     </form>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary">Send message</button>
                                 </div>
                             </div>
                         </div>

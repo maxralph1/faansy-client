@@ -11,7 +11,6 @@ export function usePosts(page = 1) {
     const axiosInstance = useAxios();
 
     const [posts, setPosts] = useState([]);
-    const [postsLoading, setPostsLoading] = useState(false)
 
     useEffect(() => {
         if (page !== null) {
@@ -24,19 +23,17 @@ export function usePosts(page = 1) {
     async function getPosts(page, { signal } = {}) {
         // return axios.get(`${ Constants.serverURL }/api/posts?page=${page}`, { signal })
         return axiosInstance.get(`posts?page=${page}`, { signal })
-            .then(setPostsLoading(true))
             .then(response => {
-                setPostsLoading(false)
                 console.log(response);
                 setPosts(response.data);
             })
             .catch((error) => {
                 console.log(error)
-                if (error.response && error.response.status == 401) {
+                if (error?.response && error?.response?.status == 401) {
                     navigate(route('index'))
                 }
             });
     }
 
-    return { posts, getPosts, postsLoading }
+    return { posts, getPosts }
 }

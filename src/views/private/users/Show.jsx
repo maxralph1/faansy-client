@@ -13,6 +13,11 @@ import Constants from '@/utils/Constants.jsx';
 import { useCreator } from '@/hooks/useCreator';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useMessage } from '@/hooks/useMessage';
+import { usePollresponse } from '@/hooks/usePollresponse.jsx';
+import { usePost } from '@/hooks/usePost.jsx';
+import { usePostcomment } from '@/hooks/usePostcomment.jsx';
+import { useBookmark } from '@/hooks/useBookmark.jsx';
+import { usePostlike } from '@/hooks/usePostlike.jsx';
 import Layout from '@/components/private/Layout.jsx';
 import Loading from '@/components/Loading.jsx';
 import Logo from '@/assets/images/logo.png';
@@ -25,26 +30,21 @@ export default function Show() {
     const { user } = useContext(AuthContext);
     const params = useParams();
     const { creator, getCreator } = useCreator(params.username);
-    console.log(creator);
-    console.log(creator?.data?.posts);
-    const { subscription, createSubscription, destroySubscription } = useSubscription();
+    const { createSubscription, destroySubscription } = useSubscription();
     const { createNewMessage } = useMessage();
+    const { createPollresponse, destroyPollresponse } = usePollresponse();
+    const { destroyPost } = usePost();
+    const { createPostcomment, destroyPostcomment } = usePostcomment();
+    const { createPostlike, destroyPostlike } = usePostlike();
+    const { createBookmark, destroyBookmark } = useBookmark();
+    
+    // console.log(creator);
+    // console.log(creator?.data?.posts);
+    // console.log(creator?.data?.subscriptions);
+    // console.log(user);
 
     /* Post comment state*/
     const [postCommentBody, setPostCommentBody] = useState();
-
-    async function subscribeToCreator(event) {
-        event.preventDefault();
-
-        const subscriber_id = event.target.subscriber_id.value;
-        const subscribed_id = event.target.subscribed_id.value;
-        const amount_paid = event.target.amount_paid.value;
-
-        if (subscriber_id == subscribed_id) return 'You cannot subscribe to yourself';
-
-        await createSubscription(subscriber_id, subscribed_id, amount_paid);
-        await getCreator(params.username);
-    }
 
     async function createMessage(event) {
         event.preventDefault();
@@ -59,25 +59,23 @@ export default function Show() {
     async function commentOnPost(event) {
         event.preventDefault();
 
-        const user_id = event.target.user_id.value;
         const post_id = event.target.post_id.value;
         const body = postCommentBody;
 
-        await createPostcomment(user_id, post_id, body);
+        await createPostcomment(post_id, body);
         setPostCommentBody('');
-        await getPosts();
+        await getCreator(params.username);
     }
 
-    async function sendTip(event) {
-        event.preventDefault();
+    // async function sendTip(event) {
+    //     event.preventDefault();
 
-        const recipient_id = event.target.recipient_id.value;
-        const donor_id = event.target.donor_id.value;
-        const amount = event.target.amount.value;
+    //     const recipient_id = event.target.recipient_id.value;
+    //     const amount = event.target.amount.value;
 
-        await createTip(recipient_id, donor_id, amount);
-        await getPosts();
-    }
+    //     await createTip(recipient_id, amount);
+    //     await getCreator(params.username);
+    // }
 
     return (
         <Layout>
@@ -85,13 +83,6 @@ export default function Show() {
                 <div
                     className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
                     <div className="d-flex align-items-center column-gap-2">
-                        <div>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-left-short"
-                                viewBox="0 0 16 16">
-                                <path fillRule="evenodd"
-                                    d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5" />
-                            </svg>
-                        </div>
                         <div className="d-flex flex-column">
                             <div className="d-flex flex-row align-items-center column-gap-1">
                                 <h1 className="fs-5">{ `${ creator?.data?.first_name } ${ creator?.data?.last_name }` }</h1>
@@ -117,7 +108,7 @@ export default function Show() {
                     </div>
                     
                     <div className="d-flex align-items-center column-gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-star"
+                        {/* <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-star"
                             viewBox="0 0 16 16">
                             <path
                                 d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.56.56 0 0 0-.163-.505L1.71 6.745l4.052-.576a.53.53 0 0 0 .393-.288L8 2.223l1.847 3.658a.53.53 0 0 0 .393.288l4.052.575-2.906 2.77a.56.56 0 0 0-.163.506l.694 3.957-3.686-1.894a.5.5 0 0 0-.461 0z" />
@@ -135,7 +126,7 @@ export default function Show() {
                                 <path
                                     d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
                             </svg>
-                        </span>
+                        </span> */}
                     </div>
                 </div>
 
@@ -143,47 +134,59 @@ export default function Show() {
                     <img src={ creator.user_background_image_url ? `${ Constants.serverURL }/storage/${creator.user_background_image_url}` : MissingUserBackgroundImage } className="card-img object-fit-cover" style={{ maxHeight: '150px' }} alt="..." />
                     <div className="card-img-overlay fw-semibold">
                         <div className="d-flex justify-content-between align-items-center px-3">
-                            <div className="icons d-flex align-items-center column-gap-2">
-                                <div className="d-flex align-items-center column-gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-image" viewBox="0 0 16 16">
-                                        <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                                        <path
-                                            d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z" />
-                                    </svg>
-                                    <small style={{ textShadow: '7px 7px 10px #000000' }}>524</small>
-                                </div>
-                                <span>-</span>
-                                <div className="d-flex align-items-center column-gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-camera-video" viewBox="0 0 16 16">
-                                        <path fillRule="evenodd"
-                                            d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2zm11.5 5.175 3.5 1.556V4.269l-3.5 1.556zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z" />
-                                    </svg>
-                                    <small style={{ textShadow: '7px 7px 10px #000000' }}>524</small>
-                                </div>
-                                <span>-</span>
-                                <div className="d-flex align-items-center column-gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-mic" viewBox="0 0 16 16">
-                                        <path
-                                            d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5" />
-                                        <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3" />
-                                    </svg>
-                                    <small style={{ textShadow: '7px 7px 10px #000000' }}>524</small>
-                                </div>
-                                <span>-</span>
-                                <div className="d-flex align-items-center column-gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-heart"  viewBox="0 0 16 16">
-                                        <path
-                                            d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
-                                    </svg>
-                                    <small style={{ textShadow: '7px 7px 10px #000000' }}>524</small>
-                                </div>
+                            <div className="icons d-flex align-items-center column-gap-3">
+                                { (creator?.data?.posts?.filter((post => post.image_url != null)).length > 0) &&
+                                    <div className="d-flex align-items-center column-gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-image" viewBox="0 0 16 16">
+                                            <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                                            <path
+                                                d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z" />
+                                        </svg>
+                                        <small style={{ textShadow: '7px 7px 10px #000000' }}>
+                                            { creator?.data?.posts?.filter((post => post.image_url != null)).length }
+                                        </small>
+                                    </div>
+                                }
+                                
+                                { creator?.data?.posts?.filter((post => post.video_url != null)).length > 0 &&
+                                    <div className="d-flex align-items-center column-gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-camera-video" viewBox="0 0 16 16">
+                                            <path fillRule="evenodd"
+                                                d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2zm11.5 5.175 3.5 1.556V4.269l-3.5 1.556zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z" />
+                                        </svg>
+                                        <small style={{ textShadow: '7px 7px 10px #000000' }}>
+                                            { creator?.data?.posts?.filter((post => post.video_url != null)).length }
+                                        </small>
+                                    </div>
+                                }
+                                
+                                { creator?.data?.livestreams?.length  > 0 &&
+                                    <div className="d-flex align-items-center column-gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-mic" viewBox="0 0 16 16">
+                                            <path
+                                                d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5" />
+                                            <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3" />
+                                        </svg>
+                                        <small style={{ textShadow: '7px 7px 10px #000000' }}>{ creator?.data?.livestreams?.length }</small>
+                                    </div>
+                                }
+                                
+                                { creator?.data?.userlikers?.length > 0 &&
+                                    <div className="d-flex align-items-center column-gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-heart"  viewBox="0 0 16 16">
+                                            <path
+                                                d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
+                                        </svg>
+                                        <small style={{ textShadow: '7px 7px 10px #000000' }}>{ creator?.data?.userlikers?.length }</small>
+                                    </div>
+                                }
                             </div>
 
                             <div className="options">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-three-dots-vertical"  viewBox="0 0 16 16">
+                                {/* <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-three-dots-vertical"  viewBox="0 0 16 16">
                                     <path
                                         d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                                </svg>
+                                </svg> */}
                             </div>
                         </div>
                     </div>
@@ -239,7 +242,6 @@ export default function Show() {
                                                     </div>
                                                 </div>
                                                 <div className="modal-footer">
-                                                    <button type="button" className="btn btn-sm btn-dark" data-bs-dismiss="modal">Close</button>
                                                     <button type="submit" className="btn btn-sm btn-faansy-red text-light">Send Message</button>
                                                 </div>
                                             </form>
@@ -251,39 +253,127 @@ export default function Show() {
                     </div>
                 </section>
 
-                <section className="d-flex flex-column align-items-center justify-content-between row-gap-2 border rounded-0 py-3">
-                    <h3 className="align-self-start ps-3 text-uppercase text-secondary fs-6"><small>Subscription</small></h3>
-                    <span className="w-100 px-3">
-                        <form onSubmit={ subscribeToCreator }>
-                            <div className="d-none">
-                                <input 
-                                    type="text" 
-                                    name="subscribed_id" 
-                                    id="subscribed_id" 
-                                    defaultValue={ creator?.data?.id } 
-                                    hidden="hidden" />
-                                <input 
-                                    type="text" 
-                                    name="subscriber_id" 
-                                    id="subscriber_id" 
-                                    defaultValue={ user?.id } 
-                                    hidden="hidden" />
-                                <input 
-                                    type="text" 
-                                    name="amount_paid" 
-                                    id="amount_paid" 
-                                    defaultValue={ creator?.data?.subscription_amount } 
-                                    hidden="hidden" />
+
+                <div>
+                    { ((creator?.data?.subscriptions?.length > 0) 
+                        && (creator?.data?.subscriptions?.find(subscription => 
+                        subscription.subscribed.id == creator?.data?.id && subscription.subscriber.id == user.id))) 
+                    ?
+                        <section className='d-flex justify-content-end align-items-center gap-2 px-3 py-2 fw-semibold'>
+                            <section className='d-flex justify-content-end align-items-center gap-2'>
+                                <span>You are subscribed to this user</span>
+                                <span 
+                                    type='button' 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#unsubscribeModal" 
+                                    data-bs-body=''
+                                    className='btn btn-sm btn-faansy-red text-light'>
+                                        Unsubscribe
+                                </span>
+                            </section>
+                            <section>
+                                <div className="modal fade" id="unsubscribeModal" tabIndex="-1" aria-labelledby="unsubscribeModalLabel" aria-hidden="true">
+                                    <div className="modal-dialog">
+                                        <div className="modal-content">
+                                            <div className="modal-header">
+                                            <h3 className="modal-title fs-5" id="unsubscribeModalLabel">Unsubscribe from <span className='fw-semibold'>{ `${creator?.data?.first_name} ${creator?.data?.last_name}` }</span></h3>
+                                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div className="modal-body">
+                                                <span className="modal-title fs-6" id="unsubscribeModalLabel">If you unsubscribe, you would no longer receive posts and other updates from this creator. Are you sure you want to unsubscribe from { `${creator?.data?.first_name} ${creator?.data?.last_name}` } ?</span>
+                                            </div>
+                                            <div className="modal-footer">
+                                            <button 
+                                                type="button" 
+                                                onClick={ async () => {
+                                                    await destroySubscription((creator?.data?.subscriptions?.find(subscription =>  subscription.subscribed.id == creator?.data?.id && subscription.subscriber.id == user.id)));
+                                                    // await getCreator(params.username);
+                                                    window.location.reload(true);
+                                                } }
+                                                className="btn btn-sm btn-dark">
+                                                    Yes, Unsubscribe
+                                            </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </section>
+                    : 
+                        <section className="d-flex flex-column align-items-center justify-content-between row-gap-2 border rounded-0 py-3">
+                            <h3 className="align-self-start ps-3 text-uppercase text-secondary fs-6"><small>Subscription</small></h3>
+                            <span className="w-100 px-3">
+                                { (creator?.data?.username != user.username) && 
+                                    <button 
+                                        type="button" 
+                                        onClick={ async () => {
+                                            await createSubscription(creator?.data?.id);
+                                            await getCreator(params.username);
+                                        } }
+                                        className="btn btn-faansy-red rounded-pill d-flex justify-content-between px-3 text-light fw-semibold py-2 w-100">
+                                        <small className="text-uppercase">Subscribe</small>
+                                        { creator?.data?.subscription_amount >= 0 && creator?.data?.free_subscription == false
+                                            ? <small className="text-uppercase">For { (creator?.data?.subscription_amount).toFixed(2) }$</small>
+                                            : <small className="text-uppercase">For Free</small>
+                                        }
+                                    </button>
+                                }
+                            </span>
+                        </section>
+                    }
+                </div>
+
+                { (creator?.data?.polls?.length > 0) && 
+                    <section className="mt-1 p-3 border-top rounded-0">
+                        <div className='d-flex flex-column justify-content-between align-items-start'>
+                            <h4 className='fs-5 fw-semibold border-bottom border-top py-2 mb-3'>Polls</h4>
+                            <div className='d-flex flex-column gap-3'>
+                                { creator?.data?.polls?.map(poll => {
+                                    return (
+                                        <article key={ poll.id } className='border-bottom mb-2'>
+                                            <div className='border-bottom'>
+                                                { (poll?.responses?.find(response => 
+                                                                    response.user_id == user.id && response?.poll_id == poll?.id)) 
+                                                                    && <span className="badge text-bg-warning d-flex justify-content-end mb-1">Already Voted. Changed your mind? Vote again.</span> }
+                                                <h5 className='fs-6'>Questionnaire: <span className='fw-semibold'>{ poll.questionnaire }</span></h5>
+                                            </div>
+                                            
+                                            { poll?.options?.map(option => {
+                                                return (
+                                                    <div key={ option.id }>
+                                                        <span 
+                                                            type="button" 
+                                                            onClick={ async () => {
+                                                                await createPollresponse(option?.id, poll?.id);
+                                                                await getCreator(params.username);
+                                                            } }
+                                                            className='d-flex gap-2'>
+                                                                <span>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" className="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                                                    </svg>
+                                                                </span>
+                                                                <span className='d-flex gap-2 align-items-center'>
+                                                                    <small>{ option.option }</small>
+                                                                    { (poll?.responses?.find(response => 
+                                                                    response.user_id == user.id && response?.polloption_id == option?.id)) 
+                                                                    && <span className="badge text-bg-success">Voted&nbsp;
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                                                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                                                        </svg>
+                                                                    </span> }
+                                                                </span>
+                                                        </span>
+                                                    </div>
+                                                )
+                                            })}
+                                        </article>
+                                    )
+                                })}
                             </div>
-                            <button type="submit"
-                            className="btn btn-faansy-red rounded-pill d-flex justify-content-between px-3 text-light fw-semibold py-2 w-100">
-                                <small className="text-uppercase">Subscribe</small>
-                                <small className="text-uppercase">For Free</small>
-                            </button>
-                        </form>
-                        
-                    </span>
-                </section>
+                        </div>
+                    </section>
+                }
 
                 <section className="mt-1 border-top card rounded-0">
                     <h4 className='fs-6 fw-semibold p-3 d-none'>Posts</h4>
@@ -354,13 +444,35 @@ export default function Show() {
                                                         : dayjs.utc(post.created_at).fromNow()}
                                                 </span>
                                                 {/* <span className="text-body-secondary">9 hours ago</span> */}
-                                                <span>
-                                                    {/* <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
-                                                        viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                                                    </svg> */}
-                                                </span>
+                                                
+                                                { post?.user?.id == user?.id && 
+                                                    <span className='mb-1 dropstart z-3'>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
+                                                            viewBox="0 0 16 16" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <path
+                                                                d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                                                        </svg>
+                                                        <ul className="dropdown-menu">
+                                                            <li>
+                                                                <Link 
+                                                                    to={ route('home.posts.edit', { id: post?.id})}
+                                                                    className="dropdown-item fw-bold" 
+                                                                    href="#edit-post"><small>Edit Post</small>
+                                                                </Link>
+                                                            </li>
+                                                            <li>
+                                                                <button 
+                                                                    onClick={ async () => {
+                                                                        await destroyPost(post);
+                                                                        await getCreator(params.username);
+                                                                    } }
+                                                                    type='button' 
+                                                                    className="dropdown-item fw-bold text-secondary" href="#delete-post"><small>Delete Post</small>
+                                                                </button>
+                                                            </li>
+                                                        </ul>
+                                                    </span>
+                                                }
                                             </div>
                                         </div>
                             
@@ -476,7 +588,7 @@ export default function Show() {
                                                     <button 
                                                         onClick={ async () => {
                                                             await destroyPostlike((post?.likes?.length > 0) && post.likes?.find(foundLike => foundLike?.user?.id == user?.id));
-                                                            await getPosts();
+                                                            await getCreator(params.username);
                                                         } }
                                                         className="text-decoration-none text-secondary d-flex align-items-center border-0 bg-transparent">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#820303" className="bi bi-heart-fill mt-1" viewBox="0 0 16 16">
@@ -486,8 +598,8 @@ export default function Show() {
                                                     :
                                                     <button 
                                                         onClick={ async () => {
-                                                            await createPostlike(user?.id, post?.id);
-                                                            await getPosts();
+                                                            await createPostlike(post?.id);
+                                                            await getCreator(params.username);
                                                         } }
                                                         className="text-decoration-none text-secondary d-flex align-items-center border-0 bg-transparent">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-heart mt-1" viewBox="0 0 16 16">
@@ -513,7 +625,7 @@ export default function Show() {
                                                                         <button 
                                                                             onClick={ async () => {
                                                                                 await destroyPostlike((post?.likes?.length > 0) && post.likes?.find(foundLike => foundLike?.user?.id == user?.id));
-                                                                                await getPosts();
+                                                                                await getCreator(params.username);
                                                                             } }
                                                                             className="text-decoration-none text-secondary d-flex align-items-center border-0 bg-transparent gap-2">
                                                                                 <span className='text-faansy-red'>Unlike post</span>
@@ -525,7 +637,7 @@ export default function Show() {
                                                                         <button 
                                                                             onClick={ async () => {
                                                                                 await createPostlike(user?.id, post?.id);
-                                                                                await getPosts();
+                                                                                await getCreator(params.username);
                                                                             } }
                                                                             className="text-decoration-none text-secondary d-flex align-items-center border-0 bg-transparent gap-2">
                                                                                 <span className='text-faansy-red'>Like post</span>
@@ -604,12 +716,6 @@ export default function Show() {
                                                                     <div className="d-none">
                                                                         <input 
                                                                             type="text" 
-                                                                            name="user_id" 
-                                                                            id="user_id" 
-                                                                            defaultValue={ user?.id } 
-                                                                            hidden="hidden" />
-                                                                        <input 
-                                                                            type="text" 
                                                                             name="post_id" 
                                                                             id="post_id" 
                                                                             defaultValue={ post?.id } 
@@ -668,7 +774,7 @@ export default function Show() {
                                                 </div>
                                             </span>
 
-                                            <span className='tip-section'>
+                                            {/* <span className='tip-section'>
                                                 <button 
                                                     href="" 
                                                     type='button' 
@@ -698,12 +804,6 @@ export default function Show() {
                                                                             id="recipient_id" 
                                                                             defaultValue={ post?.user?.id } 
                                                                             hidden="hidden" />
-                                                                        <input 
-                                                                            type="text" 
-                                                                            name="donor_id" 
-                                                                            id="donor_id" 
-                                                                            defaultValue={ user?.id } 
-                                                                            hidden="hidden" />
                                                                     </div>
                                                                     <div className="mb-3">
                                                                         <textarea 
@@ -721,7 +821,7 @@ export default function Show() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </span>
+                                            </span> */}
                                         </div>
 
                                         <div>
@@ -730,7 +830,7 @@ export default function Show() {
                                                     <button 
                                                         onClick={ async () => {
                                                             await destroyBookmark((post?.bookmarks?.length > 0) && post.bookmarks?.find(foundBookmark => foundBookmark?.user?.id == user?.id));
-                                                            await getPosts();
+                                                            await getCreator(params.username);
                                                         } }
                                                         className="text-decoration-none text-secondary d-flex align-items-center border-0 bg-transparent">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#820303" className="bi bi-bookmark-fill" viewBox="0 0 16 16">
@@ -740,8 +840,8 @@ export default function Show() {
                                                 :
                                                 <button 
                                                     onClick={ async () => {
-                                                        await createBookmark(user?.id, post?.id);
-                                                        await getPosts();
+                                                        await createBookmark(post?.id);
+                                                        await getCreator(params.username);
                                                     } }
                                                     className="text-decoration-none text-secondary d-flex align-items-center border-0 bg-transparent">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-bookmark"

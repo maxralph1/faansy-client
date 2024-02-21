@@ -50,11 +50,11 @@ export default function Index() {
                 <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
                     <h2 className="text-uppercase fs-5 fw-bold">Chats</h2>
                     <span className="mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-three-dots-vertical"
+                        {/* <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-three-dots-vertical"
                             viewBox="0 0 16 16">
                             <path
                                 d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                        </svg>
+                        </svg> */}
                     </span>
                 </div>
 
@@ -152,11 +152,13 @@ export default function Index() {
                           </article>
                         )})  : (chats?.data?.length < 1) ? (
                             <section className='vh-100 d-flex justify-content-center align-items-center'>
-                                <span className='h-50 text-center fw-semibold'>You currently do not have on-going chats.</span>
+                                <span className='h-50 text-center fw-semibold px-5'>You currently do not have on-going chats.</span>
                             </section>
                         ) : (
-                          <section className='vh-50 pt-5 mt-2'>
-                              <Loading />
+                          <section className='vh-100 pt-5 mt-2 px-5'>
+                              <div className='h-50 px-5'>
+                                  <Loading />
+                              </div>
                           </section>
                         )}
 

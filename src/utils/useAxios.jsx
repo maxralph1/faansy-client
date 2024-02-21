@@ -25,27 +25,38 @@ const useAxios = () => {
     });
 
     axiosInstance.interceptors.request.use(async req => {
-        const user = jwtDecode(authTokens.authorization.token);
+        const user = jwtDecode(authTokens?.authorization?.token);
         const isExpired = dayjs.unix(user.exp).diff(dayjs()) < 1;
 
         if (!isExpired) return req;
 
-        if (isExpired) navigate(route('index'))
+        // // modify this navigate before usage
+        // // if (isExpired) navigate(route('index'));
 
-        // const response = await axios.post(`${baseURL}/refresh`);
-        // console.log(response.data)
+        const response = await axios.post(`${baseURL}/refresh`);
+        console.log(response.data)
 
-        // localStorage.setItem('authTokens', JSON.stringify(response.data))
+        localStorage.setItem('authTokens', JSON.stringify(response.data))
 
-        // setAuthTokens(response.data);
-        // setUser(jwtDecode(response.data.authorization.token));
+        setAuthTokens(response.data);
+        setUser(jwtDecode(response.data.authorization.token));
 
-        // // Update user's last seen here
-        // // await ...
+        // Update user's last seen here
+        // await ...
 
-        req.headers.Authorization = `Bearer ${response.data.authorization.token}`;
+        req.headers.Authorization = `Bearer ${response?.data?.authorization?.token}`;
         return req;
     });
+
+    // axiosInstance.interceptors.response.use(response => {
+    //     return response;
+    //     }, error => {
+    //         console.log(error)
+    //         if (error?.response?.status == 401) {
+    //             navigate(route('index'));
+    //         }
+    //     return error;
+    // });
 
     return axiosInstance;
 }
