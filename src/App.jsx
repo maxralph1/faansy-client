@@ -1,5 +1,5 @@
-// import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+// import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { route } from '@/routes';
 import PrivateRoute from '@/utils/PrivateRoute.jsx';
@@ -32,7 +32,9 @@ import PrivateWalletIndex from '@/views/private/wallet/Index.jsx';
 
 import PrivateStatsIndex from '@/views/private/stats/Index.jsx';
 
+import PrivatePostShow from '@/views/private/posts/Show.jsx';
 import PrivatePostEdit from '@/views/private/posts/Edit.jsx';
+import PrivatePostRepost from '@/views/private/posts/Repost.jsx';
 import PrivatePostsIndex from '@/views/private/posts/Index.jsx';
 
 import PrivatePostCommentEdit from '@/views/private/postcomments/Edit.jsx';
@@ -40,7 +42,6 @@ import PrivatePostCommentsIndex from '@/views/private/postcomments/Index.jsx';
 
 import PrivateBookmarksIndex from '@/views/private/bookmarks/Index.jsx';
 
-import PrivateSubscriptionEdit from '@/views/private/subscriptions/Edit.jsx';
 import PrivateSubscriptionsIndex from '@/views/private/subscriptions/Index.jsx';
 
 import PrivateTipEdit from '@/views/private/tips/Edit.jsx';
@@ -52,7 +53,6 @@ import PrivateCardsIndex from '@/views/private/cards/Index.jsx';
 import PrivateChatShow from '@/views/private/chats/Show.jsx';
 import PrivateChatsIndex from '@/views/private/chats/Index.jsx';
 
-import PrivateNotificationEdit from '@/views/private/notifications/Edit.jsx';
 import PrivateNotificationsIndex from '@/views/private/notifications/Index.jsx';
 
 import MyProfile from '@/views/private/MyProfile.jsx';
@@ -64,17 +64,17 @@ import NotFound from '@/views/NotFound.jsx';
 
 function App() {
   return (
-    // <BrowserRouter>
-    <HashRouter>
+    <BrowserRouter>
+    {/* <HashRouter> */}
       <AuthProvider>
         <Routes>
           {/* Public routes */}
-          <Route element={<Index />} path={ route('index') } />
           <Route element={<CreateAccount />} path={ route('create-account') } />
           <Route element={<ResetPasswordRequest />} path={ route('reset-password-request') } />
           <Route element={<ResetPassword />} path={ route('reset-password') } />
           <Route element={<PasswordlessSigninRequest />} path={ route('passwordless-signin-request') } />
           <Route element={<PasswordlessSignin />} path={ route('passwordless-signin') } />
+          <Route element={<Index />} path={ route('index') } />
           {/* End of Public routes */}
 
           {/* Protected routes */}
@@ -98,7 +98,9 @@ function App() {
 
             <Route element={<PrivateWalletIndex />} path={ route('home.wallet.index') } />
 
+            <Route element={<PrivatePostShow />} path={ route('home.posts.show') } />
             <Route element={<PrivatePostEdit />} path={ route('home.posts.edit') } />
+            <Route element={<PrivatePostRepost />} path={ route('home.posts.repost') } />
             <Route element={<PrivatePostsIndex />} path={ route('home.posts.index') } />
 
             <Route element={<PrivatePostCommentEdit />} path={ route('home.post-comments.edit') } />
@@ -106,7 +108,6 @@ function App() {
 
             <Route element={<PrivateBookmarksIndex />} path={ route('home.bookmarks.index') } />
 
-            <Route element={<PrivateSubscriptionEdit />} path={ route('home.subscriptions.edit') } />
             <Route element={<PrivateSubscriptionsIndex />} path={ route('home.subscriptions.index') } />
 
             <Route element={<PrivateTipEdit />} path={ route('home.tips.edit') } />
@@ -118,7 +119,6 @@ function App() {
             <Route element={<PrivateChatShow />} path={ route('home.chats.show') } />
             <Route element={<PrivateChatsIndex />} path={ route('home.chats.index') } />
 
-            <Route element={<PrivateNotificationEdit />} path={ route('home.notifications.edit') } />
             <Route element={<PrivateNotificationsIndex />} path={ route('home.notifications.index') } />
 
             <Route element={<PrivateStatsIndex />} path={ route('home.stats.index') } />
@@ -133,8 +133,8 @@ function App() {
           <Route path='*' element={<NotFound />} />
         </Routes>
       </AuthProvider>
-    {/* </BrowserRouter> */}
-    </HashRouter>
+    {/* </HashRouter> */}
+    </BrowserRouter>
   )
 }
 

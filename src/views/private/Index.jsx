@@ -14,6 +14,7 @@ import { useBookmark } from '@/hooks/useBookmark.jsx';
 import { usePostcomment } from '@/hooks/usePostcomment.jsx';
 import { usePostlike } from '@/hooks/usePostlike.jsx';
 import { useTip } from '@/hooks/useTip.jsx';
+import { usePoll } from '@/hooks/usePoll.jsx';
 import Layout from '@/components/private/Layout.jsx';
 import Loading from '@/components/Loading.jsx';
 import Logo from '@/assets/images/logo.png';
@@ -23,23 +24,24 @@ import MissingImage from '@/assets/images/name_non-transparent.png';
 export default function Index() {
     const { user } = useContext(AuthContext);
     const { posts, getPosts } = usePosts();
-    const { post, createPost, destroyPost } = usePost();
+    const { post, createPost, featurePost, destroyPost } = usePost();
     const { createPostcomment, destroyPostcomment } = usePostcomment();
     const { createPostlike, destroyPostlike } = usePostlike();
     const { createTip } = useTip();
     const { createBookmark, destroyBookmark } = useBookmark();
+    const { createPoll } = usePoll();
 
+    console.log(posts)
+
+    
+    /* Post */
     const first_page = 1;
     const pageNumberForward = (posts?.meta?.current_page + 1 > posts?.meta?.last_page) ? posts?.meta?.last_page : posts?.meta?.current_page + 1;
     const pageNumberBackward = (posts?.meta?.current_page - 1 < first_page) ? first_page : posts?.meta?.current_page - 1;
-    console.log(pageNumberForward);
-    console.log(pageNumberBackward);
-
-    /* Post comment state*/
-    const [postCommentBody, setPostCommentBody] = useState();
-
+    // console.log(pageNumberForward);
+    // console.log(pageNumberBackward);
     // console.log(user);
-    console.log(posts);
+    // console.log(posts);
 
     async function submitPost(event) {
         event.preventDefault();
@@ -47,11 +49,43 @@ export default function Index() {
         const formData = new FormData();
         formData.append('body', post.data.body);
         post.data.image_url && formData.append('image_url', post.data.image_url);
-        // post.data.video_url && formData.append('video_url', post.data.video_url);
+        post.data.image_url_2 && formData.append('image_url_2', post.data.image_url_2);
+        post.data.image_url_3 && formData.append('image_url_3', post.data.image_url_3);
+        post.data.image_url_4 && formData.append('image_url_4', post.data.image_url_4);
+        post.data.video_url && formData.append('video_url', post.data.video_url);
+        post.data.scheduled_live_time && formData.append('scheduled_live_time', post.data.scheduled_live_time);
+        post.data.pay_per_view == 'on' ? formData.append('pay_per_view', 1) : formData.append('pay_per_view', 0);
+        post.data.payperviewamount && formData.append('payperviewamount', post.data.payperviewamount);
+
+        // console.log(post.data.body);
+        // console.log(post.data.image_url);
+        // console.log(post.data.image_url_2);
+        // console.log(post.data.image_url_3);
+        // console.log(post.data.image_url_4);
+        // console.log(post.data.video_url);
+        // console.log(post.data.scheduled_live_time);
+        // console.log(post.data.pay_per_view);
+        // console.log(event.pay_per_view);
+        // console.log(post.data.payperviewamount);
 
         await createPost(formData);
-        await getPosts();
+
+        post.data.body = '';
+        post.data.image_url = '';
+        post.data.image_url_2 = '';
+        post.data.image_url_3 = '';
+        post.data.image_url_4 = '';
+        post.data.video_url = '';
+        post.data.scheduled_live_time = '';
+        post.data.pay_per_view = '';
+        post.data.payperviewamount = '';
+
+        await getPosts(posts?.meta?.current_page);
     }
+    /* Post end */
+
+    /* Post comment*/
+    const [postCommentBody, setPostCommentBody] = useState();
 
     async function commentOnPost(event) {
         event.preventDefault();
@@ -61,9 +95,11 @@ export default function Index() {
 
         await createPostcomment(post_id, body);
         setPostCommentBody('');
-        await getPosts();
+        await getPosts(posts?.meta?.current_page);
     }
+    /* Post comment end */
 
+    /* Tip */
     async function sendTip(event) {
         event.preventDefault();
 
@@ -71,23 +107,49 @@ export default function Index() {
         const amount = event.target.amount.value;
 
         await createTip(recipient_id, amount);
-        await getPosts();
+        await getPosts(posts?.meta?.current_page);
     }
+    /* Tip end */
 
-    function openImageSelectWindow(){
-        document.getElementById("image_url").click();
-        console.log();
-    }
 
-    function openVideoSelectWindow(){
-        document.getElementById("video_url").click();
-        console.log();
+    /* Poll*/
+    const [questionnaire, setQuestionnaire] = useState();
+    const [closingTime, setClosingTime] = useState();
+    const [pollOption1, setPollOption1] = useState();
+    const [pollOption2, setPollOption2] = useState();
+    const [pollOption3, setPollOption3] = useState();
+    const [pollOption4, setPollOption4] = useState();
+
+    async function addPoll(event) {
+        event.preventDefault();
+
+        // console.log(questionnaire, closingTime, pollOption1, pollOption2, pollOption3, pollOption4)
+
+        const questionnaire = event.target.questionnaire.value;
+        const closingTime = event.target.closingTime.value;
+        const pollOption1 = event.target.pollOption1.value;
+        const pollOption2 = event.target.pollOption2.value;
+        const pollOption3 = event.target.pollOption3.value;
+        const pollOption4 = event.target.pollOption4.value;
+
+        await createPoll(questionnaire, closingTime, pollOption1, pollOption2, pollOption3, pollOption4);
+
+        setQuestionnaire('');
+        setClosingTime('');
+        setPollOption1('');
+        setPollOption2('');
+        setPollOption3('');
+        setPollOption4('');
+
+        await getPosts(posts?.meta?.current_page);
     }
+    /* Poll end */
+
 
     return (
         <Layout>
             {/* <section className="col-sm-10 col-md-5 card rounded-0"> */}
-            <section className="col-sm-9 col-md-5 card rounded-0 mid-body">
+            <section className="col-sm-9 col-md-5 card rounded-0 main-content">
                 <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
                     <h1 className="text-uppercase fs-5 fw-bold">Home</h1>
                     <span className="mb-2">
@@ -99,7 +161,7 @@ export default function Index() {
                     </span>
                 </div>
 
-                <div>
+                <section>
                     <div className="mb-1" id='new-post'>
                         <form onSubmit={ submitPost } encType='multipart/form-data'>
                             <textarea 
@@ -116,74 +178,64 @@ export default function Index() {
                             <div className="d-flex justify-content-between px-3 pt-2 pb-3 border-bottom">
                                 <div className='d-flex column-gap-3'>
                                     <span>
-                                        <div className="text-decoration-none text-secondary">
-                                            <input 
-                                                type="file" 
-                                                accept="image/*"
-                                                name="image_url" 
-                                                id="image_url" 
-                                                onChange={ event => post.setData({
-                                                    ...post.data,
-                                                    image_url: event.target.files[0],
-                                                }) }
-                                                hidden='hidden' />
-                                            <svg onClick={ openImageSelectWindow } xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-image" viewBox="0 0 16 16">
-                                                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                                                <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z"/>
-                                            </svg>
-                                            {/* <span>{ post.data.image_url }</span> */}
-                                        </div>
+                                        <span 
+                                            type="button"
+                                            href="#add-image" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#addImageModal" 
+                                            data-bs-whatever="addImage">
+                                            <div className="text-decoration-none text-secondary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-image" viewBox="0 0 16 16">
+                                                    <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                                                    <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z"/>
+                                                </svg>
+                                            </div>
+                                        </span>
                                     </span>
                                     <span>
-                                        <div className="text-decoration-none text-secondary">
-                                            {/* <input 
-                                                type="file" 
-                                                accept="video/*"
-                                                name="video_url" 
-                                                id="video_url" 
-                                                onChange={ event => post.setData({
-                                                    ...post.data,
-                                                    video_url: event.target.files[0],
-                                                }) }
-                                                hidden='hidden' />
-                                            <svg onClick={ openVideoSelectWindow } xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-camera-video" viewBox="0 0 16 16">
-                                                <path fillRule="evenodd" d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2zm11.5 5.175 3.5 1.556V4.269l-3.5 1.556zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"/>
-                                            </svg> */}
-                                        </div>
+                                        <span 
+                                            type="button"
+                                            href="#add-video" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#addVideoModal" 
+                                            data-bs-whatever="addVideo">
+                                            <div className="text-decoration-none text-secondary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-camera-video" viewBox="0 0 16 16">
+                                                    <path fillRule="evenodd" d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2zm11.5 5.175 3.5 1.556V4.269l-3.5 1.556zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"/>
+                                                </svg> 
+                                            </div>
+                                        </span>
+                                    </span>
+                                    <span>
+                                        <span 
+                                            type="button"
+                                            href="#add-poll" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#addPollModal" 
+                                            data-bs-whatever="addPoll">
+                                            <div className="text-decoration-none text-secondary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-clipboard-data-fill" viewBox="0 0 16 16">
+                                                    <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z"/>
+                                                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5zM10 8a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0zm-6 4a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0zm4-3a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1"/>
+                                                </svg>
+                                            </div>
+                                        </span>
                                     </span>
                                 </div>
                                 <div>
                                     <button 
                                         type='submit' 
-                                        className='btn btn-sm btn-faansy-red text-light'>Add New Post
+                                        className='btn btn-sm btn-faansy-red text-light'>Post
                                     </button>
                                 </div>
                             </div>
                         </form>
                     </div>
-
-                    {/* <section className="mb-1 border px-3 py-2 d-flex column-gap-1">
-                        <span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" className="bi bi-dark-circle"
-                                viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                <path
-                                    d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
-                            </svg>
-                        </span>
-                        <div>
-                            <p>Dear { `${user.first_name} ${user.last_name}` },</p>
-                            <p>We've updated our Privacy Policy, which can be viewed <a href={ `${ Constants.clientURL }/privacy-policy` } className="text-decoration-none text-faansy-red" target='_blank'>here</a>.</p>
-                            <p>At <span className='text-faansy-red'>Faansy</span>, we respect your privacy. We are committed to protecting your personal data and being transparent about how it is used.</p>
-                            <p>The key updates include more information about:</p>
-                            <p>- the personal data we collect, why we collect it and why we share it.</p>
-                        </div>
-                    </section> */}
                     
                     <section className="border-top">
                         {(posts?.data?.length > 0) ? posts?.data.map(post => {
                             return (
-                                <article key={ post?.id } className="card border-0 border-top border-bottom pb-3">
+                                <article key={ post?.id } className="card border-0 border-top border-bottom pb-3 rounded-0">
                                     { post.repost == true 
                                         &&                                        
                                             <div className="d-flex justify-content-between card-body">
@@ -196,11 +248,9 @@ export default function Index() {
                                                 </div>
                                 
                                                 <div className="d-flex column-gap-3">
-                                                    {/* <span className="text-body-secondary">{dayjs.utc(post.created_at).format('MMM D, YYYY HH:mm')}</span> */}
                                                     <small className="text-body-secondary">
                                                         <span>reposted</span> { dayjs.utc(post.created_at).fromNow() }
                                                     </small>
-                                                    {/* <span className="text-body-secondary">9 hours ago</span> */}
                                                     <span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
                                                             viewBox="0 0 16 16">
@@ -213,76 +263,98 @@ export default function Index() {
                                         }
                                     <div className={ `card-body ${ post.repost == true && 'px-5' }` }>
                                         <div className="d-flex justify-content-between mb-3">
-                                            {/* <div className="d-flex justify-content-start align-items-center column-gap-2"> */}
-                                                <Link 
-                                                    to={ route('home.users.show', {'username': post.user.username})}
-                                                    className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
-                                                    <div className="rounded-circle">
-                                                        <img src={ post.user.user_image_url ? `${ Constants.serverURL }/${ post.user.user_image_url }` : Logo } alt="" width="65" />
-                                                    </div>
-                                                    <div className="d-flex flex-column">
-                                                        <h3 className="card-title fs-5 text-dark">
-                                                            <span>{ `${ post.user.first_name } ${ post.user.last_name }` }</span>
-                                                            { post.user.verified == true
-                                                                && 
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                                                className="bi bi-patch-check mb-1" viewBox="0 0 16 16">
-                                                                <path fillRule="evenodd"
-                                                                    d="M10.354 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708 0" />
-                                                                <path
-                                                                    d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z" />
-                                                            </svg>
-                                                            }
-                                                        </h3>
-                                                        <span className="text-body-secondary">@{ post.user.username }</span>
-                                                    </div>
-                                                </Link>
-                                            {/* </div> */}
+                                            <Link 
+                                                to={ route('home.users.show', {'username': post.user.username})}
+                                                className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
+                                                <div className="rounded-circle">
+                                                    <img src={ post.user.user_image_url ? `${ Constants.serverURL }/storage/${ post.user.user_image_url }` : Logo } alt="" width="65" />
+                                                </div>
+                                                <div className="d-flex flex-column">
+                                                    <h3 className="card-title fs-6 text-dark">
+                                                        <span>{ `${ post.user.first_name } ${ post.user.last_name }` }</span>
+                                                        { post.user.verified == true
+                                                            && 
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                                            className="bi bi-patch-check mb-1" viewBox="0 0 16 16">
+                                                            <path fillRule="evenodd"
+                                                                d="M10.354 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708 0" />
+                                                            <path
+                                                                d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z" />
+                                                        </svg>
+                                                        }
+                                                    </h3>
+                                                    <span className="text-body-secondary">@{ post.user.username }</span>
+                                                </div>
+                                            </Link>
                             
                                             <div className="d-flex column-gap-3">
-                                                {/* <span className="text-body-secondary">{dayjs.utc(post.created_at).format('MMM D, YYYY HH:mm')}</span> */}
                                                 <span className="text-body-secondary">
                                                     { post.repost_original_post_timestamp != null 
                                                         ? dayjs.utc(post.repost_original_post_timestamp).fromNow() 
                                                         : dayjs.utc(post.created_at).fromNow()}
                                                 </span>
-                                                {/* <span className="text-body-secondary">9 hours ago</span> */}
-
-                                                { post?.user?.id == user?.id && 
-                                                    <span className='mb-1 dropstart z-3'>
+                                                    <span className='mb-1 dropstart z-1'>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
                                                             viewBox="0 0 16 16" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <path
                                                                 d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
                                                         </svg>
                                                         <ul className="dropdown-menu">
-                                                            <li>
-                                                                <Link 
-                                                                    to={ route('home.posts.edit', { id: post.id})}
-                                                                    className="dropdown-item fw-bold" 
-                                                                    href="#edit-post"><small>Edit Post</small>
-                                                                </Link>
-                                                            </li>
-                                                            <li>
+                                                            { ((user.role.title == 'super-admin') || (user.role.title == 'admin')) &&
                                                                 <button 
                                                                     onClick={ async () => {
-                                                                        await destroyPost(post);
+                                                                        await featurePost(post);
                                                                         await getPosts(posts?.meta?.current_page);
                                                                     } }
                                                                     type='button' 
-                                                                    className="dropdown-item fw-bold text-secondary" href="#delete-post"><small>Delete Post</small>
+                                                                    className="dropdown-item fw-bold" href="#make-post-featured"><small>Make Post Featured</small>
                                                                 </button>
-                                                            </li>
+                                                            }
+                                                            { ((post?.payperviewamount <= 0)) &&
+                                                                <li>
+                                                                    <Link 
+                                                                        to={ route('home.posts.show', { id: post.id})}
+                                                                        className="dropdown-item fw-bold" 
+                                                                        href="#show-post"><small>View Post</small>
+                                                                    </Link>
+                                                                </li>
+                                                            }
+                                                            { post?.user?.id == user?.id && 
+                                                                <>
+                                                                    <li>
+                                                                        <Link 
+                                                                            to={ route('home.posts.repost', { id: post.id})}
+                                                                            className="dropdown-item fw-bold" 
+                                                                            href="#repost-post"><small>Repost</small>
+                                                                        </Link>
+                                                                    </li>
+                                                                    <li>
+                                                                        <Link 
+                                                                            to={ route('home.posts.edit', { id: post.id})}
+                                                                            className="dropdown-item fw-bold" 
+                                                                            href="#edit-post"><small>Edit Post</small>
+                                                                        </Link>
+                                                                    </li>
+                                                                    <li>
+                                                                        <button 
+                                                                            onClick={ async () => {
+                                                                                await destroyPost(post);
+                                                                                await getPosts(posts?.meta?.current_page);
+                                                                            } }
+                                                                            type='button' 
+                                                                            className="dropdown-item fw-bold text-secondary" href="#delete-post"><small>Delete Post</small>
+                                                                        </button>
+                                                                    </li>
+                                                                </>
+                                                            }
                                                         </ul>
                                                     </span>
-                                                }
-
                                             </div>
                                         </div>
                             
                                         <p className="card-text">{ post.body }</p>
-                                        <p>
-                                            {/* {
+                                        {/* <p>
+                                            {
                                                 function replaceAts() {
                                                 var replacer = function(match) {
                                                     var id = match.substr(1);
@@ -298,94 +370,74 @@ export default function Index() {
                                                 replaceAts();
 
                                                 console.log(list);
-                                            } */}
-                                        </p>
+                                            }
+                                        </p> */}
                                         {/* <span><a href="" className="text-decoration-none text-faansy-red">onlyfans.com/natalie.brooks</a> / <a href="" className="text-decoration-none text-faansy-red">onlyfans.com/natalie.brooks</a></span> */}
                                     </div>
 
-                                    { (post.pay_per_view == false) 
+                                    { (post?.payperviewamount <= 0) 
                                         ?
                                             <>
-                                            {/* <video controls width="250" className="card-img-bottom rounded-0" alt="video title">
-                                                <source src="/media/cc0-videos/flower.webm" type="video/webm" />
-                                                <source src="../videos/spicy_tofu(720p).mp4" type="video/mp4" />
-                                                Download the
-                                                <a href="/media/cc0-videos/flower.webm">WEBM</a>
-                                                or
-                                                <a href="../videos/spicy_tofu(720p).mp4">MP4</a>
-                                                video.
-                                            </video> */}
-                                            <img src={ post.image_url ? `${ Constants.serverURL }/storage/${post.image_url}` : MissingImage } className="card-img-bottom rounded-0" alt={ post.body } />
+                                                { post?.video?.video_url?.length > 0 && 
+                                                    <video controls width="250" height={400} className="card-img-bottom object-fit-cover rounded-0 mb-1" alt={ post?.id }>
+                                                        <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/webm" />
+                                                        <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/mp4" />
+                                                        Download the
+                                                        <a href={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` }>video</a>.
+                                                    </video> 
+                                                }
+                                                <div id={`carouselIndicators${ post?.id }`} className="carousel slide pb-3">
+                                                    <div className="carousel-indicators">
+                                                        { post?.images?.length > 0 && post?.images?.map((image, index) => {
+                                                            return (
+                                                                <button key={index} type="button" data-bs-target={`carouselIndicators${ image?.id }`} data-bs-slide-to={index} className="active" aria-current="true" aria-label={ `Slide` + (index+1) }></button>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                    <div className="carousel-inner">
+                                                        { post?.images?.length > 0 && post?.images?.map((image, index) => {
+                                                                if (index == 0) {
+                                                                    return (
+                                                                        <div key={ image.id } className={`carousel-item active`}>
+                                                                            <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
+                                                                        </div>
+                                                                    )
+                                                                }
+
+                                                                return (
+                                                                    <div key={ image.id } className={`carousel-item`}>
+                                                                        <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
+                                                    { post?.images?.length > 1 && 
+                                                        <>
+                                                            <button className="carousel-control-prev" type="button" data-bs-target={`#carouselIndicators${ post?.id }`} data-bs-slide="prev">
+                                                                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                                <span className="visually-hidden">Previous</span>
+                                                            </button>
+                                                            <button className="carousel-control-next" type="button" data-bs-target={`#carouselIndicators${ post?.id }`} data-bs-slide="next">
+                                                                <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                                                                <span className="visually-hidden">Next</span>
+                                                            </button>
+                                                        </>
+                                                    }
+                                                </div>
                                             </>
                                         : 
-                                            <span className="card-img-bottom rounded d-flex justify-content-center align-items-center">
-                                                <button className='btn btn-faansy-red text-light'>View Content (Pay-Per-View (${ post.pay_per_view_amount }))</button>
+                                            <span className="card-img-bottom rounded d-flex justify-content-center align-items-center pb-3">
+                                                <Link 
+                                                    to={ route('home.posts.show', { 'id': post?.id})}
+                                                    className='btn btn-faansy-red text-light'>
+                                                        View Content (Pay-Per-View { (user?.id == post?.user?.id) ? '— Owner (free)' : `($` + (post?.payperviewamount).toFixed(2) + `)`})
+                                                </Link>
                                             </span>
                                     }
 
-                                    <section className="card-body row px-4 column-gap-4 row-gap-3">
-                                        {/* <article className="card col-md text-bg-dark border-0 rounded">
-                                            <img src="../images/background.jpeg" className="card-img object-fit-cover" style={{ maxHeight: '125px' }} alt="..." />
-                                            <div className="card-img-overlay">
-                                                <div className="d-flex justify-content-between align-items-start px-2 pt-2 h-50">
-                                                    <span className="bg-secondary opacity-50 px-1 rounded z-2"><small>Free</small></span>
-                                                    <span className="mb-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                                            className="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-                                                            <path
-                                                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                                                        </svg>
-                                                    </span>
-                                                </div>
-                                        
-                                                <div className="d-flex column-gap-3 px-2 pb-3 h-50" style={{ background: '#256d7c26' }}>
-                                                    <div className="d-flex align-items-end">
-                                                        <img src="../images/photo.jpeg" alt="" width="70" height="70"
-                                                            className="z-1 object-fit-cover border border-light border-3 rounded-circle" />
-                                                        <span className="z-2 bg-success p-1 border border-light border-1 rounded-circle"
-                                                            style={{ width: '10px', height: '10px', marginLeft: '-17px', marginBottom: '5px' }}></span>
-                                                    </div>
-                                                    <div className="text-light d-flex flex-column justify-content-center">
-                                                        <h4 className="fs-6">Raylan</h4>
-                                                        <span style={{ marginTop: '-14px' }}><small>@goalgoddess</small></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </article>
-                                        <article className="card col-md text-bg-dark border-0 rounded">
-                                            <img src="../images/background.jpeg" className="card-img object-fit-cover" style={{ maxHeight: '125px' }} alt="..." />
-                                            <div className="card-img-overlay">
-                                                <div className="d-flex justify-content-between align-items-start px-2 pt-2 h-50">
-                                                    <span className="bg-secondary opacity-50 px-1 rounded z-2"><small>Free</small></span>
-                                                    <span className="mb-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                                            className="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-                                                            <path
-                                                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                                                        </svg>
-                                                    </span>
-                                                </div>
-                                        
-                                                <div className="d-flex column-gap-3 px-2 pb-3 h-50" style={{ background: '#256d7c26' }}>
-                                                    <div className="d-flex align-items-end">
-                                                        <img src="../images/photo.jpeg" alt="" width="70" height="70"
-                                                            className="z-1 object-fit-cover border border-light border-3 rounded-circle" />
-                                                        <span className="z-2 bg-success p-1 border border-light border-1 rounded-circle"
-                                                            style={{ width: '10px', height: '10px', marginLeft: '-17px', marginBottom: '5px' }}></span>
-                                                    </div>
-                                                    <div className="text-light d-flex flex-column justify-content-center">
-                                                        <h4 className="fs-6">Raylan</h4>
-                                                        <span style={{ marginTop: '-14px' }}><small>@goalgoddess</small></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </article> */}
-                                    </section>
-
                                     <section className="px-2 d-flex justify-content-between align-items-center">
-
                                         <div className="mb-2 d-flex justify-content-start align-items-center column-gap-3">
-
                                             <span className='like-section'>
                                                 {(post?.likes?.length > 0) && post.likes?.find(foundLike => foundLike?.user?.id == user?.id)
                                                     ? 
@@ -722,7 +774,363 @@ export default function Index() {
                             </div>
                         }
                     </div>
-                </div>
+                </section>
+
+                <section className='modal-section'>
+                    <div 
+                        className="modal fade add-image" 
+                        id="addImageModal" 
+                        tabIndex="-1" 
+                        aria-labelledby="addImageModalLabel" 
+                        aria-hidden="true">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="addImageModalLabel">Add Image Post</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div className="modal-body">
+                                    <form onSubmit={ submitPost } encType='multipart/form-data'>
+                                        <div className="mb-3 d-flex flex-column row-gap-2">
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*"
+                                                        name="image_url" 
+                                                        id="image_url" 
+                                                        className='form-control' 
+                                                        onChange={ event => post.setData({
+                                                            ...post.data,
+                                                            image_url: event.target.files[0],
+                                                        }) } />
+                                                </div>
+                                                <small style={{ marginTop: '-10px' }}><small>*Upload image</small></small>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*"
+                                                        name="image_url_2" 
+                                                        id="image_url_2" 
+                                                        className='form-control'
+                                                        onChange={ event => post.setData({
+                                                            ...post.data,
+                                                            image_url_2: event.target.files[0],
+                                                        }) } />
+                                                </div>
+                                                <small style={{ marginTop: '-10px' }}><small>*Upload image</small></small>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*"
+                                                        name="image_url_3" 
+                                                        id="image_url_3" 
+                                                        className='form-control' 
+                                                        onChange={ event => post.setData({
+                                                            ...post.data,
+                                                            image_url_3: event.target.files[0],
+                                                        }) } />
+                                                </div>
+                                                <small style={{ marginTop: '-10px' }}><small>*Upload image</small></small>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*"
+                                                        name="image_url_4" 
+                                                        id="image_url_4" 
+                                                        className='form-control' 
+                                                        onChange={ event => post.setData({
+                                                            ...post.data,
+                                                            image_url_4: event.target.files[0],
+                                                        }) } />
+                                                </div>
+                                                <small style={{ marginTop: '-10px' }}><small>*Upload image</small></small>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <textarea 
+                                                        name="body" 
+                                                        id="body" 
+                                                        value={ post.data.body ?? '' }
+                                                        onChange={ event => post.setData({
+                                                            ...post.data,
+                                                            body: event.target.value,
+                                                        }) }
+                                                        className="form-control" 
+                                                        rows="3" 
+                                                        placeholder="Compose new post ..." 
+                                                        required></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className='row row-gap-2 d-flex justify-content-end border-top pt-3'>
+                                            <div className='col-6'>
+                                                <input 
+                                                    type="datetime-local" 
+                                                    name="scheduled_live_time" 
+                                                    id="scheduled_live_time" 
+                                                    value={ post.data.scheduled_live_time ?? '' }
+                                                    className='form-control'
+                                                    onChange={ event => post.setData({
+                                                        ...post.data,
+                                                        scheduled_live_time: event.target.value,
+                                                    }) } />
+                                            </div>
+                                            <small className='text-end' style={{ marginTop: '-10px' }}><small>*Scheduled up time (if applicable)</small></small>
+                                        </div>
+
+                                        <div className='row row-gap-2 d-flex align-items-center pt-2'>
+                                            <div className='col-md'>
+                                                <div className="form-check form-switch">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        name="pay_per_view" 
+                                                        id="pay_per_view" 
+                                                        // value={ post.data.pay_per_view ?? '' }
+                                                        className="form-check-input" 
+                                                        onChange={ event => post.setData({
+                                                            ...post.data,
+                                                            pay_per_view: event.target.value,
+                                                        }) } 
+                                                        role="switch" />
+                                                    <small className="form-check-label" htmlFor="pay_per_view">Make Pay-Per-View</small>
+                                                </div>
+                                            </div>
+                                            <div className='col-md'>
+                                                <input 
+                                                    type="text" 
+                                                    name="payperviewamount" 
+                                                    id="payperviewamount" 
+                                                    value={ post.data.payperviewamount ?? '' }
+                                                    className='form-control' 
+                                                    onChange={ event => post.setData({
+                                                        ...post.data,
+                                                        payperviewamount: event.target.value,
+                                                    }) } 
+                                                    placeholder='PPV Amount (USD)' />
+                                            </div>
+                                        </div>
+
+                                        <hr />
+
+                                        <div className="pe-0 me-0 d-flex justify-content-end">
+                                            <button type="submit" className="btn btn-sm btn-faansy-red text-light">Post</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div 
+                        className="modal fade add-video" 
+                        id="addVideoModal" 
+                        tabIndex="-1" 
+                        aria-labelledby="addVideoModalLabel" 
+                        aria-hidden="true">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="addVideoModalLabel">Add Video Post</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div className="modal-body">
+                                    <form onSubmit={ submitPost } encType='multipart/form-data'>
+                                        <div className="mb-3 d-flex flex-column row-gap-2">
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="video/*"
+                                                        name="video_url" 
+                                                        id="video_url" 
+                                                        className='form-control'
+                                                        default={ post.data.video_url ?? '' }
+                                                        onChange={ event => post.setData({
+                                                            ...post.data,
+                                                            video_url: event.target.files[0],
+                                                        }) } />
+                                                </div>
+                                                <small style={{ marginTop: '-10px' }}><small>*Upload video</small></small>
+                                            </div>
+
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <textarea 
+                                                        name="body" 
+                                                        id="body" 
+                                                        value={ post.data.body ?? '' }
+                                                        onChange={ event => post.setData({
+                                                            ...post.data,
+                                                            body: event.target.value,
+                                                        }) }
+                                                        className="form-control" 
+                                                        rows="3" 
+                                                        placeholder="Compose new post ..." 
+                                                        required></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className='row row-gap-2 d-flex justify-content-end border-top pt-3'>
+                                            <div className='col-6'>
+                                                <input 
+                                                    type="datetime-local" 
+                                                    name="scheduled_live_time" 
+                                                    id="scheduled_live_time" 
+                                                    value={ post.data.scheduled_live_time ?? '' }
+                                                    className='form-control'
+                                                    onChange={ event => post.setData({
+                                                        ...post.data,
+                                                        scheduled_live_time: event.target.value,
+                                                    }) } />
+                                            </div>
+                                            <small className='text-end' style={{ marginTop: '-10px' }}><small>*Scheduled up time (if applicable)</small></small>
+                                        </div>
+
+                                        <div className='row row-gap-2 d-flex align-items-center pt-2'>
+                                            <div className='col-md'>
+                                                <div className="form-check form-switch">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        name="pay_per_view" 
+                                                        id="pay_per_view" 
+                                                        // value={ post.data.pay_per_view ?? '' }
+                                                        className="form-check-input" 
+                                                        onChange={ event => post.setData({
+                                                            ...post.data,
+                                                            pay_per_view: event.target.value,
+                                                        }) } 
+                                                        role="switch" />
+                                                    <small className="form-check-label" htmlFor="pay_per_view">Make Pay-Per-View</small>
+                                                </div>
+                                            </div>
+                                            <div className='col-md'>
+                                                <input 
+                                                    type="text" 
+                                                    name="payperviewamount" 
+                                                    id="payperviewamount" 
+                                                    value={ post.data.payperviewamount ?? '' }
+                                                    className='form-control' 
+                                                    onChange={ event => post.setData({
+                                                        ...post.data,
+                                                        payperviewamount: event.target.value,
+                                                    }) } 
+                                                    placeholder='PPV Amount (USD)' />
+                                            </div>
+                                        </div>
+
+                                        <hr />
+
+                                        <div className="pe-0 me-0 d-flex justify-content-end">
+                                            <button type="submit" className="btn btn-sm btn-faansy-red text-light">Post</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div 
+                        className="modal fade add-poll" 
+                        id="addPollModal" 
+                        tabIndex="-1" 
+                        aria-labelledby="addPollModalLabel" 
+                        aria-hidden="true">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="addPollModalLabel">Add Poll</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div className="modal-body">
+                                    <form onSubmit={ addPoll }>
+                                        <div className="mb-3 d-flex flex-column row-gap-2">
+                                            <section className="d-flex flex-column row-gap-2">
+                                                <textarea 
+                                                    type="text" 
+                                                    name="questionnaire" 
+                                                    id="questionnaire" 
+                                                    className='form-control'
+                                                    value={ questionnaire } 
+                                                    onChange={e => setQuestionnaire(e.target.value)}
+                                                    placeholder="Questionnaire" 
+                                                    required >
+                                                </textarea>
+                                                <input 
+                                                    type="datetime-local" 
+                                                    name="closingTime" 
+                                                    id="closingTime" 
+                                                    className='form-control w-50 align-self-end'
+                                                    value={ closingTime } 
+                                                    onChange={e => setClosingTime(e.target.value)}
+                                                    placeholder="Poll Option 1" 
+                                                    required />
+                                                    <small className='text-end' style={{ marginTop: '-10px' }}><small>*Closing time (if applicable)</small></small>
+                                            </section>
+
+                                            <hr />
+
+                                            <section className="mb-3 d-flex flex-column row-gap-2">
+                                                <input 
+                                                    type="text" 
+                                                    name="pollOption1" 
+                                                    id="pollOption1" 
+                                                    className='form-control'
+                                                    value={ pollOption1 } 
+                                                    onChange={e => setPollOption1(e.target.value)}
+                                                    placeholder="Poll Option 1" 
+                                                    required />
+                                                <input 
+                                                    type="text" 
+                                                    name="pollOption2" 
+                                                    id="pollOption2" 
+                                                    className='form-control'
+                                                    value={ pollOption2 } 
+                                                    onChange={e => setPollOption2(e.target.value)}
+                                                    placeholder="Poll Option 2" 
+                                                    required />
+                                                <input 
+                                                    type="text" 
+                                                    name="pollOption3" 
+                                                    id="pollOption3" 
+                                                    className='form-control'
+                                                    value={ pollOption3 } 
+                                                    onChange={e => setPollOption3(e.target.value)}
+                                                    placeholder="Poll Option 3 (if applicable)" />
+                                                <input 
+                                                    type="text" 
+                                                    name="pollOption4" 
+                                                    id="pollOption4" 
+                                                    className='form-control'
+                                                    value={ pollOption4 } 
+                                                    onChange={e => setPollOption4(e.target.value)}
+                                                    placeholder="Poll Option 4 (if applicable)" />
+                                            </section>
+                                        </div>
+
+                                        <hr />
+
+                                        <div className='d-flex justify-content-end'>
+                                            <button type="submit" className="btn btn-sm btn-faansy-red text-light">Add Poll</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </section>
         </Layout>
     )

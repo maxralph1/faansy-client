@@ -229,6 +229,46 @@ a:hover {
 
 
 
+@media screen and (max-width: 600px) {
+    .sidenav {
+        display: none;
+        padding-inline: 0 !important;
+    }
+
+    .mobile-nav {
+        display: flex;
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        min-width: 300px;
+        z-index: 999 !important;
+    }
+
+    .additional-mobile-nav {
+        max-height: 85vh;
+        display: block;
+        position: fixed;
+        top: 4rem;
+        right: 1rem;
+    }
+
+    .main-content {
+        width: 100vw;
+        min-width: 300px;
+        padding-bottom: 2.45rem;
+    }
+}
+
+
+@media screen and (min-width: 601px) {
+    .mobile-nav {
+        display: none;
+        z-index: -999 !important;
+    }
+}
+
+
 
 
 

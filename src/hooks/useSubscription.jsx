@@ -30,13 +30,13 @@ export function useSubscription(id = null) {
         console.log(subscribed_id)
         return axiosInstance.post('subscriptions', {subscribed_id})
             .then(() => {
-                swal.fire({
-                    text: 'Subscribed',
-                    color: "#820303",
-                    width: 200,
-                    position: 'top',
-                    showConfirmButton: false,
-                });
+                // swal.fire({
+                //     text: 'Subscribed',
+                //     color: "#820303",
+                //     width: 200,
+                //     position: 'top',
+                //     showConfirmButton: false,
+                // });
             })
             .catch(error => {
                 // console.log(error.response);

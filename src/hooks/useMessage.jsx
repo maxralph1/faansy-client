@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import Constants from '@/utils/Constants.jsx';
 import { useNavigate } from 'react-router-dom';
 import { route } from '@/routes';
-import axios from 'axios';
 import useAxios from '@/utils/useAxios.jsx';
 import swal from 'sweetalert2';
 
@@ -39,6 +37,7 @@ export function useMessage(id = null) {
                 });
             })
             .catch(error => {
+                console.log(error);
                 console.log(error.response);
                 // console.log(error.response.data.errors);
                 setErrors(error.response);
@@ -50,13 +49,13 @@ export function useMessage(id = null) {
             .finally(() => setLoading(false));
     }
 
-    async function createMessage(body, chat_id, user_id) {
+    async function createMessage(message) {
         setLoading(true);
         setErrors({});
 
-        console.log(body, chat_id, user_id)
-        return axiosInstance.post('messages', {body, chat_id, user_id})
-            .then((response) => {console.log(response)})
+        console.log(message)
+        return axiosInstance.postForm('messages', message)
+            .then(() => {})
             .catch(error => {
                 console.log(error.response);
                 // console.log(error.response.data.errors);
@@ -72,9 +71,9 @@ export function useMessage(id = null) {
     async function getMessage(id, { signal } = {}) {
         setLoading(true);
 
-        return axios.get(`${ Constants.serverURL }/api/messages/${id}`, { signal })
+        return axiosInstance.get(`messages/${id}`, { signal })
             .then(response => setData(response.data))
-            .catch(() => {})
+            .catch((error) => {console.log(error)})
             .finally(() => setLoading(false));
     }
 

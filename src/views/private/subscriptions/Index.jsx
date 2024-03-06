@@ -23,7 +23,7 @@ export default function Index() {
 
   return (
     <Layout>
-        <section className="col-sm-10 col-md-5 card rounded-0">
+        <section className="col-sm-10 col-md-5 card rounded-0 main-content">
             <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
                 <h2 className="text-uppercase fs-5 fw-bold">Subscriptions</h2>
                 <span className="mb-2">
@@ -40,10 +40,10 @@ export default function Index() {
                     <div className="card-body d-flex justify-content-end">
                         <div className='d-flex flex-column align-items-end'>
                             <span className='d-flex align-items-center column-gap-1'>
-                                <span className='fs-5'><span className='fw-bold text-dark'>{ subscriptions?.data?.filter((subscription => subscription.subscriber.id != user.id)).length }</span>&nbsp;subscribers</span>
+                                <span className='fs-5'><span className='fw-bold text-dark'>{ subscriptions?.data?.filter((subscription => subscription.subscriber.id != user.id)).length }</span>&nbsp;{ (subscriptions?.data?.filter((subscription => subscription.subscriber.id != user.id)).length <= 1) ? 'subscriber' : 'subscribers' }</span>
                             </span>
                             <span className='d-flex align-items-center column-gap-1'>
-                                <span className='fs-5'><span className='fw-bold text-dark'>{ subscriptions?.data?.filter((subscription => subscription?.subscriber.id == user.id)).length }</span>&nbsp;subscriptions</span>
+                                <span className='fs-5'><span className='fw-bold text-dark'>{ subscriptions?.data?.filter((subscription => subscription?.subscriber.id == user.id)).length }</span>&nbsp;{ (subscriptions?.data?.filter((subscription => subscription?.subscriber.id == user.id)).length <= 1) ? 'subscription' : 'subscriptions' }</span>
                             </span>
                         </div>
                     </div>
@@ -54,10 +54,10 @@ export default function Index() {
 
                         <ul className="nav nav-tabs d-flex justify-content-between" id="myTab" role="tablist">
                             <li className="nav-item" role="presentation">
-                                <button className={ `nav-link ${ (user.role.title == 'creator') && 'active'}` } id="subscribers-tab" data-bs-toggle="tab" data-bs-target="#subscribers-tab-pane" type="button" role="tab" aria-controls="subscribers-tab-pane" aria-selected="false">Subscribers</button>
+                                <button className={ `nav-link rounded-0 ${ (user.role.title == 'creator') && 'active'}` } id="subscribers-tab" data-bs-toggle="tab" data-bs-target="#subscribers-tab-pane" type="button" role="tab" aria-controls="subscribers-tab-pane" aria-selected="false">Subscribers</button>
                             </li>
                             <li className="nav-item" role="presentation">
-                                <button className={ `nav-link ${ (user.role.title != 'creator') && 'active'}` } id="subscribed-tab" data-bs-toggle="tab" data-bs-target="#subscribed-tab-pane" type="button" role="tab" aria-controls="subscribed-tab-pane" aria-selected="true">Subscriptions</button>
+                                <button className={ `nav-link rounded-0 ${ (user.role.title != 'creator') && 'active'}` } id="subscribed-tab" data-bs-toggle="tab" data-bs-target="#subscribed-tab-pane" type="button" role="tab" aria-controls="subscribed-tab-pane" aria-selected="true">Subscriptions</button>
                             </li>
                         </ul>
                         <div className="tab-content" id="myTabContent">
@@ -68,7 +68,7 @@ export default function Index() {
                                             <article key={ subscription.id } className="card text-bg-dark rounded-0 my-3">
                                                 <Link to={ route('home.users.show', { username: subscription?.subscriber?.username }) }>
                                                 <div>
-                                                    <img src={ subscription?.subscriber?.user_image_url ? `${ Constants.serverURL }/storage/${subscription?.subscriber?.user_image_url}` : MissingUserBackgroundImage } className="card-img object-fit-cover rounded-0" style={{ maxHeight: '125px' }} alt="..." />
+                                                    <img src={ subscription?.subscriber?.user_background_image_url ? `${ Constants.serverURL }/storage/${subscription?.subscriber?.user_background_image_url}` : MissingUserBackgroundImage } className="card-img object-fit-cover rounded-0" style={{ maxHeight: '125px' }} alt="..." />
                                                     <div className="card-img-overlay">
                                                         <div className="d-flex justify-content-end align-items-start px-2 pt-2 h-50">
                                                             {/* <span className="bg-secondary text-light opacity-75 px-1 rounded z-2" style={{ boxShadow: '3px 3px 5px #000000', textShadow: '7px 7px 10px #000000' }}><small>{ subscription?.subscriber?.free_subscription == true ? 'Free' : 'Paid' }</small></span> */}
@@ -129,7 +129,7 @@ export default function Index() {
                                             <article key={ subscription.id } className="card text-bg-dark border-0 rounded-0 my-3">
                                                 <Link to={ route('home.users.show', { username: subscription?.subscribed?.username }) }>
                                                 <div>
-                                                    <img src={ subscription?.subscribed?.user_image_url ? `${ Constants.serverURL }/storage/${subscription?.subscribed?.user_image_url}` : MissingUserBackgroundImage } className="card-img object-fit-cover rounded-0" style={{ maxHeight: '125px' }} alt="..." />
+                                                    <img src={ subscription?.subscribed?.user_background_image_url ? `${ Constants.serverURL }/storage/${subscription?.subscribed?.user_background_image_url}` : MissingUserBackgroundImage } className="card-img object-fit-cover rounded-0" style={{ maxHeight: '125px' }} alt="..." />
                                                     <div className="card-img-overlay">
                                                         <div className="d-flex justify-content-end align-items-start px-2 pt-2 h-50">
                                                             {/* <span className="bg-secondary text-light opacity-75 px-1 rounded z-2" style={{ boxShadow: '3px 3px 5px #000000', textShadow: '7px 7px 10px #000000' }}><small>{ subscription?.subscribed?.free_subscription == true ? 'Free' : 'Paid' }</small></span> */}

@@ -3,7 +3,8 @@ import Constants from '@/utils/Constants.jsx';
 import { useNavigate } from 'react-router-dom';
 import { route } from '@/routes';
 import axios from 'axios'
-import useAxios from '@/utils/useAxios'
+import useAxios from '@/utils/useAxios.jsx';
+import swal from 'sweetalert2';
 
 
 export function usePoll(id = null) {
@@ -36,6 +37,15 @@ export function usePoll(id = null) {
 
                 if (error.response.status == 401) {
                     navigate(route('index'))
+                }
+                if (error?.response?.status == 403) {
+                    swal.fire({
+                        text: 'You must be a creator before you can add polls',
+                        color: "#820303",
+                        width: 350,
+                        position: 'top',
+                        showConfirmButton: false,
+                    });
                 }
             })
             .finally(() => setLoading(false));

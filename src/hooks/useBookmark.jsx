@@ -29,13 +29,13 @@ export function useBookmark(id = null) {
         console.log(post_id)
         return axiosInstance.post('bookmarks', {post_id})
             .then(() => {
-                swal.fire({
-                    text: 'Post bookmarked',
-                    color: "#820303",
-                    width: 250,
-                    position: 'top',
-                    showConfirmButton: false,
-                });
+                // swal.fire({
+                //     text: 'Post bookmarked',
+                //     color: "#820303",
+                //     width: 250,
+                //     position: 'top',
+                //     showConfirmButton: false,
+                // });
             })
             .catch(error => {
                 // console.log(error.response);
@@ -61,13 +61,13 @@ export function useBookmark(id = null) {
     async function destroyBookmark(bookmark) {
         return axiosInstance.delete(`bookmarks/${bookmark.id}`)
             .then(() => {
-                swal.fire({
-                    text: 'Bookmark removed',
-                    color: "#820303",
-                    width: 250,
-                    position: 'top',
-                    showConfirmButton: false,
-                });
+                // swal.fire({
+                //     text: 'Bookmark removed',
+                //     color: "#820303",
+                //     width: 250,
+                //     position: 'top',
+                //     showConfirmButton: false,
+                // });
             })
             .catch(error => {
                 // console.log(error);

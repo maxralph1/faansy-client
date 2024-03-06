@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import Constants from '@/utils/Constants.jsx';
 import { useNavigate } from 'react-router-dom';
 import { route } from '@/routes';
-import axios from 'axios'
-import useAxios from '@/utils/useAxios'
+import axios from 'axios';
+import useAxios from '@/utils/useAxios.jsx';
+import swal from 'sweetalert2';
 
 
 export function useCreator(username = null) {
@@ -62,13 +63,22 @@ export function useCreator(username = null) {
         setLoading(true);
         setErrors({});
 
-        return axiosInstance.put(`creators/${creator.username}`, creator)
-            .then(() => navigate(route('home.index')))
+        return axiosInstance.postForm(`creators/${username}/update`, creator)
+            .then(() => {})
             .catch(error => {
                 console.log(error);
                 setErrors(error.response);
                 if (error?.response?.status == 401) {
                     navigate(route('index'))
+                }
+                if (error?.response?.status == 403) {
+                    swal.fire({
+                        text: 'You can only update your details.',
+                        color: "#820303",
+                        width: 350,
+                        position: 'top',
+                        showConfirmButton: false,
+                    });
                 }
             })
             .finally(() => setLoading(false));

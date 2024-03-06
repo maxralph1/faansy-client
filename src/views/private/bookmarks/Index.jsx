@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { route } from '@/routes';
 import Constants from '@/utils/Constants.jsx';
 import { usePosts } from '@/hooks/usePosts.jsx';
+import { usePost } from '@/hooks/usePost.jsx';
 import { usePostcomment } from '@/hooks/usePostcomment.jsx';
 import { usePostlike } from '@/hooks/usePostlike.jsx';
 import { useBookmarks } from '@/hooks/useBookmarks.jsx';
@@ -16,17 +17,16 @@ import Layout from '@/components/private/Layout.jsx';
 import Loading from '@/components/Loading.jsx';
 import Logo from '@/assets/images/logo.png';
 import MissingImage from '@/assets/images/name_non-transparent.png';
-// import MissingUserBackgroundImage from '@/assets/images/logo_non_transparent.png';
-// import MissingUserImage from '@/assets/images/faansy_icon_non_transparent.png';
 
 export default function Index() {
   const { user } = useContext(AuthContext);
-  const { posts, getPosts } = usePosts();
-  const { postcomment, createPostcomment, destroyPostcomment } = usePostcomment();
-  const { postlike, createPostlike, destroyPostlike } = usePostlike();
-  const { tip, createTip, destroyTip } = useTip();
+  const { getPosts } = usePosts();
+  const { featurePost, destroyPost } = usePost();
+  const { createPostcomment } = usePostcomment();
+  const { createPostlike, destroyPostlike } = usePostlike();
+  const { createTip } = useTip();
   const { bookmarks, getBookmarks } = useBookmarks();
-  const { bookmark, destroyBookmark } = useBookmark();
+  const { destroyBookmark } = useBookmark();
 
   /* Post comment state*/
   const [postCommentBody, setPostCommentBody] = useState();
@@ -53,12 +53,12 @@ export default function Index() {
       const amount = event.target.amount.value;
 
       await createTip(recipient_id, amount);
-      await getPosts();
+      await getBookmarks();
   }
     
   return (
     <Layout>
-        <section className="col-sm-10 col-md-5 card rounded-0 mid-body">
+        <section className="col-sm-10 col-md-5 card rounded-0 main-content">
             <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
                 <h2 className="text-uppercase fs-5 fw-bold">Bookmarks</h2>
                 <span className="mb-2">
@@ -107,10 +107,10 @@ export default function Index() {
                                                 to={ route('home.users.show', {'username': bookmark.post.user.username})}
                                                 className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
                                                 <div className="rounded-circle">
-                                                    <img src={ bookmark.post.user.user_image_url ? `${ Constants.serverURL }/${ bookmark.post.user.user_image_url }` : Logo } alt="" width="65" />
+                                                    <img src={ bookmark.post.user.user_image_url ? `${ Constants.serverURL }/storage/${ bookmark?.post?.user?.user_image_url }` : Logo } alt="" width="65" />
                                                 </div>
                                                 <div className="d-flex flex-column">
-                                                    <h3 className="card-title fs-5 text-dark">
+                                                    <h3 className="card-title fs-6 text-dark">
                                                         <span>{ `${ bookmark.post.user.first_name } ${ bookmark.post.user.last_name }` }</span>
                                                         { bookmark.post.user.verified == true
                                                             && 
@@ -135,34 +135,62 @@ export default function Index() {
                                                     : dayjs.utc(bookmark.post.created_at).fromNow()}
                                             </span>
 
-                                            { bookmark?.post?.user?.id == user?.id && 
-                                                <span className='mb-1 dropstart z-3'>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
-                                                        viewBox="0 0 16 16" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <path
-                                                            d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                                                    </svg>
-                                                    <ul className="dropdown-menu">
+                                            <span className='mb-1 dropstart z-3'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
+                                                    viewBox="0 0 16 16" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <path
+                                                        d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                                                </svg>
+                                                <ul className="dropdown-menu">
+                                                    { ((user.role.title == 'super-admin') || (user.role.title == 'admin')) &&
+                                                        <button 
+                                                            onClick={ async () => {
+                                                                await featurePost(bookmark?.post);
+                                                                await getPosts(bookmarks?.meta?.current_page);
+                                                            } }
+                                                            type='button' 
+                                                            className="dropdown-item fw-bold" href="#make-post-featured"><small>Make Post Featured</small>
+                                                        </button>
+                                                    }
+                                                    { ((bookmark?.post?.payperviewamount <= 0)) &&
                                                         <li>
                                                             <Link 
-                                                                to={ route('home.posts.edit', { id: bookmark?.post?.id})}
+                                                                to={ route('home.posts.show', { id: bookmark?.post?.id })}
                                                                 className="dropdown-item fw-bold" 
-                                                                href="#edit-post"><small>Edit Post</small>
+                                                                href="#show-post"><small>View Post</small>
                                                             </Link>
                                                         </li>
-                                                        <li>
-                                                            <button 
-                                                                onClick={ async () => {
-                                                                    await destroyPost(bookmark?.post);
-                                                                    await getPosts(bookmarks?.meta?.current_page);
-                                                                } }
-                                                                type='button' 
-                                                                className="dropdown-item fw-bold text-secondary" href="#delete-post"><small>Delete Post</small>
-                                                            </button>
-                                                        </li>
-                                                    </ul>
-                                                </span>
-                                            }
+                                                    }
+                                                    { bookmark?.post?.user?.id == user?.id && 
+                                                        <>
+                                                            <li>
+                                                                <Link 
+                                                                    to={ route('home.posts.repost', { id: bookmark?.post?.id })}
+                                                                    className="dropdown-item fw-bold" 
+                                                                    href="#repost-post"><small>Repost</small>
+                                                                </Link>
+                                                            </li>
+                                                            <li>
+                                                                <Link 
+                                                                    to={ route('home.posts.edit', { id: bookmark?.post?.id })}
+                                                                    className="dropdown-item fw-bold" 
+                                                                    href="#edit-post"><small>Edit Post</small>
+                                                                </Link>
+                                                            </li>
+                                                            <li>
+                                                                <button 
+                                                                    onClick={ async () => {
+                                                                        await destroyPost(bookmark?.post);
+                                                                        await getPosts(bookmarks?.meta?.current_page);
+                                                                    } }
+                                                                    type='button' 
+                                                                    className="dropdown-item fw-bold text-secondary" href="#delete-post"><small>Delete Post</small>
+                                                                </button>
+                                                            </li>
+                                                        </>
+                                                    }
+                                                </ul>
+                                            </span>
 
                                         </div>
                                     </div>
@@ -170,23 +198,64 @@ export default function Index() {
                                     <p className="card-text">{ bookmark.post.body }</p>
                                 </div>
 
-                                { (bookmark.post.pay_per_view == false) 
-                                    ?
-                                        <>
-                                        {/* <video controls width="250" className="card-img-bottom rounded-0" alt="video title">
-                                            <source src="/media/cc0-videos/flower.webm" type="video/webm" />
-                                            <source src="../videos/spicy_tofu(720p).mp4" type="video/mp4" />
-                                            Download the
-                                            <a href="/media/cc0-videos/flower.webm">WEBM</a>
-                                            or
-                                            <a href="../videos/spicy_tofu(720p).mp4">MP4</a>
-                                            video.
-                                        </video> */}
-                                        <img src={ bookmark.post.image_url ? `${ Constants.serverURL }/storage/${bookmark.post.image_url}` : MissingImage } className="card-img-bottom rounded-0" alt="..." />
-                                        </>
+                                { (bookmark?.post?.payperviewamount <= 0) 
+                                        ?
+                                            <>
+                                                { bookmark?.post?.video?.video_url?.length > 0 && 
+                                                    <video controls width="250" height={400} className="card-img-bottom object-fit-cover rounded-0 mb-1" alt={ bookmark?.post?.id }>
+                                                        <source src={ `${ Constants.serverURL }/storage/${ bookmark?.post?.video?.video_url }` } type="video/webm" />
+                                                        <source src={ `${ Constants.serverURL }/storage/${ bookmark?.post?.video?.video_url }` } type="video/mp4" />
+                                                        Download the
+                                                        <a href={ `${ Constants.serverURL }/storage/${ bookmark?.post?.video?.video_url }` }>video</a>.
+                                                    </video> 
+                                                }
+                                                <div id={`carouselIndicators${ bookmark?.post?.id }`} className="carousel slide">
+                                                    <div className="carousel-indicators">
+                                                        { bookmark?.post?.images?.length > 0 && bookmark?.post?.images?.map((image, index) => {
+                                                            return (
+                                                                <button type="button" data-bs-target={`carouselIndicators${ image?.id }`} data-bs-slide-to={index} className="active" aria-current="true" aria-label={ `Slide` + (index+1) }></button>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                    <div className="carousel-inner">
+                                                        { bookmark?.post?.images?.length > 0 && bookmark?.post?.images?.map((image, index) => {
+                                                                if (index == 0) {
+                                                                    return (
+                                                                        <div key={ image.id } className={`carousel-item active`}>
+                                                                            <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
+                                                                        </div>
+                                                                    )
+                                                                }
+
+                                                                return (
+                                                                    <div key={ image.id } className={`carousel-item`}>
+                                                                        <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
+                                                    { bookmark?.post?.images?.length > 1 && 
+                                                        <>
+                                                            <button className="carousel-control-prev" type="button" data-bs-target={`#carouselIndicators${ bookmark?.post?.id }`} data-bs-slide="prev">
+                                                                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                                <span className="visually-hidden">Previous</span>
+                                                            </button>
+                                                            <button className="carousel-control-next" type="button" data-bs-target={`#carouselIndicators${ bookmark?.post?.id }`} data-bs-slide="next">
+                                                                <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                                                                <span className="visually-hidden">Next</span>
+                                                            </button>
+                                                        </>
+                                                    }
+                                                </div>
+                                            </>
                                     : 
                                         <span className="card-img-bottom rounded d-flex justify-content-center align-items-center">
-                                            <button className='btn btn-faansy-red text-light'>View Content (Pay-Per-View (${ bookmark.post.pay_per_view_amount }))</button>
+                                            <Link 
+                                                to={ route('home.posts.show', { 'id': bookmark?.post?.id})}
+                                                className='btn btn-faansy-red text-light'>
+                                                    View Content (Pay-Per-View { (user?.id == bookmark?.post?.user?.id) ? '— Owner (free)' : `($` + (bookmark?.post?.payperviewamount).toFixed(2) + `)`})
+                                            </Link>
                                         </span>
                                 }
 

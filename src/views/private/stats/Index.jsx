@@ -119,7 +119,7 @@ export default function Index() {
 
   return (
     <Layout>
-      <section className="col-sm-10 col-md-9 card rounded-0 mid-body">
+      <section className="col-sm-10 col-md-9 card rounded-0 main-content">
         <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
             <h2 className="text-uppercase fs-5 fw-bold">Stats</h2>
             <span className="mb-2">

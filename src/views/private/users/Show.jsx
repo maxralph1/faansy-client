@@ -33,7 +33,7 @@ export default function Show() {
     const { createSubscription, destroySubscription } = useSubscription();
     const { createNewMessage } = useMessage();
     const { createPollresponse, destroyPollresponse } = usePollresponse();
-    const { destroyPost } = usePost();
+    const { post, createPost, featurePost, destroyPost } = usePost();
     const { createPostcomment, destroyPostcomment } = usePostcomment();
     const { createPostlike, destroyPostlike } = usePostlike();
     const { createBookmark, destroyBookmark } = useBookmark();
@@ -54,6 +54,8 @@ export default function Show() {
         const participator_2_id = creator?.data?.id;
 
         await createNewMessage(body, participator_1_id, participator_2_id);
+
+        event.target.body.value = '';
     }
 
     async function commentOnPost(event) {
@@ -67,19 +69,19 @@ export default function Show() {
         await getCreator(params.username);
     }
 
-    // async function sendTip(event) {
-    //     event.preventDefault();
+    async function sendTip(event) {
+        event.preventDefault();
 
-    //     const recipient_id = event.target.recipient_id.value;
-    //     const amount = event.target.amount.value;
+        const recipient_id = event.target.recipient_id.value;
+        const amount = event.target.amount.value;
 
-    //     await createTip(recipient_id, amount);
-    //     await getCreator(params.username);
-    // }
+        await createTip(recipient_id, amount);
+        await getCreator(params.username);
+    }
 
     return (
         <Layout>
-            <section className="col-sm-10 col-md-5 card rounded-0">
+            <section className="col-sm-10 col-md-5 card rounded-0 main-content">
                 <div
                     className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
                     <div className="d-flex align-items-center column-gap-2">
@@ -106,32 +108,10 @@ export default function Show() {
                             </span>
                         </div>
                     </div>
-                    
-                    <div className="d-flex align-items-center column-gap-3">
-                        {/* <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-star"
-                            viewBox="0 0 16 16">
-                            <path
-                                d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.56.56 0 0 0-.163-.505L1.71 6.745l4.052-.576a.53.53 0 0 0 .393-.288L8 2.223l1.847 3.658a.53.53 0 0 0 .393.288l4.052.575-2.906 2.77a.56.56 0 0 0-.163.506l.694 3.957-3.686-1.894a.5.5 0 0 0-.461 0z" />
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-box-arrow-up-right"
-                            viewBox="0 0 16 16">
-                            <path fillRule="evenodd"
-                                d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
-                            <path fillRule="evenodd"
-                                d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
-                        </svg>
-                        <span className="mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                className="bi bi-three-dots-vertical" style={{ marginTop: '10px' }} viewBox="0 0 16 16">
-                                <path
-                                    d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                            </svg>
-                        </span> */}
-                    </div>
                 </div>
 
                 <section className="card text-bg-dark border-0 rounded-0">
-                    <img src={ creator.user_background_image_url ? `${ Constants.serverURL }/storage/${creator.user_background_image_url}` : MissingUserBackgroundImage } className="card-img object-fit-cover" style={{ maxHeight: '150px' }} alt="..." />
+                    <img src={ creator?.data?.user_background_image_url ? `${ Constants.serverURL }/storage/${creator?.data?.user_background_image_url}` : MissingUserBackgroundImage } className="card-img object-fit-cover" style={{ maxHeight: '150px' }} alt="..." />
                     <div className="card-img-overlay fw-semibold">
                         <div className="d-flex justify-content-between align-items-center px-3">
                             <div className="icons d-flex align-items-center column-gap-3">
@@ -193,7 +173,7 @@ export default function Show() {
 
                     <div className="card rounded-0">
                         <div className="d-flex align-items-end ms-2" style={{ marginTop: '-2.5rem' }}>
-                            <img src={ creator.user_image_url ? `${ Constants.serverURL }/storage/${creator.user_image_url}` : MissingUserImage } alt="" width="90" height="90" className="z-1 object-fit-cover border border-light border-3 rounded-circle" />
+                            <img src={ creator?.data?.user_image_url ? `${ Constants.serverURL }/storage/${creator?.data?.user_image_url}` : MissingUserImage } alt="" width="90" height="90" className="z-1 object-fit-cover border border-light border-3 rounded-circle" />
                             { (dayjs.utc().diff(dayjs.utc(creator?.data?.last_seen)) < 7200000) &&
                             <span className="z-2 bg-success p-1 border border-light border-1 rounded-circle"
                                 style={{ width: '10px', height: '10px', marginLeft: '-25px', marginBottom: '5px' }}></span> }
@@ -226,7 +206,8 @@ export default function Show() {
                                 <p className="card-text mt-1">{ creator?.data?.profile?.bio ? creator?.data?.profile?.bio : 'User has yet to write a bio. 😉'}</p>
                             </div>
                             <div className='d-flex justify-content-end'>
-                                <button type="button" data-bs-toggle="modal" data-bs-target="#messageModal" data-bs-whatever="@mdo" className="text-decoration-none btn btn-sm btn-faansy-red text-light align-self-end mt-3">Send Direct Message</button>
+                                { creator?.data?.username != user?.username &&
+                                    <button type="button" data-bs-toggle="modal" data-bs-target="#messageModal" data-bs-whatever="@mdo" className="text-decoration-none btn btn-sm btn-faansy-red text-light align-self-end mt-3">Send Direct Message</button> }
 
                                 <div className="modal fade" id="messageModal" tabIndex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
                                     <div className="modal-dialog">
@@ -300,25 +281,27 @@ export default function Show() {
                             </section>
                         </section>
                     : 
-                        <section className="d-flex flex-column align-items-center justify-content-between row-gap-2 border rounded-0 py-3">
-                            <h3 className="align-self-start ps-3 text-uppercase text-secondary fs-6"><small>Subscription</small></h3>
-                            <span className="w-100 px-3">
-                                { (creator?.data?.username != user.username) && 
-                                    <button 
-                                        type="button" 
-                                        onClick={ async () => {
-                                            await createSubscription(creator?.data?.id);
-                                            await getCreator(params.username);
-                                        } }
-                                        className="btn btn-faansy-red rounded-pill d-flex justify-content-between px-3 text-light fw-semibold py-2 w-100">
-                                        <small className="text-uppercase">Subscribe</small>
-                                        { creator?.data?.subscription_amount >= 0 && creator?.data?.free_subscription == false
-                                            ? <small className="text-uppercase">For { (creator?.data?.subscription_amount).toFixed(2) }$</small>
-                                            : <small className="text-uppercase">For Free</small>
-                                        }
-                                    </button>
-                                }
-                            </span>
+                        <section className={`d-flex flex-column align-items-center justify-content-between row-gap-2 border rounded-0 ${(creator?.data?.username != user.username) && `py-3`}`}>
+                            { (creator?.data?.username != user.username) &&
+                                <>
+                                    <h3 className="align-self-start ps-3 text-uppercase text-secondary fs-6"><small>Subscription</small></h3>
+                                    <span className="w-100 px-3">
+                                        <button 
+                                            type="button" 
+                                            onClick={ async () => {
+                                                await createSubscription(creator?.data?.id);
+                                                await getCreator(params.username);
+                                            } }
+                                            className="btn btn-faansy-red rounded-pill d-flex justify-content-between px-3 text-light fw-semibold py-2 w-100">
+                                            <small className="text-uppercase">Subscribe</small>
+                                            { creator?.data?.subscription_amount >= 0 && creator?.data?.free_subscription == false
+                                                ? <small className="text-uppercase">For { (creator?.data?.subscription_amount).toFixed(2) }$</small>
+                                                : <small className="text-uppercase">For Free</small>
+                                            }
+                                        </button>
+                                    </span>
+                                </>
+                            }
                         </section>
                     }
                 </div>
@@ -358,7 +341,7 @@ export default function Show() {
                                                                     { (poll?.responses?.find(response => 
                                                                     response.user_id == user.id && response?.polloption_id == option?.id)) 
                                                                     && <span className="badge text-bg-success">Voted&nbsp;
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" className="bi bi-check-circle-fill" viewBox="0 0 16 16">
                                                                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
                                                                         </svg>
                                                                     </span> }
@@ -393,11 +376,9 @@ export default function Show() {
                                                 </div>
                                 
                                                 <div className="d-flex column-gap-3">
-                                                    {/* <span className="text-body-secondary">{dayjs.utc(post.created_at).format('MMM D, YYYY HH:mm')}</span> */}
                                                     <small className="text-body-secondary">
                                                         <span>reposted</span> { dayjs.utc(post.created_at).fromNow() }
                                                     </small>
-                                                    {/* <span className="text-body-secondary">9 hours ago</span> */}
                                                     <span>
                                                         {/* <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
                                                             viewBox="0 0 16 16">
@@ -410,34 +391,31 @@ export default function Show() {
                                         }
                                     <div className={ `card-body ${ post.repost == true && 'px-5' }` }>
                                         <div className="d-flex justify-content-between mb-3">
-                                            {/* <div className="d-flex justify-content-start align-items-center column-gap-2"> */}
-                                                <Link 
-                                                    to={ route('home.users.show', {'username': post.user.username})}
-                                                    className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
-                                                    <div className="rounded-circle">
-                                                        <img src={ post.user.user_image_url ? `${ Constants.serverURL }/${ post.user.user_image_url }` : Logo } alt="" width="65" />
-                                                    </div>
-                                                    <div className="d-flex flex-column">
-                                                        <h3 className="card-title fs-5 text-dark">
-                                                            <span>{ `${ post.user.first_name } ${ post.user.last_name }` }</span>
-                                                            { post.user.verified == true
-                                                                && 
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                                                className="bi bi-patch-check mb-1" viewBox="0 0 16 16">
-                                                                <path fillRule="evenodd"
-                                                                    d="M10.354 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708 0" />
-                                                                <path
-                                                                    d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z" />
-                                                            </svg>
-                                                            }
-                                                        </h3>
-                                                        <span className="text-body-secondary">@{ post.user.username }</span>
-                                                    </div>
-                                                </Link>
-                                            {/* </div> */}
+                                            <Link 
+                                                to={ route('home.users.show', {'username': post.user.username})}
+                                                className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
+                                                <div className="rounded-circle">
+                                                    <img src={ post.user.user_image_url ? `${ Constants.serverURL }/storage/${ post?.user?.user_image_url }` : Logo } alt="" width="65" />
+                                                </div>
+                                                <div className="d-flex flex-column">
+                                                    <h3 className="card-title fs-6 text-dark">
+                                                        <span>{ `${ post.user.first_name } ${ post.user.last_name }` }</span>
+                                                        { post.user.verified == true
+                                                            && 
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                                            className="bi bi-patch-check mb-1" viewBox="0 0 16 16">
+                                                            <path fillRule="evenodd"
+                                                                d="M10.354 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708 0" />
+                                                            <path
+                                                                d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z" />
+                                                        </svg>
+                                                        }
+                                                    </h3>
+                                                    <span className="text-body-secondary">@{ post.user.username }</span>
+                                                </div>
+                                            </Link>
                             
                                             <div className="d-flex column-gap-3">
-                                                {/* <span className="text-body-secondary">{dayjs.utc(post.created_at).format('MMM D, YYYY HH:mm')}</span> */}
                                                 <span className="text-body-secondary">
                                                     { post.repost_original_post_timestamp != null 
                                                         ? dayjs.utc(post.repost_original_post_timestamp).fromNow() 
@@ -446,30 +424,60 @@ export default function Show() {
                                                 {/* <span className="text-body-secondary">9 hours ago</span> */}
                                                 
                                                 { post?.user?.id == user?.id && 
-                                                    <span className='mb-1 dropstart z-3'>
+                                                    <span className='mb-1 dropstart z-1'>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
                                                             viewBox="0 0 16 16" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <path
                                                                 d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
                                                         </svg>
                                                         <ul className="dropdown-menu">
-                                                            <li>
-                                                                <Link 
-                                                                    to={ route('home.posts.edit', { id: post?.id})}
-                                                                    className="dropdown-item fw-bold" 
-                                                                    href="#edit-post"><small>Edit Post</small>
-                                                                </Link>
-                                                            </li>
-                                                            <li>
+                                                            { ((user.role.title == 'super-admin') || (user.role.title == 'admin')) &&
                                                                 <button 
                                                                     onClick={ async () => {
-                                                                        await destroyPost(post);
+                                                                        await featurePost(post);
                                                                         await getCreator(params.username);
                                                                     } }
                                                                     type='button' 
-                                                                    className="dropdown-item fw-bold text-secondary" href="#delete-post"><small>Delete Post</small>
+                                                                    className="dropdown-item fw-bold" href="#make-post-featured"><small>Make Post Featured</small>
                                                                 </button>
-                                                            </li>
+                                                            }
+                                                            { ((post?.payperviewamount <= 0)) &&
+                                                                <li>
+                                                                    <Link 
+                                                                        to={ route('home.posts.show', { id: post.id})}
+                                                                        className="dropdown-item fw-bold" 
+                                                                        href="#show-post"><small>View Post</small>
+                                                                    </Link>
+                                                                </li>
+                                                            }
+                                                            { post?.user?.id == user?.id && 
+                                                                <>
+                                                                    <li>
+                                                                        <Link 
+                                                                            to={ route('home.posts.repost', { id: post.id})}
+                                                                            className="dropdown-item fw-bold" 
+                                                                            href="#repost-post"><small>Repost</small>
+                                                                        </Link>
+                                                                    </li>
+                                                                    <li>
+                                                                        <Link 
+                                                                            to={ route('home.posts.edit', { id: post.id})}
+                                                                            className="dropdown-item fw-bold" 
+                                                                            href="#edit-post"><small>Edit Post</small>
+                                                                        </Link>
+                                                                    </li>
+                                                                    <li>
+                                                                        <button 
+                                                                            onClick={ async () => {
+                                                                                await destroyPost(post);
+                                                                                await getCreator(params.username);
+                                                                            } }
+                                                                            type='button' 
+                                                                            className="dropdown-item fw-bold text-secondary" href="#delete-post"><small>Delete Post</small>
+                                                                        </button>
+                                                                    </li>
+                                                                </>
+                                                            }
                                                         </ul>
                                                     </span>
                                                 }
@@ -499,89 +507,69 @@ export default function Show() {
                                         {/* <span><a href="" className="text-decoration-none text-faansy-red">onlyfans.com/natalie.brooks</a> / <a href="" className="text-decoration-none text-faansy-red">onlyfans.com/natalie.brooks</a></span> */}
                                     </div>
 
-                                    { (post.pay_per_view == false) 
+                                    { (post?.payperviewamount <= 0) 
                                         ?
                                             <>
-                                            {/* <video controls width="250" className="card-img-bottom rounded-0" alt="video title">
-                                                <source src="/media/cc0-videos/flower.webm" type="video/webm" />
-                                                <source src="../videos/spicy_tofu(720p).mp4" type="video/mp4" />
-                                                Download the
-                                                <a href="/media/cc0-videos/flower.webm">WEBM</a>
-                                                or
-                                                <a href="../videos/spicy_tofu(720p).mp4">MP4</a>
-                                                video.
-                                            </video> */}
-                                            <img src={ post.image_url ? `${ Constants.serverURL }/storage/${post.image_url}` : MissingImage } className="card-img-bottom rounded-0" alt="..." />
+                                                { post?.video?.video_url?.length > 0 && 
+                                                    <video controls width="250" height={400} className="card-img-bottom object-fit-cover rounded-0 mb-1" alt={ post?.id }>
+                                                        <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/webm" />
+                                                        <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/mp4" />
+                                                        Download the
+                                                        <a href={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` }>video</a>.
+                                                    </video> 
+                                                }
+                                                <div id={`carouselIndicators${ post?.id }`} className="carousel slide pb-3">
+                                                    <div className="carousel-indicators">
+                                                        { post?.images?.length > 0 && post?.images?.map((image, index) => {
+                                                            return (
+                                                                <button key={ index } type="button" data-bs-target={`carouselIndicators${ image?.id }`} data-bs-slide-to={index} className="active" aria-current="true" aria-label={ `Slide` + (index+1) }></button>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                    <div className="carousel-inner">
+                                                        { post?.images?.length > 0 && post?.images?.map((image, index) => {
+                                                                if (index == 0) {
+                                                                    return (
+                                                                        <div key={ image.id } className={`carousel-item active`}>
+                                                                            <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
+                                                                        </div>
+                                                                    )
+                                                                }
+
+                                                                return (
+                                                                    <div key={ image.id } className={`carousel-item`}>
+                                                                        <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
+                                                    { post?.images?.length > 1 && 
+                                                        <>
+                                                            <button className="carousel-control-prev" type="button" data-bs-target={`#carouselIndicators${ post?.id }`} data-bs-slide="prev">
+                                                                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                                <span className="visually-hidden">Previous</span>
+                                                            </button>
+                                                            <button className="carousel-control-next" type="button" data-bs-target={`#carouselIndicators${ post?.id }`} data-bs-slide="next">
+                                                                <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                                                                <span className="visually-hidden">Next</span>
+                                                            </button>
+                                                        </>
+                                                    }
+                                                </div>
                                             </>
                                         : 
-                                            <span className="card-img-bottom rounded d-flex justify-content-center align-items-center">
-                                                <button className='btn btn-faansy-red text-light'>View Content (Pay-Per-View (${ post.pay_per_view_amount }))</button>
+                                            <span className="card-img-bottom rounded d-flex justify-content-center align-items-center pb-3">
+                                                <Link 
+                                                    to={ route('home.posts.show', { 'id': post?.id})}
+                                                    className='btn btn-faansy-red text-light'>
+                                                        View Content (Pay-Per-View { (user?.id == post?.user?.id) ? '— Owner (free)' : `($` + (post?.payperviewamount).toFixed(2) + `)`})
+                                                </Link>
                                             </span>
                                     }
 
-                                    <section className="card-body row px-4 column-gap-4 row-gap-3">
-                                        {/* <article className="card col-md text-bg-dark border-0 rounded">
-                                            <img src="../images/background.jpeg" className="card-img object-fit-cover" style={{ maxHeight: '125px' }} alt="..." />
-                                            <div className="card-img-overlay">
-                                                <div className="d-flex justify-content-between align-items-start px-2 pt-2 h-50">
-                                                    <span className="bg-secondary opacity-50 px-1 rounded z-2"><small>Free</small></span>
-                                                    <span className="mb-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                                            className="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-                                                            <path
-                                                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                                                        </svg>
-                                                    </span>
-                                                </div>
-                                        
-                                                <div className="d-flex column-gap-3 px-2 pb-3 h-50" style={{ background: '#256d7c26' }}>
-                                                    <div className="d-flex align-items-end">
-                                                        <img src="../images/photo.jpeg" alt="" width="70" height="70"
-                                                            className="z-1 object-fit-cover border border-light border-3 rounded-circle" />
-                                                        <span className="z-2 bg-success p-1 border border-light border-1 rounded-circle"
-                                                            style={{ width: '10px', height: '10px', marginLeft: '-17px', marginBottom: '5px' }}></span>
-                                                    </div>
-                                                    <div className="text-light d-flex flex-column justify-content-center">
-                                                        <h4 className="fs-6">Raylan</h4>
-                                                        <span style={{ marginTop: '-14px' }}><small>@goalgoddess</small></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </article>
-                                        <article className="card col-md text-bg-dark border-0 rounded">
-                                            <img src="../images/background.jpeg" className="card-img object-fit-cover" style={{ maxHeight: '125px' }} alt="..." />
-                                            <div className="card-img-overlay">
-                                                <div className="d-flex justify-content-between align-items-start px-2 pt-2 h-50">
-                                                    <span className="bg-secondary opacity-50 px-1 rounded z-2"><small>Free</small></span>
-                                                    <span className="mb-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                                            className="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-                                                            <path
-                                                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                                                        </svg>
-                                                    </span>
-                                                </div>
-                                        
-                                                <div className="d-flex column-gap-3 px-2 pb-3 h-50" style={{ background: '#256d7c26' }}>
-                                                    <div className="d-flex align-items-end">
-                                                        <img src="../images/photo.jpeg" alt="" width="70" height="70"
-                                                            className="z-1 object-fit-cover border border-light border-3 rounded-circle" />
-                                                        <span className="z-2 bg-success p-1 border border-light border-1 rounded-circle"
-                                                            style={{ width: '10px', height: '10px', marginLeft: '-17px', marginBottom: '5px' }}></span>
-                                                    </div>
-                                                    <div className="text-light d-flex flex-column justify-content-center">
-                                                        <h4 className="fs-6">Raylan</h4>
-                                                        <span style={{ marginTop: '-14px' }}><small>@goalgoddess</small></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </article> */}
-                                    </section>
-
                                     <section className="px-2 d-flex justify-content-between align-items-center">
-
                                         <div className="mb-2 d-flex justify-content-start align-items-center column-gap-3">
-
                                             <span className='like-section'>
                                                 {(post?.likes?.length > 0) && post.likes?.find(foundLike => foundLike?.user?.id == user?.id)
                                                     ? 
@@ -774,54 +762,56 @@ export default function Show() {
                                                 </div>
                                             </span>
 
-                                            {/* <span className='tip-section'>
-                                                <button 
-                                                    href="" 
-                                                    type='button' 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target={`#tipModal${ post?.id }`}
-                                                    data-bs-body={ `@${post?.user?.id}` }
-                                                    className="text-decoration-none text-secondary d-flex align-items-center border-0 bg-transparent">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-currency-dollar" viewBox="0 0 16 16">
-                                                        <path d="M4 10.781c.148 1.667 1.513 2.85 3.591 3.003V15h1.043v-1.216c2.27-.179 3.678-1.438 3.678-3.3 0-1.59-.947-2.51-2.956-3.028l-.722-.187V3.467c1.122.11 1.879.714 2.07 1.616h1.47c-.166-1.6-1.54-2.748-3.54-2.875V1H7.591v1.233c-1.939.23-3.27 1.472-3.27 3.156 0 1.454.966 2.483 2.661 2.917l.61.162v4.031c-1.149-.17-1.94-.8-2.131-1.718zm3.391-3.836c-1.043-.263-1.6-.825-1.6-1.616 0-.944.704-1.641 1.8-1.828v3.495l-.2-.05zm1.591 1.872c1.287.323 1.852.859 1.852 1.769 0 1.097-.826 1.828-2.2 1.939V8.73z"/>
-                                                    </svg>
-                                                    <span className="text-uppercase">Send Tip</span>
-                                                </button>
+                                            { post?.user?.id != user?.id &&
+                                                <span className='tip-section'>
+                                                    <button 
+                                                        href="" 
+                                                        type='button' 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target={`#tipModal${ post?.id }`}
+                                                        data-bs-body={ `@${post?.user?.id}` }
+                                                        className="text-decoration-none text-secondary d-flex align-items-center border-0 bg-transparent">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-currency-dollar" viewBox="0 0 16 16">
+                                                            <path d="M4 10.781c.148 1.667 1.513 2.85 3.591 3.003V15h1.043v-1.216c2.27-.179 3.678-1.438 3.678-3.3 0-1.59-.947-2.51-2.956-3.028l-.722-.187V3.467c1.122.11 1.879.714 2.07 1.616h1.47c-.166-1.6-1.54-2.748-3.54-2.875V1H7.591v1.233c-1.939.23-3.27 1.472-3.27 3.156 0 1.454.966 2.483 2.661 2.917l.61.162v4.031c-1.149-.17-1.94-.8-2.131-1.718zm3.391-3.836c-1.043-.263-1.6-.825-1.6-1.616 0-.944.704-1.641 1.8-1.828v3.495l-.2-.05zm1.591 1.872c1.287.323 1.852.859 1.852 1.769 0 1.097-.826 1.828-2.2 1.939V8.73z"/>
+                                                        </svg>
+                                                        <span className="text-uppercase">Send Tip</span>
+                                                    </button>
 
-                                                <div className="modal fade" id={`tipModal${ post?.id }`} tabIndex="-1" aria-labelledby="tipModalLabel" aria-hidden="true">
-                                                    <div className="modal-dialog">
-                                                        <div className="modal-content">
-                                                            <div className="modal-header">
-                                                                <h4 className="modal-title fs-5 fw-semibold" id="tipModalLabel">Specify Amount (in units only)</h4>
-                                                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                            </div>
-                                                            <div className="modal-body">
-                                                                <form onSubmit={ sendTip }>
-                                                                    <div className="d-none">
-                                                                        <input 
-                                                                            type="text" 
-                                                                            name="recipient_id" 
-                                                                            id="recipient_id" 
-                                                                            defaultValue={ post?.user?.id } 
-                                                                            hidden="hidden" />
-                                                                    </div>
-                                                                    <div className="mb-3">
-                                                                        <textarea 
-                                                                            name="amount" 
-                                                                            id="amount" 
-                                                                            placeholder='e.g. 20.50' 
-                                                                            aria-label="Tip amount"
-                                                                            className="form-control"></textarea>
-                                                                    </div>
-                                                                    <div className="d-flex justify-content-end">
-                                                                        <button type="submit" className="btn btn-sm btn-faansy-red text-light">Tip</button>
-                                                                    </div>
-                                                                </form>
+                                                    <div className="modal fade" id={`tipModal${ post?.id }`} tabIndex="-1" aria-labelledby="tipModalLabel" aria-hidden="true">
+                                                        <div className="modal-dialog">
+                                                            <div className="modal-content">
+                                                                <div className="modal-header">
+                                                                    <h4 className="modal-title fs-5 fw-semibold" id="tipModalLabel">Specify Amount (in units only)</h4>
+                                                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div className="modal-body">
+                                                                    <form onSubmit={ sendTip }>
+                                                                        <div className="d-none">
+                                                                            <input 
+                                                                                type="text" 
+                                                                                name="recipient_id" 
+                                                                                id="recipient_id" 
+                                                                                defaultValue={ post?.user?.id } 
+                                                                                hidden="hidden" />
+                                                                        </div>
+                                                                        <div className="mb-3">
+                                                                            <textarea 
+                                                                                name="amount" 
+                                                                                id="amount" 
+                                                                                placeholder='e.g. 20.50' 
+                                                                                aria-label="Tip amount"
+                                                                                className="form-control"></textarea>
+                                                                        </div>
+                                                                        <div className="d-flex justify-content-end">
+                                                                            <button type="submit" className="btn btn-sm btn-faansy-red text-light">Tip</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </span> */}
+                                                </span>
+                                            }
                                         </div>
 
                                         <div>

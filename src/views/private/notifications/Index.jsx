@@ -21,15 +21,11 @@ export default function Index() {
 
   return (
     <Layout>
-      <section className="col-sm-10 col-md-5 card rounded-0 mid-body">
+      <section className="col-sm-10 col-md-5 card rounded-0 main-content">
         <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
             <h2 className="text-uppercase fs-5 fw-bold">Notifications</h2>
             <span className="mb-2">
-                {/* <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-three-dots-vertical"
-                    viewBox="0 0 16 16">
-                    <path
-                        d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                </svg> */}
+
             </span>
         </div>
 

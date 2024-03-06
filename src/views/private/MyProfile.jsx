@@ -13,6 +13,7 @@ import Constants from '@/utils/Constants.jsx';
 import { useCreator } from '@/hooks/useCreator.jsx';
 import { usePoll } from '@/hooks/usePoll.jsx';
 import { useUserverification } from '@/hooks/useUserverification.jsx';
+import { useUserbecomeacreator } from '@/hooks/useUserbecomeacreator.jsx';
 import { useMyPosts } from '@/hooks/useMyPosts.jsx';
 import { usePost } from '@/hooks/usePost.jsx';
 import { usePostcomment } from '@/hooks/usePostcomment.jsx';
@@ -30,11 +31,12 @@ export default function MyProfile() {
     const { user } = useContext(AuthContext);
     const { creator, getCreator, updateCreator } = useCreator(user.username);
     const { posts, getPosts } = useMyPosts();
-    const { destroyPost } = usePost();
+    const { post, createPost, featurePost, destroyPost } = usePost();
     // const { polls, getPolls } = usePolls();
     const { poll, getPoll, createPoll, updatePoll, destroyPoll } = usePoll();
     const { createBookmark, destroyBookmark } = useBookmark();
     const { userverification, createUserverification } = useUserverification();
+    const { userbecomeacreator, createUserbecomeacreator } = useUserbecomeacreator();
     const { createPostcomment, destroyPostcomment } = usePostcomment();
     const { createPostlike, destroyPostlike } = usePostlike();
 
@@ -51,25 +53,11 @@ export default function MyProfile() {
     const [pollOption4, setPollOption4] = useState();
 
     /* User Profile Update states*/
-    const [firstName, setFirstName] = useState();
-    const [lastName, setLastName] = useState();
-    const [username, setUsername] = useState();
-    const [email, setEmail] = useState();
-    const [userImageUrl, setUserImageUrl] = useState();
-    const [userBackgroundImageUrl, setUserBackgroundImageUrl] = useState();
-    const [showActivityStatus, setShowActivityStatus] = useState();
-    const [usersMustBeSubscribedToViewMyContent, setUsersMustBeSubscribedToViewMyContent] = useState();
-    const [freeSubscription, setFreeSubscription] = useState();
-    const [subscriptionAmount, setSubscriptionAmount] = useState();
-    const [showSubscriptionOffers, setShowSubscriptionOffers] = useState();
-    const [bio, setBio] = useState();
-    const [address, setAddress] = useState();
-    const [phoneNumber, setPhoneNumber] = useState();
-    const [websiteUrl, setWebsiteUrl] = useState();
-    const [twitterAccount, setTwitterAccount] = useState();
-    const [googleAccount, setGoogleAccount] = useState();
-    const [language, setLanguage] = useState();
-    const [darkMode, setDarkMode] = useState();
+    const [showActivityStatus, setShowActivityStatus] = useState(creator?.data?.show_activity_status);
+    const [usersMustBeSubscribedToViewMyContent, setUsersMustBeSubscribedToViewMyContent] = useState(creator?.data?.users_must_be_subscribed_to_view_my_content);
+    const [freeSubscription, setFreeSubscription] = useState(creator?.data?.free_subscription);
+    const [showSubscriptionOffers, setShowSubscriptionOffers] = useState(creator?.data?.show_subscription_offers);
+    const [darkMode, setDarkMode] = useState(creator?.data?.false);
 
     /* Verify Profile state*/
     const [userVerificationImageUrl, setUserVerificationImageUrl] = useState();
@@ -104,68 +92,35 @@ export default function MyProfile() {
     async function updateProfile(event) {
         event.preventDefault();
 
-        console.log(event.target.showActivityStatus.value);
-        console.log(event.target.usersMustBeSubscribedToViewMyContent.value);
-        console.log(event.target.freeSubscription.value);
-        console.log(event.target.subscriptionAmount.value);
-        console.log(event.target.showSubscriptionOffers.value);
+        console.log(creator.data.first_name);
+        console.log(creator.data.last_name);
+        console.log(creator.data.username);
+        console.log(creator.data.email);
 
         const formData = new FormData();
-        formData.append('firstName', event.target.firstName.value);
-        formData.append('lastName', event.target.lastName.value);
-        formData.append('username', event.target.username.value);
-        formData.append('email', event.target.email.value);
-        event.target.userImageUrl.value && formData.append('userImageUrl', event.target.userImageUrl.value);
-        event.target.userBackgroundImageUrl.value && formData.append('userBackgroundImageUrl', event.target.userBackgroundImageUrl.value);
-        formData.append('showActivityStatus', event.target.showActivityStatus.value);
-        formData.append('usersMustBeSubscribedToViewMyContent', event.target.usersMustBeSubscribedToViewMyContent.value);
-        formData.append('freeSubscription', event.target.freeSubscription.value);
-        formData.append('subscriptionAmount', event.target.subscriptionAmount.value);
-        formData.append('showSubscriptionOffers', event.target.showSubscriptionOffers.value);
+        // formData.append('_method', 'put');
+        formData.append('first_name', creator.data.first_name);
+        formData.append('last_name', creator.data.last_name);
+        formData.append('username', creator.data.username);
+        formData.append('email', creator.data.email);
+        event.target.user_image_url.files[0] && formData.append('user_image_url', event.target.user_image_url.files[0]);
+        event.target.user_background_image_url.files[0] && formData.append('user_background_image_url', event.target.user_background_image_url.files[0]);
+        showActivityStatus == false ? formData.append('show_activity_status', 0) : formData.append('show_activity_status', 1);
+        usersMustBeSubscribedToViewMyContent == false ? formData.append('users_must_be_subscribed_to_view_my_content', 0) : formData.append('users_must_be_subscribed_to_view_my_content', 1);
+        freeSubscription == false ? formData.append('free_subscription', 0) : formData.append('free_subscription', 1);
+        formData.append('subscription_amount', creator.data.subscription_amount);
+        showSubscriptionOffers == false ? formData.append('show_subscription_offers', 0) : formData.append('show_subscription_offers', 1);
 
         /* Profile Section */ 
-        formData.append('bio', event.target.bio.value);
-        formData.append('address', event.target.address.value);
-        formData.append('phoneNumber', event.target.phoneNumber.value);
-        formData.append('websiterUrl', event.target.websiterUrl.value);
-        formData.append('twitterAccount', event.target.twitterAccount.value);
-        formData.append('googleAccount', event.target.googleAccount.value);
-        formData.append('language', event.target.language.value);
-        formData.append('darkMode', event.target.darkMode.value);
+        formData.append('bio', creator.data.bio);
+        formData.append('phone_number', creator.data.phone_number);
+        formData.append('website_url', creator.data.website_url);
+        formData.append('twitter_account', creator.data.twitter_account);
+        formData.append('google_account', creator.data.google_account);
+        formData.append('language', creator.data.language);
+        darkMode == false ? formData.append('dark_mode', 0) : formData.append('dark_mode', 1);
 
         await updateCreator(formData);
-
-        setFirstName('');
-        setLastName('');
-        setUsername('');
-        setEmail('');
-        setUserImageUrl('');
-        setUserBackgroundImageUrl('');
-        setLastSeen('');
-        setShowActivityStatus('');
-        setUsersMustBeSubscribedToViewMyContent('');
-        setFreeSubscription('');
-        setSubscriptionAmount('');
-        setShowSubscriptionOffers('');
-        setBio('');
-        setAddress('');
-        setPhoneNumber('');
-        setWebsiteUrl('');
-        setTwitterAccount('');
-        setGoogleAccount('');
-        setLanguage('');
-        setDarkMode('');
-
-        await getCreator();
-    }
-
-    async function verifyProfile(event) {
-        event.preventDefault();
-
-        const formData = new FormData();
-        formData.append('verification_material_image_url', userverification.data.verification_material_image_url);
-
-        await createUserverification(formData);
 
         await getCreator(user.username);
     }
@@ -181,6 +136,28 @@ export default function MyProfile() {
         setPostCommentBody('');
         await getPosts();
     }
+    
+    async function verifyProfile(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('verification_material_image_url', userverification.data.verification_material_image_url);
+
+        await createUserverification(formData);
+
+        await getCreator(user.username);
+    }
+    
+    async function becomeACreator(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('verification_material_image_url', userverification.data.verification_material_image_url);
+
+        await createUserbecomeacreator(formData);
+
+        await getCreator(user.username);
+    }
 
     // async function sendTip(event) {
     //     event.preventDefault();
@@ -195,7 +172,7 @@ export default function MyProfile() {
 
     return (
         <Layout>
-            <section className="col-sm-10 col-md-5 card rounded-0">
+            <section className="col-sm-10 col-md-5 card rounded-0 main-content">
                 <div
                     className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
                     <div className="d-flex align-items-center column-gap-2">
@@ -252,9 +229,8 @@ export default function MyProfile() {
                                         data-bs-target="#pollsModal" 
                                         data-bs-whatever="polls">
                                             <small>Polls&nbsp;
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" className="bi bi-clipboard-data-fill mb-1" viewBox="0 0 16 16">
-                                                    <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z"/>
-                                                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5zM10 8a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0zm-6 4a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0zm4-3a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1"/>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" className="bi bi-bar-chart-fill mb-1" viewBox="0 0 16 16">
+                                                    <path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>
                                                 </svg>
                                             </small>
                                     </div>
@@ -304,15 +280,31 @@ export default function MyProfile() {
                                                 </svg>
                                             </small>
                                     </div>
-                                    
                                 </li>
+                                { user.role.title == 'generic-user' &&
+                                    <li>
+                                        <div 
+                                            type="button"
+                                            className="dropdown-item fw-bold" 
+                                            href="#become-a-creator" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#becomeACreatorModal" 
+                                            data-bs-whatever="become-a-creator">
+                                                <small>Become a Creator&nbsp;
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" className="bi bi-person-lines-fill mb-1" viewBox="0 0 16 16">
+                                                        <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z"/>
+                                                    </svg>
+                                                </small>
+                                        </div>
+                                    </li> 
+                                }
                             </ul>
                         </span>
                     </div>
                 </div>
 
                 <section className="card text-bg-dark border-0 rounded-0">
-                    <img src={ creator?.data?.user_background_image_url ? `${ Constants.serverURL }/storage/${creator.user_background_image_url}` : MissingUserBackgroundImage } className="card-img object-fit-cover" style={{ maxHeight: '150px' }} alt="..." />
+                    <img src={ creator?.data?.user_background_image_url ? `${ Constants.serverURL }/storage/${creator?.data?.user_background_image_url}` : MissingUserBackgroundImage } className="card-img object-fit-cover" style={{ maxHeight: '150px' }} alt="..." />
                     <div className="card-img-overlay fw-semibold">
                         <div className="d-flex justify-content-between align-items-center px-3">
                             <div className="icons d-flex align-items-center column-gap-3">
@@ -329,7 +321,7 @@ export default function MyProfile() {
                                     </div>
                                 }
                                 
-                                { creator?.data?.posts?.filter((post => post.video_url != null)).length > 0 &&
+                                { creator?.data?.posts?.filter((post => post?.video_url != null)).length > 0 &&
                                     <div className="d-flex align-items-center column-gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-camera-video" viewBox="0 0 16 16">
                                             <path fillRule="evenodd"
@@ -374,7 +366,7 @@ export default function MyProfile() {
 
                     <div className="card rounded-0">
                         <div className="d-flex align-items-end ms-2" style={{ marginTop: '-2.5rem' }}>
-                            <img src={ creator.user_image_url ? `${ Constants.serverURL }/storage/${creator.user_image_url}` : MissingUserImage } alt="" width="90" height="90" className="z-1 object-fit-cover border border-light border-3 rounded-circle" />
+                            <img src={ creator?.data?.user_image_url ? `${ Constants.serverURL }/storage/${creator?.data?.user_image_url}` : MissingUserImage } alt="" width="90" height="90" className="z-1 object-fit-cover border border-light border-3 rounded-circle" />
                             { (dayjs.utc().diff(dayjs.utc(creator?.data?.last_seen)) < 7200000) &&
                             <span className="z-2 bg-success p-1 border border-light border-1 rounded-circle"
                                 style={{ width: '10px', height: '10px', marginLeft: '-25px', marginBottom: '5px' }}></span> }
@@ -479,17 +471,17 @@ export default function MyProfile() {
                                                 </div>
                                             </div>
                                         }
-                                    <div className={ `card-body ${ post.repost == true && 'px-5' }` }>
+                                    <div className={ `card-body ${ post?.repost == true && 'px-5' }` }>
                                         <div className="d-flex justify-content-between mb-3">
                                             {/* <div className="d-flex justify-content-start align-items-center column-gap-2"> */}
                                                 <Link 
-                                                    to={ route('home.users.show', {'username': post.user.username})}
+                                                    to={ route('home.users.show', {'username': post?.user?.username})}
                                                     className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
                                                     <div className="rounded-circle">
-                                                        <img src={ post.user.user_image_url ? `${ Constants.serverURL }/${ post.user.user_image_url }` : Logo } alt="" width="65" />
+                                                        <img src={ post?.user?.user_image_url ? `${ Constants.serverURL }/storage/${ post?.user?.user_image_url }` : Logo } alt="" width="65" />
                                                     </div>
                                                     <div className="d-flex flex-column">
-                                                        <h3 className="card-title fs-5 text-dark">
+                                                        <h3 className="card-title fs-6 text-dark">
                                                             <span>{ `${ post.user.first_name } ${ post.user.last_name }` }</span>
                                                             { post.user.verified == true
                                                                 && 
@@ -517,13 +509,37 @@ export default function MyProfile() {
                                                 {/* <span className="text-body-secondary">9 hours ago</span> */}
                                                 
                                                 { post?.user?.id == user?.id && 
-                                                    <span className='mb-1 dropstart z-3'>
+                                                    <span className='mb-1 dropstart z-1'>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
                                                             viewBox="0 0 16 16" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                             <path
                                                                 d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
                                                         </svg>
                                                         <ul className="dropdown-menu">
+                                                            { ((user.role.title == 'super-admin') || (user.role.title == 'admin')) &&
+                                                                <button 
+                                                                    onClick={ async () => {
+                                                                        await featurePost(post);
+                                                                        await getPosts(posts?.meta?.current_page);
+                                                                    } }
+                                                                    type='button' 
+                                                                    className="dropdown-item fw-bold" href="#make-post-featured"><small>Make Post Featured</small>
+                                                                </button>
+                                                            }
+                                                            <li>
+                                                                <Link 
+                                                                    to={ route('home.posts.show', { id: post.id})}
+                                                                    className="dropdown-item fw-bold" 
+                                                                    href="#show-post"><small>View Post</small>
+                                                                </Link>
+                                                            </li>
+                                                            <li>
+                                                                <Link 
+                                                                    to={ route('home.posts.repost', { id: post.id})}
+                                                                    className="dropdown-item fw-bold" 
+                                                                    href="#repost-post"><small>Repost</small>
+                                                                </Link>
+                                                            </li>
                                                             <li>
                                                                 <Link 
                                                                     to={ route('home.posts.edit', { id: post.id})}
@@ -548,8 +564,8 @@ export default function MyProfile() {
                                         </div>
                             
                                         <p className="card-text">{ post.body }</p>
-                                        <p>
-                                            {/* {
+                                        {/* <p>
+                                            {
                                                 function replaceAts() {
                                                 var replacer = function(match) {
                                                     var id = match.substr(1);
@@ -565,94 +581,74 @@ export default function MyProfile() {
                                                 replaceAts();
 
                                                 console.log(list);
-                                            } */}
-                                        </p>
+                                            }
+                                        </p> */}
                                         {/* <span><a href="" className="text-decoration-none text-faansy-red">onlyfans.com/natalie.brooks</a> / <a href="" className="text-decoration-none text-faansy-red">onlyfans.com/natalie.brooks</a></span> */}
                                     </div>
 
-                                    { (post.pay_per_view == false) 
+                                    { (post?.payperviewamount <= 0) 
                                         ?
                                             <>
-                                            {/* <video controls width="250" className="card-img-bottom rounded-0" alt="video title">
-                                                <source src="/media/cc0-videos/flower.webm" type="video/webm" />
-                                                <source src="../videos/spicy_tofu(720p).mp4" type="video/mp4" />
-                                                Download the
-                                                <a href="/media/cc0-videos/flower.webm">WEBM</a>
-                                                or
-                                                <a href="../videos/spicy_tofu(720p).mp4">MP4</a>
-                                                video.
-                                            </video> */}
-                                            <img src={ post.image_url ? `${ Constants.serverURL }/storage/${post.image_url}` : MissingImage } className="card-img-bottom rounded-0" alt="..." />
+                                                { post?.video?.video_url?.length > 0 && 
+                                                    <video controls width="250" height={400} className="card-img-bottom object-fit-cover rounded-0 mb-1" alt={ post?.id }>
+                                                        <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/webm" />
+                                                        <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/mp4" />
+                                                        Download the
+                                                        <a href={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` }>video</a>.
+                                                    </video> 
+                                                }
+                                                <div id={`carouselIndicators${ post?.id }`} className="carousel slide mb-3">
+                                                    <div className="carousel-indicators">
+                                                        { post?.images?.length > 0 && post?.images?.map((image, index) => {
+                                                            return (
+                                                                <button type="button" data-bs-target={`carouselIndicators${ image?.id }`} data-bs-slide-to={index} className="active" aria-current="true" aria-label={ `Slide` + (index+1) }></button>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                    <div className="carousel-inner">
+                                                        { post?.images?.length > 0 && post?.images?.map((image, index) => {
+                                                                if (index == 0) {
+                                                                    return (
+                                                                        <div key={ image.id } className={`carousel-item active`}>
+                                                                            <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
+                                                                        </div>
+                                                                    )
+                                                                }
+
+                                                                return (
+                                                                    <div key={ image.id } className={`carousel-item`}>
+                                                                        <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
+                                                    { post?.images?.length > 1 && 
+                                                        <>
+                                                            <button className="carousel-control-prev" type="button" data-bs-target={`#carouselIndicators${ post?.id }`} data-bs-slide="prev">
+                                                                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                                <span className="visually-hidden">Previous</span>
+                                                            </button>
+                                                            <button className="carousel-control-next" type="button" data-bs-target={`#carouselIndicators${ post?.id }`} data-bs-slide="next">
+                                                                <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                                                                <span className="visually-hidden">Next</span>
+                                                            </button>
+                                                        </>
+                                                    }
+                                                </div>
                                             </>
                                         : 
                                             <span className="card-img-bottom rounded d-flex justify-content-center align-items-center">
-                                                <button className='btn btn-faansy-red text-light'>View Content (Pay-Per-View (${ post.pay_per_view_amount }))</button>
+                                                <Link 
+                                                    to={ route('home.posts.show', { 'id': post?.id})}
+                                                    className='btn btn-faansy-red text-light'>
+                                                        View Content (Pay-Per-View { (user?.id == post?.user?.id) ? '— Owner (free)' : `($` + (post?.payperviewamount).toFixed(2) + `)`})
+                                                </Link>
                                             </span>
                                     }
 
-                                    <section className="card-body row px-4 column-gap-4 row-gap-3">
-                                        {/* <article className="card col-md text-bg-dark border-0 rounded">
-                                            <img src="../images/background.jpeg" className="card-img object-fit-cover" style={{ maxHeight: '125px' }} alt="..." />
-                                            <div className="card-img-overlay">
-                                                <div className="d-flex justify-content-between align-items-start px-2 pt-2 h-50">
-                                                    <span className="bg-secondary opacity-50 px-1 rounded z-2"><small>Free</small></span>
-                                                    <span className="mb-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                                            className="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-                                                            <path
-                                                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                                                        </svg>
-                                                    </span>
-                                                </div>
-                                        
-                                                <div className="d-flex column-gap-3 px-2 pb-3 h-50" style={{ background: '#256d7c26' }}>
-                                                    <div className="d-flex align-items-end">
-                                                        <img src="../images/photo.jpeg" alt="" width="70" height="70"
-                                                            className="z-1 object-fit-cover border border-light border-3 rounded-circle" />
-                                                        <span className="z-2 bg-success p-1 border border-light border-1 rounded-circle"
-                                                            style={{ width: '10px', height: '10px', marginLeft: '-17px', marginBottom: '5px' }}></span>
-                                                    </div>
-                                                    <div className="text-light d-flex flex-column justify-content-center">
-                                                        <h4 className="fs-6">Raylan</h4>
-                                                        <span style={{ marginTop: '-14px' }}><small>@goalgoddess</small></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </article>
-                                        <article className="card col-md text-bg-dark border-0 rounded">
-                                            <img src="../images/background.jpeg" className="card-img object-fit-cover" style={{ maxHeight: '125px' }} alt="..." />
-                                            <div className="card-img-overlay">
-                                                <div className="d-flex justify-content-between align-items-start px-2 pt-2 h-50">
-                                                    <span className="bg-secondary opacity-50 px-1 rounded z-2"><small>Free</small></span>
-                                                    <span className="mb-1">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                                            className="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-                                                            <path
-                                                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
-                                                        </svg>
-                                                    </span>
-                                                </div>
-                                        
-                                                <div className="d-flex column-gap-3 px-2 pb-3 h-50" style={{ background: '#256d7c26' }}>
-                                                    <div className="d-flex align-items-end">
-                                                        <img src="../images/photo.jpeg" alt="" width="70" height="70"
-                                                            className="z-1 object-fit-cover border border-light border-3 rounded-circle" />
-                                                        <span className="z-2 bg-success p-1 border border-light border-1 rounded-circle"
-                                                            style={{ width: '10px', height: '10px', marginLeft: '-17px', marginBottom: '5px' }}></span>
-                                                    </div>
-                                                    <div className="text-light d-flex flex-column justify-content-center">
-                                                        <h4 className="fs-6">Raylan</h4>
-                                                        <span style={{ marginTop: '-14px' }}><small>@goalgoddess</small></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </article> */}
-                                    </section>
-
                                     <section className="px-2 d-flex justify-content-between align-items-center">
-
                                         <div className="mb-2 d-flex justify-content-start align-items-center column-gap-3">
-
                                             <span className='like-section'>
                                                 {(post?.likes?.length > 0) && post.likes?.find(foundLike => foundLike?.user?.id == user?.id)
                                                     ? 
@@ -1085,7 +1081,8 @@ export default function MyProfile() {
                                                     placeholder="Poll Option 4 (if applicable)" />
                                             </section>
                                         </div>
-                                        <div className="modal-footer">
+                                        <hr />
+                                        <div className='d-flex justify-content-end'>
                                             <button type="submit" className="btn btn-sm btn-faansy-red text-light">Add Poll</button>
                                         </div>
                                     </form>
@@ -1107,21 +1104,24 @@ export default function MyProfile() {
                                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div className="modal-body">
-                                    <form onSubmit={ updateProfile }>
+                                    <form onSubmit={ updateProfile } encType='multipart/form-data'>
                                         <div className="mb-3 d-flex flex-column row-gap-2">
                                             <div className='row row-gap-2'>
                                                 <div className='col-md'>
                                                     <input 
                                                         type="file" 
                                                         accept="image/*" 
-                                                        name="userImageUrl" 
-                                                        id="userImageUrl" 
+                                                        name="user_image_url" 
+                                                        id="user_image_url" 
                                                         className='form-control'
-                                                        value={ userImageUrl } 
-                                                        onChange={e => setUserImageUrl(e.target.value)}
+                                                        // value={ creator.data.user_image_url ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            user_image_url: event.target.files[0],
+                                                        }) }
                                                         placeholder="User Image" />
                                                 </div>
-                                                <small><small>*Upload your profile image</small></small>
+                                                <small style={{ marginTop: '-7px' }}><small>*Upload your profile image</small></small>
                                             </div>
 
                                             <div className='row row-gap-2'>
@@ -1129,35 +1129,44 @@ export default function MyProfile() {
                                                     <input 
                                                         type="file" 
                                                         accept="image/*"
-                                                        name="userBackgroundImageUrl" 
-                                                        id="userBackgroundImageUrl" 
+                                                        name="user_background_image_url" 
+                                                        id="user_background_image_url" 
                                                         className='form-control'
-                                                        value={ userBackgroundImageUrl } 
-                                                        onChange={e => setUserBackgroundImageUrl(e.target.value)}
+                                                        // value={ creator.data.user_background_image_url ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            user_background_image_url: event.target.files[0],
+                                                        }) }
                                                         placeholder="User Profile Background Image" />
                                                 </div>
-                                                <small><small>*Upload your profile background image</small></small>
+                                                <small style={{ marginTop: '-7px' }}><small>*Upload your profile background image</small></small>
                                             </div>
 
                                             <div className='row row-gap-2'>
                                                 <div className='col-md'>
                                                     <input 
                                                         type="text" 
-                                                        name="firstName" 
-                                                        id="firstName" 
+                                                        name="first_name" 
+                                                        id="first_name" 
                                                         className='form-control'
-                                                        value={ firstName } 
-                                                        onChange={e => setFirstName(e.target.value)}
+                                                        value={ creator.data.first_name ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            first_name: event.target.value,
+                                                        }) }
                                                         placeholder="First Name" />
                                                 </div>
                                                 <div className='col-md'>
                                                     <input 
                                                         type="text" 
-                                                        name="lastName" 
-                                                        id="lastName" 
+                                                        name="last_name" 
+                                                        id="last_name" 
                                                         className='form-control'
-                                                        value={ lastName } 
-                                                        onChange={e => setLastName(e.target.value)}
+                                                        value={ creator.data.last_name ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            last_name: event.target.value,
+                                                        }) }
                                                         placeholder="Last Name" />
                                                 </div>
                                             </div>
@@ -1169,18 +1178,24 @@ export default function MyProfile() {
                                                         name="username" 
                                                         id="username" 
                                                         className='form-control'
-                                                        value={ username } 
-                                                        onChange={e => setUsername(e.target.value)}
+                                                        value={ creator.data.username ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            username: event.target.value,
+                                                        }) }
                                                         placeholder="Userame" />
                                                 </div>
                                                 <div className='col-md'>
                                                     <input 
-                                                        type="text" 
+                                                        type="email" 
                                                         name="email" 
                                                         id="email" 
                                                         className='form-control'
-                                                        value={ email } 
-                                                        onChange={e => setEmail(e.target.value)}
+                                                        value={ creator.data.email ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            email: event.target.value,
+                                                        }) }
                                                         placeholder="Email" />
                                                 </div>
                                             </div>
@@ -1192,8 +1207,11 @@ export default function MyProfile() {
                                                         name="bio" 
                                                         id="bio" 
                                                         className='form-control'
-                                                        value={ bio } 
-                                                        onChange={e => setBio(e.target.value)}
+                                                        value={ creator.data.bio ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            bio: event.target.value,
+                                                        }) }
                                                         placeholder="Bio"></textarea>
                                                 </div>
                                             </div>
@@ -1202,109 +1220,131 @@ export default function MyProfile() {
                                                 <div className='col-md'>
                                                     <input 
                                                         type="text" 
-                                                        name="address" 
-                                                        id="address" 
+                                                        name="twitter_account" 
+                                                        id="twitter_account" 
                                                         className='form-control'
-                                                        value={ address } 
-                                                        onChange={e => setAddress(e.target.value)}
-                                                        placeholder="Address" />
-                                                </div>
-                                            </div>
-
-                                            <div className='row row-gap-2'>
-                                                <div className='col-md'>
-                                                    <input 
-                                                        type="text" 
-                                                        name="twitterAccount" 
-                                                        id="twitterAccount" 
-                                                        className='form-control'
-                                                        value={ twitterAccount } 
-                                                        onChange={e => setTwitterAccount(e.target.value)}
+                                                        value={ creator.data.twitter_account ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            twitter_account: event.target.value,
+                                                        }) }
                                                         placeholder="Twitter Account" />
                                                 </div>
 
                                                 <div className='col-md'>
                                                     <input 
                                                         type="text" 
-                                                        name="googleAccount" 
-                                                        id="googleAccount" 
+                                                        name="google_account" 
+                                                        id="google_account" 
                                                         className='form-control'
-                                                        value={ googleAccount } 
-                                                        onChange={e => setGoogleAccount(e.target.value)}
+                                                        value={ creator.data.google_account ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            google_account: event.target.value,
+                                                        }) }
                                                         placeholder="Google Account" />
                                                 </div>
                                             </div>
 
-                                            <div className='row row-gap-2'>
-                                                <div className='col-md'>
-                                                    <div class="form-check form-switch">
-                                                        <input 
-                                                            class="form-check-input" 
-                                                            type="checkbox" 
-                                                            role="switch" 
-                                                            id="showActivityStatus" />
-                                                        <small class="form-check-label" for="showActivityStatus">Show Activity Status</small>
-                                                    </div>
-                                                </div>
+                                            <div className='d-flex align-items-center gap-2'>
+                                                { showActivityStatus == false ?
+                                                    (<span 
+                                                        type="button" 
+                                                        onClick={() => setShowActivityStatus(true)}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" className="bi bi-toggle-off" viewBox="0 0 16 16">
+                                                            <path d="M11 4a4 4 0 0 1 0 8H8a5 5 0 0 0 2-4 5 5 0 0 0-2-4zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8M0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5"/>
+                                                        </svg>
+                                                    </span>) :
+                                                    (<span 
+                                                        type="button" 
+                                                        onClick={() => setShowActivityStatus(false)}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" className="bi bi-toggle-on" viewBox="0 0 16 16">
+                                                            <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8"/>
+                                                        </svg>
+                                                    </span>)
+                                                }
+                                                <small className="form-check-label" htmlFor="showActivityStatus">Show Activity Status</small>
                                             </div>
 
-                                            <div className='row row-gap-2'>
-                                                <div className='col-md'>
-                                                    <div class="form-check form-switch">
-                                                        <input 
-                                                            class="form-check-input" 
-                                                            type="checkbox" 
-                                                            role="switch" 
-                                                            id="usersMustBeSubscribedToViewMyContent" />
-                                                        <small class="form-check-label" for="usersMustBeSubscribedToViewMyContent">Users Must Be Subscribed To View My Content</small>
-                                                    </div>
-                                                </div>
+                                            <div className='d-flex align-items-center gap-2'>
+                                                { usersMustBeSubscribedToViewMyContent == false ?
+                                                    (<span 
+                                                        type="button" 
+                                                        onClick={() => setUsersMustBeSubscribedToViewMyContent(true)}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" className="bi bi-toggle-off" viewBox="0 0 16 16">
+                                                            <path d="M11 4a4 4 0 0 1 0 8H8a5 5 0 0 0 2-4 5 5 0 0 0-2-4zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8M0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5"/>
+                                                        </svg>
+                                                    </span>) :
+                                                    (<span 
+                                                        type="button" 
+                                                        onClick={() => setUsersMustBeSubscribedToViewMyContent(false)}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" className="bi bi-toggle-on" viewBox="0 0 16 16">
+                                                            <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8"/>
+                                                        </svg>
+                                                    </span>)
+                                                }
+                                                <small className="form-check-label" htmlFor="showActivityStatus">Users Must Be Subscribed To View My Content</small>
                                             </div>
 
                                             <div className='row row-gap-2 align-items-center'>
                                                 <div className='col-md'>
-                                                    <div class="form-check form-switch">
-                                                        <input 
-                                                            type="checkbox" 
-                                                            name="freeSubscription"
-                                                            id="freeSubscription" 
-                                                            value={ freeSubscription } 
-                                                            onChange={e => setFreeSubscription(e.target.value)}
-                                                            class="form-check-input" 
-                                                            role="switch" />
-                                                        <small class="form-check-label" for="freeSubscription">Free Subscription</small>
+                                                    <div className='d-flex align-items-center gap-2'>
+                                                        { freeSubscription == false ?
+                                                            (<span 
+                                                                type="button" 
+                                                                onClick={() => setFreeSubscription(true)}>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" className="bi bi-toggle-off" viewBox="0 0 16 16">
+                                                                    <path d="M11 4a4 4 0 0 1 0 8H8a5 5 0 0 0 2-4 5 5 0 0 0-2-4zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8M0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5"/>
+                                                                </svg>
+                                                            </span>) :
+                                                            (<span 
+                                                                type="button" 
+                                                                onClick={() => setFreeSubscription(false)}>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" className="bi bi-toggle-on" viewBox="0 0 16 16">
+                                                                    <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8"/>
+                                                                </svg>
+                                                            </span>)
+                                                        }
+                                                        <small className="form-check-label" htmlFor="showActivityStatus">Free Subscription</small>
                                                     </div>
                                                 </div>
                                                 <div className='col-md'>
                                                     <input 
                                                         type="text" 
-                                                        name="subscriptionAmount" 
-                                                        id="subscriptionAmount" 
+                                                        name="subscription_amount" 
+                                                        id="subscription_amount" 
                                                         className='form-control'
-                                                        value={ subscriptionAmount } 
-                                                        onChange={e => setSubscriptionAmount(e.target.value)}
+                                                        value={ creator.data.subscription_amount ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            subscription_amount: event.target.value,
+                                                        }) }
                                                         placeholder="Subscription Amount" />
                                                 </div>
                                             </div>
 
-                                            <div className='row row-gap-2 align-items-center'>
-                                                <div className='col-md'>
-                                                    <div class="form-check form-switch">
-                                                        <input 
-                                                            type="checkbox" 
-                                                            name="showSubscriptionOffers"
-                                                            id="showSubscriptionOffers" 
-                                                            value={ showSubscriptionOffers } 
-                                                            onChange={e => setShowSubscriptionOffers(e.target.value)}
-                                                            class="form-check-input" 
-                                                            role="switch" />
-                                                        <small class="form-check-label" for="showSubscriptionOffers">Show Subscription Offers</small>
-                                                    </div>
-                                                </div>
+                                            <div className='d-flex align-items-center gap-2'>
+                                                { showSubscriptionOffers == false ?
+                                                    (<span 
+                                                        type="button" 
+                                                        onClick={() => setShowSubscriptionOffers(true)}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" className="bi bi-toggle-off" viewBox="0 0 16 16">
+                                                            <path d="M11 4a4 4 0 0 1 0 8H8a5 5 0 0 0 2-4 5 5 0 0 0-2-4zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8M0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5"/>
+                                                        </svg>
+                                                    </span>) :
+                                                    (<span 
+                                                        type="button" 
+                                                        onClick={() => setShowSubscriptionOffers(false)}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" className="bi bi-toggle-on" viewBox="0 0 16 16">
+                                                            <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8"/>
+                                                        </svg>
+                                                    </span>)
+                                                }
+                                                <small className="form-check-label" htmlFor="showActivityStatus">Show Subscription Offers</small>
                                             </div>
-
                                         </div>
-                                        <div className="modal-footer pe-0 me-0">
+                                        <hr />
+                                        <div className='d-flex justify-content-end'>
                                             <button type="submit" className="btn btn-sm btn-faansy-red text-light">Update Profile</button>
                                         </div>
                                     </form>
@@ -1347,8 +1387,53 @@ export default function MyProfile() {
                                                 </small>
                                             </div>
                                         </div>
-                                        <div className="modal-footer me-0 pe-0">
+                                        <hr />
+                                        <div className='d-flex justify-content-end'>
                                             <button type="submit" className="btn btn-sm btn-faansy-red text-light">Verify Profile</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div 
+                        className="modal fade" 
+                        id="becomeACreatorModal" 
+                        tabIndex="-1" 
+                        aria-labelledby="becomeACreatorModalLabel" 
+                        aria-hidden="true">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="becomeACreatorModalLabel">Request to Become A Creator</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div className="modal-body">
+                                    <form onSubmit={ becomeACreator } encType='multipart/form-data'>
+                                        <div className="mb-3 d-flex flex-column row-gap-2">
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*"
+                                                        name="verification_material_image_url" 
+                                                        id="verification_material_image_url" 
+                                                        className='form-control'
+                                                        onChange={ event => userverification.setData({
+                                                            ...userverification.data,
+                                                            verification_material_image_url: event.target.files[0],
+                                                        }) }
+                                                        placeholder="User Verification Image" />
+                                                </div>
+                                                <small style={{ marginTop: '-7.5px' }}>
+                                                    <small>*Could be an international passport, national ID card</small>
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <div className='d-flex justify-content-end'>
+                                            <button type="submit" className="btn btn-sm btn-faansy-red text-light">Send Request</button>
                                         </div>
                                     </form>
                                 </div>

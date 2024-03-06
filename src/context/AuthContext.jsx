@@ -167,13 +167,6 @@ export const AuthProvider = ({children}) => {
             }
         })
         navigate(route('index'));
-        swal.fire({
-            text: 'You have been logged out',
-            color: "#820303",
-            width: 300,
-            position: 'top',
-            showConfirmButton: false,
-        });
     }
 
 

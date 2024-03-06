@@ -24,7 +24,7 @@ export default function Index() {
 
   return (
     <Layout>
-      <section className="col-sm-10 col-md-5 card rounded-0">
+      <section className="col-sm-10 col-md-5 card rounded-0 main-content">
         <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
             <h2 className="text-uppercase fs-5 fw-bold">Wallet</h2>
             <span className="mb-2">
@@ -57,27 +57,27 @@ export default function Index() {
                         className='btn btn-sm btn-success my-2'><small>Fund wallet</small>
                       </span>
 
-                      <div class="modal fade" id="fundWalletModal" tabindex="-1" aria-labelledby="fundWalletModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h4 class="modal-title fs-5" id="fundWalletModalLabel">Fund Wallet</h4>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      <div className="modal fade" id="fundWalletModal" tabIndex="-1" aria-labelledby="fundWalletModalLabel" aria-hidden="true">
+                        <div className="modal-dialog">
+                          <div className="modal-content">
+                            <div className="modal-header">
+                              <h4 className="modal-title fs-5" id="fundWalletModalLabel">Fund Wallet</h4>
+                              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                               { (cards?.data?.length > 0) ?
                                 <form className='d-flex flex-column'>
-                                  <div class="mb-3">
+                                  <div className="mb-3">
                                     <input 
                                       type="text" 
-                                      class="form-control" 
+                                      className="form-control" 
                                       id="amount" 
                                       placeholder='Amount in USD' />
                                   </div> 
-                                  <div class="form-floating mb-3">
+                                  <div className="form-floating mb-3">
                                     {(cards?.data?.length > 0) && 
                                         <>
-                                          <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                          <select className="form-select" id="floatingSelect" aria-label="Floating label select example">
                                             {(cards?.data?.length > 0) && cards?.data?.map(card => {
                                               return (
                                                   <option key={ card?.id } value="">{ card.card_number }</option>
@@ -95,7 +95,7 @@ export default function Index() {
                                   <hr />
 
                                   <div className='align-self-end'>
-                                    <button type="button" class="btn btn-sm btn-success text-light">Fund Now</button>
+                                    <button type="button" className="btn btn-sm btn-success text-light">Fund Now</button>
                                   </div> 
                                 </form>
                                 : (

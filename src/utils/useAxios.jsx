@@ -23,6 +23,24 @@ const useAxios = () => {
             "Content-Type": "multipart/form-data",
         },
     });
+    
+    async function refreshFunc() {
+        const response = await axiosInstance.post(`${baseURL}/refresh`, {
+            headers: {
+                // 'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                "Content-Type": "multipart/form-data",
+                'Authorization': `Bearer ${authTokens?.authorization.token}`,
+            },
+        });
+        console.log(response.data)
+        console.log('refreshed');
+
+        localStorage.setItem('authTokens', JSON.stringify(response.data))
+
+        setAuthTokens(response.data);
+        setUser(jwtDecode(response.data.authorization.token));
+    };
 
     axiosInstance.interceptors.request.use(async req => {
         const user = jwtDecode(authTokens?.authorization?.token);
@@ -30,19 +48,29 @@ const useAxios = () => {
 
         if (!isExpired) return req;
 
-        // // modify this navigate before usage
-        // // if (isExpired) navigate(route('index'));
+        refreshFunc();
 
-        const response = await axios.post(`${baseURL}/refresh`);
-        console.log(response.data)
+        // // // modify this navigate before usage
+        // // // if (isExpired) navigate(route('index'));
 
-        localStorage.setItem('authTokens', JSON.stringify(response.data))
+        // const response = await axios.post(`${baseURL}/refresh`, {
+        //     headers: {
+        //         // 'Content-Type': 'application/json',
+        //         'Access-Control-Allow-Origin': '*',
+        //         "Content-Type": "multipart/form-data",
+        //         'Authorization': `Bearer ${authTokens?.authorization.token}`,
+        //     },
+        // });
+        // console.log(response.data)
+        // console.log('refreshed');
 
-        setAuthTokens(response.data);
-        setUser(jwtDecode(response.data.authorization.token));
+        // localStorage.setItem('authTokens', JSON.stringify(response.data))
 
-        // Update user's last seen here
-        // await ...
+        // setAuthTokens(response.data);
+        // setUser(jwtDecode(response.data.authorization.token));
+
+        // // Update user's last seen here
+        // // await ...
 
         req.headers.Authorization = `Bearer ${response?.data?.authorization?.token}`;
         return req;

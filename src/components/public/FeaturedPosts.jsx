@@ -11,7 +11,6 @@ import { useFeaturedPosts } from '@/hooks/useFeaturedPosts.jsx';
 import Loading from '@/components/Loading.jsx';
 import Logo from '@/assets/images/logo.png';
 import MissingImage from '@/assets/images/name_non-transparent.png';
-// import Video from '@/assets/videos/spicy_tofu(720p).mp4';
 
 
 export default function FeaturedPosts() {

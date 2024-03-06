@@ -30,13 +30,13 @@ export function usePostlike(id = null) {
         console.log(post_id)
         return axiosInstance.post('postlikes', {post_id})
             .then(() => {
-                swal.fire({
-                    text: 'Post liked',
-                    color: "#820303",
-                    width: 200,
-                    position: 'top',
-                    showConfirmButton: false,
-                });
+                // swal.fire({
+                //     text: 'Post liked',
+                //     color: "#820303",
+                //     width: 200,
+                //     position: 'top',
+                //     showConfirmButton: false,
+                // });
             })
             .catch(error => {
                 // console.log(error.response);
@@ -63,13 +63,13 @@ export function usePostlike(id = null) {
     async function destroyPostlike(postlike) {
         return axiosInstance.delete(`postlikes/${postlike.id}/`)
             .then(() => {
-                swal.fire({
-                    text: 'Post unliked',
-                    color: "#820303",
-                    width: 200,
-                    position: 'top',
-                    showConfirmButton: false,
-                });
+                // swal.fire({
+                //     text: 'Post unliked',
+                //     color: "#820303",
+                //     width: 200,
+                //     position: 'top',
+                //     showConfirmButton: false,
+                // });
             })
             .catch(error => {
                 // console.log(error);
