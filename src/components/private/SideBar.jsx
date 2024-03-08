@@ -9,7 +9,7 @@ import MissingUserImage from '@/assets/images/icon.png';
 export default function SideBar() {
     const { user, logoutUser } = useContext(AuthContext);
     const [additionalNavVisible, setAdditionalNavVisible] = useState(false);
-    // console.log(user);
+    console.log(user);
 
     return (
         <>
@@ -18,7 +18,7 @@ export default function SideBar() {
                 <div className='d-flex gap-2 flex-wrap d-none d-md-block'>
                     <span href="" className="text-decoration-none text-light">
                         <div className="d-flex align-items-center column-gap-3 bg-dark rounded-pill py-1 ps-2 pe-4">
-                            <img src={ user.user_image_url ? `${ Constants.serverURL }/${ user.user_image_url }` : MissingUserImage } alt="" width="25" />
+                            <img src={ user.user_image_url ? `${ Constants.serverURL }/storage/${ user.user_image_url }` : MissingUserImage } alt="" width="25" height="25" className='object-fit-cover border border-light border-1 rounded-circle' />
                             <small className="fw-semibold text-light text-uppercase ms-2">{ user.first_name }</small>
                         </div>
                         {/* <div className="d-block d-md-none">
@@ -161,16 +161,26 @@ export default function SideBar() {
                     </Link>
                 </span>
 
-                { (user.role.title == 'super-admin' || user.role.title == 'admin') &&
-                    <span className="sidebar-item d-none d-md-block">
-                        <Link to={ route('home.user-verifications.index') } className="text-decoration-none text-secondary d-flex align-items-center column-gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="#4c5661" className="bi bi-person-check" viewBox="0 0 16 16">
-                                <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
-                                <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
-                            </svg>
-                            <span className="fs-6 fw-semibold">User Verifications</span>
-                        </Link>
-                    </span>
+                { (user.role.title == 'super-admin' || user.role.title == 'admin') && 
+                    <>
+                        <span className="sidebar-item d-none d-md-block">
+                            <Link to={ route('home.user-verifications.index') } className="text-decoration-none text-secondary d-flex align-items-center column-gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="#4c5661" className="bi bi-person-check" viewBox="0 0 16 16">
+                                    <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                                    <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
+                                </svg>
+                                <span className="fs-6 fw-semibold">User Verifications</span>
+                            </Link>
+                        </span>
+                        <span className="sidebar-item d-none d-md-block">
+                            <Link to={ route('home.user-become-creators.index') } className="text-decoration-none text-secondary d-flex align-items-center column-gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="#4c5661" className="bi bi-person-lines-fill" viewBox="0 0 16 16">
+                                    <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z"/>
+                                </svg>
+                                <span className="fs-6 fw-semibold">Become Creator Requests</span>
+                            </Link>
+                        </span>
+                    </>
                 }
 
                 <span className="align-self-stretch">
@@ -242,12 +252,24 @@ export default function SideBar() {
                     </Link>
 
                     <span className='user-and-other-navs'>
-                        <span 
-                            type="button"  
-                            onClick={() => setAdditionalNavVisible(!additionalNavVisible)}
-                            className="text-bg-dark text-light rounded py-1 px-2">{ user.first_name.slice(0, 1) }
-                        </span>
+                        { user.user_image_url ? 
+                                <span className='d-flex align-items-center column-gap-3 bg-dark rounded-pill' 
+                                    type="button"  
+                                    onClick={() => setAdditionalNavVisible(!additionalNavVisible)}>
+                                    <img src={ `${ Constants.serverURL }/storage/${ user.user_image_url }` } alt="" width="27" height="27" className='object-fit-cover border border-light border-1 rounded-circle' />
+                                </span> 
+                            : 
+                                <span 
+                                    type="button"  
+                                    onClick={() => setAdditionalNavVisible(!additionalNavVisible)}
+                                    className="text-bg-dark text-light rounded py-1 px-2">{ user.first_name.slice(0, 1) }
+                                </span>
+                        }
                     </span>
+
+
+
+
                 </div>
             </aside>
             {/* Mobile Nav end */}
@@ -259,7 +281,7 @@ export default function SideBar() {
                         <div className='d-flex gap-2 flex-wrap'>
                             <span href="" className="text-decoration-none text-light">
                                 <div className="d-flex align-items-center column-gap-3 bg-dark rounded-pill py-1 ps-2 pe-4">
-                                    <img src={ user.user_image_url ? `${ Constants.serverURL }/storage/${ user.user_image_url }` : MissingUserImage } alt="" width="25" />
+                                    <img src={ user.user_image_url ? `${ Constants.serverURL }/storage/${ user.user_image_url }` : MissingUserImage } alt="" width="25" height="25" className='object-fit-cover border border-light border-1 rounded-circle' />
                                     <small className="fw-semibold text-light text-uppercase ms-2">{ user.first_name }</small>
                                 </div>
                                 {/* <div className="d-block d-md-none">
@@ -402,7 +424,8 @@ export default function SideBar() {
                             </Link>
                         </span>
 
-                        { (user.role.title == 'super-admin' || user.role.title == 'admin') &&
+                        { (user.role.title == 'super-admin' || user.role.title == 'admin') && 
+                        <>
                             <span className="sidebar-item">
                                 <Link to={ route('home.user-verifications.index') } className="text-decoration-none text-secondary d-flex align-items-center column-gap-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="#4c5661" className="bi bi-person-check" viewBox="0 0 16 16">
@@ -412,6 +435,15 @@ export default function SideBar() {
                                     <span className="fs-6 fw-semibold">User Verifications</span>
                                 </Link>
                             </span>
+                            <span className="sidebar-item">
+                                <Link to={ route('home.user-become-creators.index') } className="text-decoration-none text-secondary d-flex align-items-center column-gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="#4c5661" className="bi bi-person-lines-fill" viewBox="0 0 16 16">
+                                        <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1z"/>
+                                    </svg>
+                                    <span className="fs-6 fw-semibold">Become Creator Requests</span>
+                                </Link>
+                            </span>
+                        </>
                         }
 
                         <span className="align-self-stretch">

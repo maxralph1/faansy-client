@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import swal from 'sweetalert2';
 import { route } from '@/routes';
 import Constants from '@/utils/Constants.jsx';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -26,40 +27,67 @@ export const AuthProvider = ({children}) => {
     const navigate = useNavigate();
 
 
-    const registerUser = async (email, firstname, lastname, username, password) => {
-        const response = await fetch(`${ Constants.serverURL }/api/register`, {
-            method: 'POST', 
-            headers: {
-                'Content-Type': 'application/json', 
-                'Access-Control-Allow-Origin': 'http://localhost:5173'
-            }, 
-            body: JSON.stringify({
-                email, 
-                first_name: firstname, 
-                last_name: lastname, 
-                username, 
-                password 
-            })
-        })
+    // const registerUser = async (email, firstname, lastname, username, password) => {
+    //     const response = await fetch(`${ Constants.serverURL }/api/register`, {
+    //         method: 'POST', 
+    //         headers: {
+    //             'Content-Type': 'application/json', 
+    //             // 'Access-Control-Allow-Origin': `${ Constants.clientURL }`
+    //         }, 
+    //         body: JSON.stringify({
+    //             email, 
+    //             first_name: firstname, 
+    //             last_name: lastname, 
+    //             username, 
+    //             password 
+    //         })
+    //     })
 
-        if (response.status == 201) {
-            navigate(route('index'));
-            swal.fire({
-                text: 'Registration successful, you can now sign in',
-                color: "#820303",
-                width: 325,
-                position: 'top',
-                showConfirmButton: false,
-            });
-        } else {
-            swal.fire({
-                text: 'Something went wrong. Retry registration.',
-                color: "#820303",
-                width: 325,
-                position: 'top',
-                showConfirmButton: false,
-            });
-        }
+    //     console.log(response)
+
+    //     if (response.status == 200 || response.status == 201) {
+    //         navigate(route('index'));
+    //         swal.fire({
+    //             text: 'Registration successful, you can now sign in',
+    //             color: "#820303",
+    //             width: 325,
+    //             position: 'top',
+    //             showConfirmButton: false,
+    //         });
+    //     } else {
+    //         swal.fire({
+    //             text: 'Something went wrong. Retry registration.',
+    //             color: "#820303",
+    //             width: 325,
+    //             position: 'top',
+    //             showConfirmButton: false,
+    //         });
+    //     }
+    // }
+
+
+    const registerUser = async (email, firstname, lastname, username, password) => {
+        await axios.post(`${ Constants.serverURL }/api/register`, {email, first_name: firstname, last_name: lastname, username, password})
+            .then(() => {
+                navigate(route('index'));
+                swal.fire({
+                    text: 'Registration successful, you can now sign in',
+                    color: "#820303",
+                    width: 325,
+                    position: 'top',
+                    showConfirmButton: false,
+                });
+            })
+            .catch(error => {
+                // console.log(error);
+                swal.fire({
+                    text: 'Something went wrong. Retry registration.',
+                    color: "#820303",
+                    width: 325,
+                    position: 'top',
+                    showConfirmButton: false,
+                });
+            })
     }
 
 
@@ -140,7 +168,7 @@ export const AuthProvider = ({children}) => {
         if (response.status == 200) {
             console.log('Logged in');
             setAuthTokens(data);
-            setUser(jwtDecode(data.authorization.token));
+            setUser(jwtDecode(data?.authorization?.token));
             localStorage.setItem('authTokens', JSON.stringify(data));
             navigate(route('home.index'));
             console.log('Login successful');

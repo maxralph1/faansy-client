@@ -6,15 +6,16 @@ import utc from 'dayjs/plugin/utc';
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
 import { useParams } from 'react-router-dom';
+import Constants from '@/utils/Constants.jsx';
 import { useMessage } from '@/hooks/useMessage.jsx';
 import Layout from '@/components/private/Layout.jsx';
 
 export default function Show() {
   const { user } = useContext(AuthContext);
   const params = useParams();
-  const { message, getMessage, destroyMessage } = useMessage(params.id);
+  const { message, getMessage, destroyMessage } = useMessage(params?.id);
 
-  console.log(message);
+  console.log(message?.data);
 
   return (
     <Layout>
@@ -30,24 +31,26 @@ export default function Show() {
             </span>
         </section>
 
-        <article className='w-75 rounded' style={{ backgroundColor: '#82030324' }}>
+        <article className='w-100 rounded my-5 d-flex justify-content-center'>
           <div className="d-flex flex-column justify-content-center gap-2 p-2">
-            <div>
-              <span className='card-text fs-6 fw-semibold'>{ message?.data?.body }</span>
-            </div>
+            { message?.data?.data?.body != "undefined" && 
+              <div>
+                <span className='card-text fs-6 fw-semibold'>{ message?.data?.data?.body }</span>
+              </div>
+            }
             <div className='d-flex flex-column'>
                 <>
-                  { message?.image_url && 
+                  { message?.data?.data?.image_url && 
                   <span className='pt-2'>
-                    <img src={ `${ Constants.serverURL }/storage/${ message?.image_url }` } className="card-img-bottom object-fit-cover rounded" height={150} /> 
+                    <img src={ `${ Constants.serverURL }/storage/${ message?.data?.data?.image_url }` } className="card-img-bottom object-fit-cover rounded" height={150} /> 
                   </span> }
                   { message?.video_url && 
                     <span className='pt-3'>
                       <video controls height={150} className="card-img-bottom object-fit-cover rounded mb-1" alt={ message?.id }>
-                        <source src={ `${ Constants.serverURL }/storage/${ message?.video_url }` } type="video/webm" />
-                        <source src={ `${ Constants.serverURL }/storage/${ message?.video_url }` } type="video/mp4" />
+                        <source src={ `${ Constants.serverURL }/storage/${ message?.data?.data?.video_url }` } type="video/webm" />
+                        <source src={ `${ Constants.serverURL }/storage/${ message?.data?.data?.video_url }` } type="video/mp4" />
                         Download the
-                        <a href={ `${ Constants.serverURL }/storage/${ message?.video_url }` }>video</a>.
+                        <a href={ `${ Constants.serverURL }/storage/${ message?.data?.data?.video_url }` }>video</a>.
                       </video> 
                     </span> }
                 </>

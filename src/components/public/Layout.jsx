@@ -5,7 +5,6 @@ dayjs.extend(relativeTime);
 import { Link } from 'react-router-dom';
 import { route } from '@/routes';
 import Constants from '@/utils/Constants.jsx';
-import { usePosts } from '@/hooks/usePosts.jsx';
 import Header from '@/components/public/Header.jsx';
 import FeaturedPosts from '@/components/public/FeaturedPosts.jsx';
 import Footer from '@/components/public/Footer.jsx';
@@ -14,10 +13,6 @@ import '@/assets/css/style.css';
 
 
 export default function Layout({ children }) {
-    const { posts, getPosts } = usePosts();
-
-    console.log(posts)
-
     return (
         <>
             <Header />

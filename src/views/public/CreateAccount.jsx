@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { route } from '@/routes';
 import AuthContext from '@/context/AuthContext.jsx';
 import Layout from '@/components/public/Layout.jsx';
+import Logo from '@/assets/images/logo.png';
 
 
 export default function CreateAccount() {
@@ -15,8 +16,8 @@ export default function CreateAccount() {
 
     let { registerUser } = useContext(AuthContext);
 
-    const handleSubmit = async e => {
-        e.preventDefault();
+    const handleSubmit = async event => {
+        event.preventDefault();
         if (password == password2) {
             registerUser(email, firstname, lastname, username, password)
         } else {
@@ -26,7 +27,8 @@ export default function CreateAccount() {
     
     return (
         <Layout>
-            <div className="col-md-6 col-sm-12 px-5 min-h-100 d-flex flex-column justify-content-center">
+            <div className="col-md-6 col-sm-12 px-3 min-h-100 d-flex flex-column justify-content-center">
+                <span className='position-absolute top-0 px-5 pt-3 mb-2 d-block d-md-none'><img src={ Logo } alt="Faansy Logo" width="95" /></span>
                 <h2 className="fs-6 px-5 text-end">Create account</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="d-flex flex-column px-5">
@@ -85,7 +87,7 @@ export default function CreateAccount() {
                 <div className="mt-4 px-5 d-flex justify-content-center flex-wrap column-gap-1">
                     <span className="">Already have an account?&nbsp;
                         <Link 
-                            to={ route('home.index') } 
+                            to={ route('index') } 
                             className="text-decoration-none text-faansy-red fs-6">
                                 Sign in
                         </Link>

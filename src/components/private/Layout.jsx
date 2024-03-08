@@ -17,7 +17,14 @@ export default function Layout({ children }) {
 
                 { children }
 
-                { location.pathname != route('home.stats.index') && <Aside />}
+                {/* { (location.pathname != route('home.stats.index')) || (location.pathname != route('home.user-verifications.index')) || (location.pathname != route('home.user-become-creators.index')) && <Aside />} */}
+                { (location.pathname == route('home.stats.index')) 
+                    ? '' 
+                        : (location.pathname == route('home.user-verifications.index'))
+                        ? ''
+                            : (location.pathname == route('home.user-become-creators.index'))
+                            ? '' 
+                                : <Aside />}
             </main>
         </>
     )

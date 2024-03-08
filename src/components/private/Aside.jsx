@@ -134,15 +134,16 @@ export default function Aside() {
                         </article>
                     )
                     
-                }) : (
-                    // <div>
-                    //     <span className='text-center'>No creators yet</span>
-                    // </div>
-                    <>
-                        <section className='vh-50 pt-5 mt-2'>
+                }) : (creators?.data?.length < 1) ? (
+                      <section className='py-5 d-flex justify-content-center align-items-center px-5'>
+                        <span className='py-5 h-50 text-center fw-semibold'>There are currently no creators on the platform.</span>
+                      </section>
+                ) : (
+                    <section className='vh-100 pt-5 mt-2 px-5'>
+                        <div className='h-50 px-5'>
                             <Loading />
-                        </section>
-                    </>
+                        </div>
+                    </section>
                 )}
             </section>
             

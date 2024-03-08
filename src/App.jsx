@@ -20,6 +20,8 @@ import PrivateUserLikesIndex from '@/views/private/userlikes/Index.jsx';
 
 import PrivateUserVerificationsIndex from '@/views/private/userverifications/Index.jsx';
 
+import PrivateUserBecomecreatorsIndex from '@/views/private/userbecomecreators/Index.jsx';
+
 import PrivateUserBlocksIndex from '@/views/private/blocks/Index.jsx';
 
 import PrivateUserRestrictsIndex from '@/views/private/restricts/Index.jsx';
@@ -85,6 +87,8 @@ function App() {
             <Route element={<PrivateUsersIndex />} path={ route('home.users.index') } />
 
             <Route element={<PrivateUserVerificationsIndex />} path={ route('home.user-verifications.index') } />
+
+            <Route element={<PrivateUserBecomecreatorsIndex />} path={ route('home.user-become-creators.index') } />
 
             <Route element={<PrivateUserLikesIndex />} path={ route('home.user-likes.index') } />
 

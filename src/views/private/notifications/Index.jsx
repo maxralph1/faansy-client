@@ -74,11 +74,17 @@ export default function Index() {
                                 <div className='d-flex justify-content-between'>
                                   <h2 className='card-text fs-6 fw-semibold'>
                                     {
-                                      notification.notification_type == 'subscription' 
-                                      ? 'Subscription Notification' 
-                                      : notification.notification_type == 'tip' 
-                                      ? 'Tip Notification' 
-                                      : 'New Message'
+                                      notification.notification_type == 'pay_per_view_in_chat' 
+                                      ? 'Pay-Per-View (on Chat) Notification' 
+                                        : notification.notification_type == 'pay_per_view_on_post' 
+                                        ? 'Pay-Per-View (on Post) Notification' 
+                                          : notification.notification_type == 'stream_tip' 
+                                          ? 'Stream Tip Notification' 
+                                            : notification.notification_type == 'subscription' 
+                                            ? 'Subscription Notification' 
+                                              :  notification.notification_type == 'tip' 
+                                              ? 'Tip Notification' 
+                                        : 'New Message'
                                     }
                                   </h2>
                                   {/* <span 
@@ -88,10 +94,16 @@ export default function Index() {
                                 </div>
                                 <div className='column-gap-2'>
                                     <p className='card-text fs-6'>
-                                      { notification.notification_type == 'subscription'
-                                        ? `${notification.transactor.first_name} ${notification.transactor.last_name} (@${notification.transactor.username}) subscribed to you` 
-                                          : notification.notification_type == 'tip'
-                                          ? `You received a tip of $${(notification.monies_if_any / 100).toFixed(2)}` 
+                                      { notification.notification_type == 'pay_per_view_in_chat'
+                                        ? `You received $${(notification.monies_if_any / 100).toFixed(2)} on chat Pay-Per-View` 
+                                          : notification.notification_type == 'pay_per_view_on_post'
+                                          ? `You received $${(notification.monies_if_any / 100).toFixed(2)} on post Pay-Per-View` 
+                                            : notification.notification_type == 'stream_tip'
+                                            ? `You received a stream tip of $${(notification.monies_if_any / 100).toFixed(2)}` 
+                                              : notification.notification_type == 'subscription'
+                                              ? `${notification.transactor.first_name} ${notification.transactor.last_name} (@${notification.transactor.username}) subscribed to you` 
+                                                : notification.notification_type == 'tip'
+                                                ? `You received a tip of $${(notification.monies_if_any / 100).toFixed(2)}` 
                                           
                                           : 'New Message'
                                       } 
@@ -110,11 +122,17 @@ export default function Index() {
                                 <div className="modal-header">
                                   <h3 className="modal-title fs-5" id="exampleModalLabel">
                                       {
-                                          notification.notification_type == 'subscription' 
+                                        notification.notification_type == 'pay_per_view_in_chat' 
+                                        ? 'Pay-Per-View (on Chat) Notification' 
+                                          : notification.notification_type == 'pay_per_view_on_post' 
+                                          ? 'Pay-Per-View (on Post) Notification' 
+                                            : notification.notification_type == 'stream_tip' 
+                                            ? 'Stream Tip Notification' 
+                                              : notification.notification_type == 'subscription' 
                                               ? 'Subscription Notification' 
-                                                  :  notification.notification_type == 'tip' 
-                                                        ? 'Tip Notification' 
-                                              : 'New Message'
+                                                :  notification.notification_type == 'tip' 
+                                                ? 'Tip Notification' 
+                                          : 'New Message'
                                       }
                                   </h3>
                                   <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -124,28 +142,59 @@ export default function Index() {
                                     <div className='w-100 rounded' style={{ backgroundColor: '#82030324' }}>
                                       <div className="d-flex align-items-center p-2">
                                         {
-                                            notification.notification_type == 'subscription' 
-                                            ? <span className='d-flex flex-column'>
-                                                <span className='align-self-end'><small>{ dayjs.utc(notification.created_at).fromNow() }</small></span>
-                                                <span className='card-text fs-6'>{notification.transactor.first_name} {notification.transactor.last_name}&nbsp;
-                                                  <a 
-                                                    href={ route('home.users.show', {username: notification.transactor.username})}
-                                                    className='text-dark fw-semibold'>(@{notification.transactor.username})
-                                                  </a>&nbsp;subscribed to your content. You earned {(notification?.monies_if_any / 100)?.toFixed(2)}$ in subscription fees.
-                                                </span>
+                                          notification.notification_type == 'pay_per_view_in_chat' 
+                                          ? <span className='d-flex flex-column'>
+                                              <span className='align-self-end'><small>{ dayjs.utc(notification.created_at).fromNow() }</small></span>
+                                              <span className='card-text fs-6'>{notification.transactor.first_name} {notification.transactor.last_name}&nbsp;
+                                                <a 
+                                                  href={ route('home.users.show', {username: notification.transactor.username})}
+                                                  className='text-dark fw-semibold'>(@{notification.transactor.username})
+                                                </a>&nbsp;viewed your content. You earned {(notification?.monies_if_any / 100)?.toFixed(2)}$ in Pay-Per-View charge.
                                               </span>
-                                                    : notification.notification_type == 'tip' 
-                                                    ? 
-                                                      <span className='d-flex flex-column'>
-                                                        <span className='align-self-end'><small>{ dayjs.utc(notification.created_at).fromNow() }</small></span>
-                                                        <span className='card-text fs-6'>You received {(notification?.monies_if_any / 100)?.toFixed(2)}$ in tip from&nbsp;{notification.transactor.first_name} {notification.transactor.last_name}&nbsp;
-                                                          <a 
-                                                            href={ route('home.users.show', {username: notification.transactor.username})}
-                                                            className='text-dark fw-semibold'>(@{notification.transactor.username})
-                                                          </a>.
+                                            </span>
+                                                : notification.notification_type == 'pay_per_view_on_post' 
+                                                ? <span className='d-flex flex-column'>
+                                                    <span className='align-self-end'><small>{ dayjs.utc(notification.created_at).fromNow() }</small></span>
+                                                    <span className='card-text fs-6'>{notification.transactor.first_name} {notification.transactor.last_name}&nbsp;
+                                                      <a 
+                                                        href={ route('home.users.show', {username: notification.transactor.username})}
+                                                        className='text-dark fw-semibold'>(@{notification.transactor.username})
+                                                      </a>&nbsp;viewed your content. You earned {(notification?.monies_if_any / 100)?.toFixed(2)}$ in Pay-Per-View charge.
+                                                    </span>
+                                                  </span>
+                                                      : notification.notification_type == 'stream_tip' 
+                                                      ? 
+                                                        <span className='d-flex flex-column'>
+                                                          <span className='align-self-end'><small>{ dayjs.utc(notification.created_at).fromNow() }</small></span>
+                                                          <span className='card-text fs-6'>You received {(notification?.monies_if_any / 100)?.toFixed(2)}$ in stream tip from&nbsp;{notification.transactor.first_name} {notification.transactor.last_name}&nbsp;
+                                                            <a 
+                                                              href={ route('home.users.show', {username: notification.transactor.username})}
+                                                              className='text-dark fw-semibold'>(@{notification.transactor.username})
+                                                            </a>.
+                                                          </span>
                                                         </span>
-                                                      </span>
-                                            : <span className='card-text fs-6'><span>&nbsp;</span><small className='fst-italic'>Notification</small></span>
+                                                            : notification.notification_type == 'subscription' 
+                                                            ? <span className='d-flex flex-column'>
+                                                                <span className='align-self-end'><small>{ dayjs.utc(notification.created_at).fromNow() }</small></span>
+                                                                <span className='card-text fs-6'>{notification.transactor.first_name} {notification.transactor.last_name}&nbsp;
+                                                                  <a 
+                                                                    href={ route('home.users.show', {username: notification.transactor.username})}
+                                                                    className='text-dark fw-semibold'>(@{notification.transactor.username})
+                                                                  </a>&nbsp;subscribed to your content. You earned {(notification?.monies_if_any / 100)?.toFixed(2)}$ in subscription fees.
+                                                                </span>
+                                                              </span>
+                                                                  : notification.notification_type == 'tip' 
+                                                                  ? 
+                                                                    <span className='d-flex flex-column'>
+                                                                      <span className='align-self-end'><small>{ dayjs.utc(notification.created_at).fromNow() }</small></span>
+                                                                      <span className='card-text fs-6'>You received {(notification?.monies_if_any / 100)?.toFixed(2)}$ in tip from&nbsp;{notification.transactor.first_name} {notification.transactor.last_name}&nbsp;
+                                                                        <a 
+                                                                          href={ route('home.users.show', {username: notification.transactor.username})}
+                                                                          className='text-dark fw-semibold'>(@{notification.transactor.username})
+                                                                        </a>.
+                                                                      </span>
+                                                                    </span>
+                                            : <span className='card-text fs-6'><span>&nbsp;</span><small className='fst-italic'>Other Notification</small></span>
                                         } 
                                       </div>
                                     </div>

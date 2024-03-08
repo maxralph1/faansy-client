@@ -22,18 +22,25 @@ export function useBlock(id = null) {
         }
     }, [id]);
 
-    async function createBlock(user_id, post_id) {
+    async function createBlock(blocked_id) {
         setLoading(true);
         setErrors({});
 
-        console.log(user_id, post_id)
-        return axiosInstance.post('blocks', {user_id, post_id})
-            .then(() => navigate(route('home.index')))
+        console.log(blocked_id)
+        return axiosInstance.post('blocks', {blocked_id})
+            .then(() => {
+                swal.fire({
+                    text: 'User Blocked',
+                    color: "#820303",
+                    width: 150,
+                    position: 'top',
+                    showConfirmButton: false,
+                });
+            })
             .catch(error => {
                 console.log(error.response);
                 // console.log(error.response.data.errors);
                 setErrors(error.response);
-
                 if (error.response.status == 401) {
                     navigate(route('index'))
                 }
@@ -65,12 +72,14 @@ export function useBlock(id = null) {
     }
 
     async function destroyBlock(block) {
-        return axiosInstance.delete(`blocks/${block.id}/`)
-            .then(() => navigate(route('home.index')))
+        return axiosInstance.delete(`blocks/${block?.id}/delete`)
+            .then(() => {})
             .catch(error => {
                 console.log(error);
                 setErrors(error.response);
-                swalUnauthAlert(error);
+                if (error.response.status == 401) {
+                    navigate(route('index'))
+                }
             })
             .finally(() => setLoading(false));
     }

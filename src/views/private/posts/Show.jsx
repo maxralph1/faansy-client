@@ -104,7 +104,7 @@ export default function Show() {
                             to={ route('home.users.show', {'username': post?.data?.user?.username})}
                             className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
                             <div className="rounded-circle">
-                                <img src={ post?.data?.user?.user_image_url ? `${ Constants.serverURL }/storage/${ post?.data?.user?.user_image_url }` : Logo } alt="" width="65" />
+                                <img src={ post?.data?.user?.user_image_url ? `${ Constants.serverURL }/storage/${ post?.data?.user?.user_image_url }` : Logo } alt="" width="65" height='65' className='object-fit-cover rounded' />
                             </div>
                             <div className="d-flex flex-column">
                                 <h3 className="card-title fs-6 text-dark">
@@ -171,8 +171,8 @@ export default function Show() {
                     </div>
 
                     <p className="card-text">{ post?.data?.body }</p>
-                    <p>
-                        {/* {
+                    {/* <p>
+                        {
                             function replaceAts() {
                             var replacer = function(match) {
                                 var id = match.substr(1);
@@ -188,8 +188,8 @@ export default function Show() {
                             replaceAts();
 
                             console.log(list);
-                        } */}
-                    </p>
+                        }
+                    </p> */}
                     {/* <span><a href="" className="text-decoration-none text-faansy-red">onlyfans.com/natalie.brooks</a> / <a href="" className="text-decoration-none text-faansy-red">onlyfans.com/natalie.brooks</a></span> */}
                 </div>
 

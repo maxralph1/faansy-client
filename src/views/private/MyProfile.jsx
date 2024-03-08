@@ -13,12 +13,14 @@ import Constants from '@/utils/Constants.jsx';
 import { useCreator } from '@/hooks/useCreator.jsx';
 import { usePoll } from '@/hooks/usePoll.jsx';
 import { useUserverification } from '@/hooks/useUserverification.jsx';
-import { useUserbecomeacreator } from '@/hooks/useUserbecomeacreator.jsx';
+import { useUserbecomecreator } from '@/hooks/useUserbecomecreator.jsx';
 import { useMyPosts } from '@/hooks/useMyPosts.jsx';
 import { usePost } from '@/hooks/usePost.jsx';
 import { usePostcomment } from '@/hooks/usePostcomment.jsx';
 import { usePostlike } from '@/hooks/usePostlike.jsx';
 import { useBookmark } from '@/hooks/useBookmark.jsx';
+import { useRestrict } from '@/hooks/useRestrict.jsx';
+import { useBlock } from '@/hooks/useBlock.jsx';
 import Layout from '@/components/private/Layout.jsx';
 import Loading from '@/components/Loading.jsx';
 import Logo from '@/assets/images/logo.png';
@@ -36,13 +38,15 @@ export default function MyProfile() {
     const { poll, getPoll, createPoll, updatePoll, destroyPoll } = usePoll();
     const { createBookmark, destroyBookmark } = useBookmark();
     const { userverification, createUserverification } = useUserverification();
-    const { userbecomeacreator, createUserbecomeacreator } = useUserbecomeacreator();
+    const { userbecomecreator, createUserbecomecreator } = useUserbecomecreator();
     const { createPostcomment, destroyPostcomment } = usePostcomment();
     const { createPostlike, destroyPostlike } = usePostlike();
+    const { destroyRestrict } = useRestrict();
+    const { destroyBlock } = useBlock();
 
     // console.log(user)
     // console.log(user.username)
-    // console.log(creator)
+    console.log(creator)
 
     /* Poll add states*/
     const [questionnaire, setQuestionnaire] = useState();
@@ -148,13 +152,13 @@ export default function MyProfile() {
         await getCreator(user.username);
     }
     
-    async function becomeACreator(event) {
+    async function becomeCreator(event) {
         event.preventDefault();
 
         const formData = new FormData();
-        formData.append('verification_material_image_url', userverification.data.verification_material_image_url);
+        formData.append('verification_material_image_url', userbecomecreator.data.verification_material_image_url);
 
-        await createUserbecomeacreator(formData);
+        await createUserbecomecreator(formData);
 
         await getCreator(user.username);
     }
@@ -173,8 +177,7 @@ export default function MyProfile() {
     return (
         <Layout>
             <section className="col-sm-10 col-md-5 card rounded-0 main-content">
-                <div
-                    className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
+                <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
                     <div className="d-flex align-items-center column-gap-2">
                         <div className="d-flex flex-column">
                             <div className="d-flex flex-row align-items-center column-gap-1">
@@ -288,7 +291,7 @@ export default function MyProfile() {
                                             className="dropdown-item fw-bold" 
                                             href="#become-a-creator" 
                                             data-bs-toggle="modal" 
-                                            data-bs-target="#becomeACreatorModal" 
+                                            data-bs-target="#becomeCreatorModal" 
                                             data-bs-whatever="become-a-creator">
                                                 <small>Become a Creator&nbsp;
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" className="bi bi-person-lines-fill mb-1" viewBox="0 0 16 16">
@@ -298,6 +301,38 @@ export default function MyProfile() {
                                         </div>
                                     </li> 
                                 }
+                                <li>
+                                    <div 
+                                        type="button"
+                                        className="dropdown-item fw-bold" 
+                                        href="#restricted-list" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#restrictedListModal" 
+                                        data-bs-whatever="restricted-list">
+                                            <small>Restricted List&nbsp;
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" class="bi bi-person-exclamation mb-1" viewBox="0 0 16 16">
+                                                    <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m.256 7a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
+                                                    <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1.5a.5.5 0 0 0 1 0V11a.5.5 0 0 0-.5-.5m0 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
+                                                </svg>
+                                            </small>
+                                    </div>
+                                </li> 
+                                <li>
+                                    <div 
+                                        type="button"
+                                        className="dropdown-item fw-bold" 
+                                        href="#blocked-list" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#blockedListModal" 
+                                        data-bs-whatever="blocked-list">
+                                            <small>Blocked List&nbsp;
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" class="bi bi-person-fill-exclamation mb-1" viewBox="0 0 16 16">
+                                                    <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
+                                                    <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1.5a.5.5 0 0 0 1 0V11a.5.5 0 0 0-.5-.5m0 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
+                                                </svg>
+                                            </small>
+                                    </div>
+                                </li> 
                             </ul>
                         </span>
                     </div>
@@ -478,7 +513,7 @@ export default function MyProfile() {
                                                     to={ route('home.users.show', {'username': post?.user?.username})}
                                                     className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
                                                     <div className="rounded-circle">
-                                                        <img src={ post?.user?.user_image_url ? `${ Constants.serverURL }/storage/${ post?.user?.user_image_url }` : Logo } alt="" width="65" />
+                                                        <img src={ post?.user?.user_image_url ? `${ Constants.serverURL }/storage/${ post?.user?.user_image_url }` : Logo } alt="" width="65" height='65' className='object-fit-cover rounded' />
                                                     </div>
                                                     <div className="d-flex flex-column">
                                                         <h3 className="card-title fs-6 text-dark">
@@ -601,7 +636,7 @@ export default function MyProfile() {
                                                     <div className="carousel-indicators">
                                                         { post?.images?.length > 0 && post?.images?.map((image, index) => {
                                                             return (
-                                                                <button type="button" data-bs-target={`carouselIndicators${ image?.id }`} data-bs-slide-to={index} className="active" aria-current="true" aria-label={ `Slide` + (index+1) }></button>
+                                                                <button key={image?.id} type="button" data-bs-target={`carouselIndicators${ image?.id }`} data-bs-slide-to={index} className="active" aria-current="true" aria-label={ `Slide` + (index+1) }></button>
                                                             )
                                                         })}
                                                     </div>
@@ -1399,18 +1434,18 @@ export default function MyProfile() {
 
                     <div 
                         className="modal fade" 
-                        id="becomeACreatorModal" 
+                        id="becomeCreatorModal" 
                         tabIndex="-1" 
-                        aria-labelledby="becomeACreatorModalLabel" 
+                        aria-labelledby="becomeCreatorModalLabel" 
                         aria-hidden="true">
                         <div className="modal-dialog">
                             <div className="modal-content">
                                 <div className="modal-header">
-                                    <h3 className="modal-title fs-5" id="becomeACreatorModalLabel">Request to Become A Creator</h3>
+                                    <h3 className="modal-title fs-5" id="becomeCreatorModalLabel">Request to Become A Creator</h3>
                                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div className="modal-body">
-                                    <form onSubmit={ becomeACreator } encType='multipart/form-data'>
+                                    <form onSubmit={ becomeCreator } encType='multipart/form-data'>
                                         <div className="mb-3 d-flex flex-column row-gap-2">
                                             <div className='row row-gap-2'>
                                                 <div className='col-md'>
@@ -1420,8 +1455,8 @@ export default function MyProfile() {
                                                         name="verification_material_image_url" 
                                                         id="verification_material_image_url" 
                                                         className='form-control'
-                                                        onChange={ event => userverification.setData({
-                                                            ...userverification.data,
+                                                        onChange={ event => userbecomecreator.setData({
+                                                            ...userbecomecreator.data,
                                                             verification_material_image_url: event.target.files[0],
                                                         }) }
                                                         placeholder="User Verification Image" />
@@ -1436,6 +1471,104 @@ export default function MyProfile() {
                                             <button type="submit" className="btn btn-sm btn-faansy-red text-light">Send Request</button>
                                         </div>
                                     </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div 
+                        className="modal fade" 
+                        id="restrictedListModal" 
+                        tabIndex="-1" 
+                        aria-labelledby="restrictedListModalLabel" 
+                        aria-hidden="true">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="restrictedListModalLabel">Restricted Users</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="mb-3 d-flex flex-column row-gap-2">
+                                        <div className='row row-gap-2'>
+                                            <div className='col-md'>
+                                                { (creator?.data?.restrictor?.length > 0) ? creator?.data?.restrictor?.map(restrict => {
+                                                    return (
+                                                        <div key={ restrict?.id } className='d-flex justify-content-between align-items-center border-bottom py-2'>
+                                                            <span className=''>
+                                                                <Link 
+                                                                    to={ route('home.users.show', { username: restrict?.restrictee?.username })} 
+                                                                    className='text-decoration-none text-faansy-red'>
+                                                                    { `${restrict?.restrictee?.first_name + ' ' + restrict?.restrictee?.last_name}` }
+                                                                </Link>
+                                                            </span>
+                                                            <span>
+                                                                <button 
+                                                                    onClick={ async () => {
+                                                                    await destroyRestrict(restrict);
+                                                                    await getCreator(user?.username);
+                                                                    } }
+                                                                    className='btn btn-sm btn-faansy-red text-light'>
+                                                                        <small>Unrestrict</small>
+                                                                </button>
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                }) : (
+                                                    <span className='d-flex justify-content-center'><small>You have no restricted users yet.</small></span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div 
+                        className="modal fade" 
+                        id="blockedListModal" 
+                        tabIndex="-1" 
+                        aria-labelledby="blockedListModalLabel" 
+                        aria-hidden="true">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="blockedListModalLabel">Blocked Users</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="mb-3 d-flex flex-column row-gap-2">
+                                        <div className='row row-gap-2'>
+                                            <div className='col-md'>
+                                                { (creator?.data?.blocker?.length > 0) ? creator?.data?.blocker?.map(block => {
+                                                    return (
+                                                        <div key={ block?.id } className='d-flex justify-content-between align-items-center border-bottom py-2'>
+                                                            <span className=''>
+                                                                <Link 
+                                                                    to={ route('home.users.show', { username: block?.blocked?.username })} 
+                                                                    className='text-decoration-none text-faansy-red'>
+                                                                    { `${block?.blocked?.first_name + ' ' + block?.blocked?.last_name}` }
+                                                                </Link>
+                                                            </span>
+                                                            <span>
+                                                                <button 
+                                                                    onClick={ async () => {
+                                                                    await destroyBlock(block);
+                                                                    await getCreator(user?.username);
+                                                                    } }
+                                                                    className='btn btn-sm btn-faansy-red text-light'>
+                                                                        <small>Unblock</small>
+                                                                </button>
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                }) : (
+                                                    <span className='d-flex justify-content-center'><small>You have no restricted users yet.</small></span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -36,12 +36,12 @@ export default function Index() {
 
   /* Other initializations */
   const { user } = useContext(AuthContext);
-  const { transactions, getTransactions } = useTransactions();
+  const { transactions } = useTransactions();
 
   console.log(transactions);
 
-  const payPerViewEarningTransactions = transactions?.data?.filter((transaction) => transaction?.transaction_type == 'pay_per_view' && transaction?.transactor.id != user.id);
-  const payPerViewExpenditureTransactions = transactions?.data?.filter((transaction) => transaction?.transaction_type == 'pay_per_view' && transaction?.transactor.id == user.id);
+  const payPerViewEarningTransactions = transactions?.data?.filter((transaction) => (transaction?.transaction_type == 'pay_per_view_in_chat' || transaction?.transaction_type == 'pay_per_view_on_post') && transaction?.transactor.id != user.id);
+  const payPerViewExpenditureTransactions = transactions?.data?.filter((transaction) => (transaction?.transaction_type == 'pay_per_view_in_chat' || transaction?.transaction_type == 'pay_per_view_on_post') && transaction?.transactor.id == user.id);
 
   const subscriptionEarningTransactions = transactions?.data?.filter((transaction) => transaction?.transaction_type == 'subscription' && transaction?.transactor.id != user.id);
   const subscriptionExpenditureTransactions = transactions?.data?.filter((transaction) => transaction?.transaction_type == 'subscription' && transaction?.transactor.id == user.id);
@@ -117,6 +117,21 @@ export default function Index() {
   /* End Tip */
 
 
+  // /* Chart */
+  // const xArray = ["Italy", "France", "Spain", "USA", "Argentina"];
+  // const yArray = [55, 49, 44, 24, 15];
+
+  // const data = [{
+  //   x:xArray,
+  //   y:yArray,
+  //   type:"bar"
+  // }];
+
+  // const layout = {title:"World Wide Wine Production"};
+
+  // Plotly.newPlot("myPlot", data, layout);
+
+
   return (
     <Layout>
       <section className="col-sm-10 col-md-9 card rounded-0 main-content">
@@ -130,6 +145,10 @@ export default function Index() {
                 </svg> */}
             </span>
         </div>
+
+        <section>
+          {/* <div id="myPlot" style="width:100%;max-width:700px"></div> */}
+        </section>
 
         <section className='earnings-section row px-3'>
             {/* <section className="border-top">
@@ -161,22 +180,22 @@ export default function Index() {
                   <tbody>
                     <tr>
                       <th scope="row" colSpan='2'>Pay-Per-View</th>
-                      <td>{ payPerViewEarningSum?.toFixed(2) }</td>
+                      <td>{ (payPerViewEarningSum * 100)?.toFixed(2) }</td>
                       <td><button type='button' data-bs-toggle="modal" data-bs-target="#payPerViewModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
                     </tr>
                     <tr>
                       <th scope="row" colSpan='2'>Subscription</th>
-                      <td>{ subscriptionEarningSum?.toFixed(2) }</td>
+                      <td>{ (subscriptionEarningSum * 100)?.toFixed(2) }</td>
                       <td><button type='button' data-bs-toggle="modal" data-bs-target="#subscriptionModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
                     </tr>
                     <tr>
                       <th scope="row" colSpan='2'>Stream Tips</th>
-                      <td>{ streamTipEarningSum?.toFixed(2) }</td>
+                      <td>{ (streamTipEarningSum * 100)?.toFixed(2) }</td>
                       <td><button type='button' data-bs-toggle="modal" data-bs-target="#streamTipModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
                     </tr>
                     <tr>
                       <th scope="row" colSpan='2'>Tips</th>
-                      <td>{ tipEarningSum?.toFixed(2) }</td>
+                      <td>{ (tipEarningSum * 100)?.toFixed(2) }</td>
                       <td><button type='button' data-bs-toggle="modal" data-bs-target="#tipModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
                     </tr>
                   </tbody>
@@ -196,7 +215,7 @@ export default function Index() {
                       {(payPerViewEarningTransactions?.length > 0) ? (payPerViewEarningTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2 border-bottom'>
-                            {`${ (transaction.amount)?.toFixed(2) }$ earned in content pay-per-view from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            {`${ (transaction.amount * 100)?.toFixed(2) }$ earned in content pay-per-view from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
                           </article>
                         )
                       })) : (
@@ -221,7 +240,7 @@ export default function Index() {
                       {(subscriptionEarningTransactions?.length > 0) ? (subscriptionEarningTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2 border-bottom'>
-                            {`${ (transaction.amount)?.toFixed(2) }$ earned in subscription fee from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            {`${ (transaction.amount * 100)?.toFixed(2) }$ earned in subscription fee from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
                           </article>
                         )
                       })) : (
@@ -246,7 +265,7 @@ export default function Index() {
                       {(streamTipEarningTransactions?.length > 0) ? (streamTipEarningTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2 border-bottom'>
-                            {`${ (transaction.amount)?.toFixed(2) }$ received from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in stream tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            {`${ (transaction.amount * 100)?.toFixed(2) }$ received from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in stream tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
                           </article>
                         )
                       })) : (
@@ -271,7 +290,7 @@ export default function Index() {
                       {(tipEarningTransactions?.length > 0) ? (tipEarningTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2 border-bottom'>
-                            {`${ (transaction.amount)?.toFixed(2) }$ received from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            {`${ (transaction.amount * 100)?.toFixed(2) }$ received from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
                           </article>
                         )
                       })) : (
@@ -316,22 +335,22 @@ export default function Index() {
                   <tbody>
                     <tr>
                       <th scope="row" colSpan='2'>Pay-Per-View</th>
-                      <td>{ payPerViewExpenditureSum?.toFixed(2) }</td>
+                      <td>{ (payPerViewExpenditureSum * 100)?.toFixed(2) }</td>
                       <td><button type='button' data-bs-toggle="modal" data-bs-target="#payPerViewExpenditureModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
                     </tr>
                     <tr>
                       <th scope="row" colSpan='2'>Subscription</th>
-                      <td>{ subscriptionExpenditureSum?.toFixed(2) }</td>
+                      <td>{ (subscriptionExpenditureSum * 100)?.toFixed(2) }</td>
                       <td><button type='button' data-bs-toggle="modal" data-bs-target="#subscriptionExpenditureModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
                     </tr>
                     <tr>
                       <th scope="row" colSpan='2'>Stream Tips</th>
-                      <td>{ streamTipExpenditureSum?.toFixed(2) }</td>
+                      <td>{ (streamTipExpenditureSum * 100)?.toFixed(2) }</td>
                       <td><button type='button' data-bs-toggle="modal" data-bs-target="#streamTipExpenditureModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
                     </tr>
                     <tr>
                       <th scope="row" colSpan='2'>Tips</th>
-                      <td>{ tipExpenditureSum?.toFixed(2) }</td>
+                      <td>{ (tipExpenditureSum * 100)?.toFixed(2) }</td>
                       <td><button type='button' data-bs-toggle="modal" data-bs-target="#tipExpenditureModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
                     </tr>
                   </tbody>
@@ -351,7 +370,7 @@ export default function Index() {
                       {(payPerViewExpenditureTransactions?.length) ? (payPerViewExpenditureTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2'>
-                            {`${ (transaction.amount)?.toFixed(2) }$ paid to view ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} content, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            {`${ (transaction.amount * 100)?.toFixed(2) }$ paid to view ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} content, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
                           </article>
                         )
                       })) : (
@@ -376,7 +395,7 @@ export default function Index() {
                       {(subscriptionExpenditureTransactions?.length > 0) ? (subscriptionExpenditureTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2'>
-                            {`${ (transaction.amount)?.toFixed(2) }$ paid to subscribe to ${transaction.beneficiary.first_name} ${transaction?.beneficiary?.last_name}, ${(dayjs.utc(transaction?.created_at).fromNow())}.`}
+                            {`${ (transaction.amount * 100)?.toFixed(2) }$ paid to subscribe to ${transaction.beneficiary.first_name} ${transaction?.beneficiary?.last_name}, ${(dayjs.utc(transaction?.created_at).fromNow())}.`}
                           </article>
                         )
                       })) : (
@@ -401,7 +420,7 @@ export default function Index() {
                       {(streamTipExpenditureTransactions?.length > 0) ? (streamTipExpenditureTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2'>
-                            {`${ (transaction.amount)?.toFixed(2) }$ paid to ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in stream tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            {`${ (transaction.amount * 100)?.toFixed(2) }$ paid to ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in stream tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
                           </article>
                         )
                       })) : (
@@ -426,7 +445,7 @@ export default function Index() {
                       {(tipExpenditureTransactions?.length > 0) ? (tipExpenditureTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2'>
-                            {`${ (transaction.amount)?.toFixed(2) }$ paid to ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            {`${ (transaction.amount * 100)?.toFixed(2) }$ paid to ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
                           </article>
                         )
                       })) : (

@@ -3,16 +3,17 @@ import { Link, useParams } from 'react-router-dom';
 import { route } from '@/routes';
 import AuthContext from '@/context/AuthContext.jsx';
 import Layout from '@/components/public/Layout.jsx';
+import Logo from '@/assets/images/logo.png';
 
 
 export default function ResetPassword() {
     const { resetPassword } = useContext(AuthContext);
     const params = useParams();
 
-    const handleSubmit = e => {
-        e.preventDefault();
-        const password = e.target.password.value;
-        const repeat_password = e.target.repeat_password.value;
+    const handleSubmit = event => {
+        event.preventDefault();
+        const password = event.target.password.value;
+        const repeat_password = event.target.repeat_password.value;
         const email = params.email;
         const token = params.token;
 
@@ -26,7 +27,8 @@ export default function ResetPassword() {
 
     return (
         <Layout>
-            <div className="col-md-6 col-sm-12 px-5 min-h-100 d-flex flex-column justify-content-center">
+            <div className="col-md-6 col-sm-12 px-3 min-h-100 d-flex flex-column justify-content-center">
+                <span className='position-absolute top-0 px-5 pt-3 mb-2 d-block d-md-none'><img src={ Logo } alt="Faansy Logo" width="95" /></span>
                 <h2 className="fs-6 px-5 text-end">Reset Password</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="d-flex flex-column px-5">

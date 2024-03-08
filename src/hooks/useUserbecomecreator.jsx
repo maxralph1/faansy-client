@@ -7,7 +7,7 @@ import useAxios from '@/utils/useAxios.jsx';
 import swal from 'sweetalert2';
 
 
-export function useUserbecomeacreator(id = null) {
+export function useUserbecomecreator(id = null) {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState({});
@@ -18,17 +18,17 @@ export function useUserbecomeacreator(id = null) {
     useEffect(() => {
         if (id !== null) {
             const controller = new AbortController();
-            getUserbecomeacreator(id, { signal: controller.signal })
+            getUserbecomecreator(id, { signal: controller.signal })
             return () => controller.abort();
         }
     }, [id]);
 
-    async function createUserbecomeacreator(userbecomeacreator) {
+    async function createUserbecomecreator(userbecomecreator) {
         setLoading(true);
         setErrors({});
 
-        console.log(userbecomeacreator)
-        return axiosInstance.postForm('user-become-creators', userbecomeacreator)
+        console.log(userbecomecreator)
+        return axiosInstance.postForm('user-become-creators', userbecomecreator)
             .then((response) => {
                 if (response.status == 201) {
                     swal.fire({
@@ -52,7 +52,7 @@ export function useUserbecomeacreator(id = null) {
             .finally(() => setLoading(false));
     }
 
-    async function getUserbecomeacreator(id, { signal } = {}) {
+    async function getUserbecomecreator(id, { signal } = {}) {
         setLoading(true);
 
         return axios.get(`${ Constants.serverURL }/api/user-become-creators/${id}`, { signal })
@@ -65,11 +65,11 @@ export function useUserbecomeacreator(id = null) {
             .finally(() => setLoading(false));
     }
 
-    async function updateUserbecomeacreator(userbecomeacreator) {
+    async function updateUserbecomecreator(userbecomecreator) {
         setLoading(true);
         setErrors({});
 
-        return axiosInstance.postForm(`user-become-creators/${id}/`, userbecomeacreator)
+        return axiosInstance.postForm(`user-become-creators/${id}/`, userbecomecreator)
             .then(() => {})
             .catch(error => {
                 console.log(error);
@@ -81,11 +81,11 @@ export function useUserbecomeacreator(id = null) {
             .finally(() => setLoading(false));
     }
 
-    async function approveUserbecomeacreator(userbecomeacreator) {
+    async function approveUserbecomecreator(userbecomecreator) {
         setLoading(true);
         setErrors({});
 
-        return axiosInstance.put(`user-become-creators/${userbecomeacreator.id}/approve`)
+        return axiosInstance.put(`user-become-creators/${userbecomecreator.id}/approve`)
             .then((response) => {
                 console.log(response);
                 swal.fire({
@@ -106,16 +106,16 @@ export function useUserbecomeacreator(id = null) {
             .finally(() => setLoading(false));
     }
 
-    async function rejectUserbecomeacreator(userbecomeacreator) {
+    async function rejectUserbecomecreator(userbecomecreator) {
         setLoading(true);
         setErrors({});
-        console.log(userbecomeacreator)
+        console.log(userbecomecreator)
 
-        return axiosInstance.put(`user-become-creators/${userbecomeacreator.id}/reject`)
+        return axiosInstance.postForm(`user-become-creators/reject`, userbecomecreator)
             .then((response) => {
                 console.log(response);
-                console.log(userbecomeacreator)
-                console.log(userbecomeacreator?.id)
+                console.log(userbecomecreator)
+                // console.log(userbecomecreator?.id)
                 swal.fire({
                     text: 'Rejected',
                     color: "#820303",
@@ -134,8 +134,8 @@ export function useUserbecomeacreator(id = null) {
             .finally(() => setLoading(false));
     }
 
-    async function destroyUserbecomeacreator(userbecomeacreator) {
-        return axiosInstance.delete(`user-become-creators/${userbecomeacreator.id}/`)
+    async function destroyUserbecomecreator(userbecomecreator) {
+        return axiosInstance.delete(`user-become-creators/${userbecomecreator.id}/`)
             .then(() => {
                 swal.fire({
                     text: 'User become a creator record deleted',
@@ -156,12 +156,12 @@ export function useUserbecomeacreator(id = null) {
     }
 
     return {
-        userbecomeacreator: { data, setData, errors, loading }, 
-        getUserbecomeacreator, 
-        createUserbecomeacreator, 
-        updateUserbecomeacreator, 
-        approveUserbecomeacreator, 
-        rejectUserbecomeacreator, 
-        destroyUserbecomeacreator
+        userbecomecreator: { data, setData, errors, loading }, 
+        getUserbecomecreator, 
+        createUserbecomecreator, 
+        updateUserbecomecreator, 
+        approveUserbecomecreator, 
+        rejectUserbecomecreator, 
+        destroyUserbecomecreator
     }
 }

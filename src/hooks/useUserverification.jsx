@@ -30,7 +30,7 @@ export function useUserverification(id = null) {
         console.log(userverification)
         return axiosInstance.postForm('user-verifications', userverification)
             .then((response) => {
-                if (response.status == 201) {
+                if (response.status == 200 || response.status == 201) {
                     swal.fire({
                         text: 'User verification started',
                         color: "#820303",
@@ -39,6 +39,7 @@ export function useUserverification(id = null) {
                         showConfirmButton: false,
                     });
                 }
+                console.log('success');
             })
             .catch(error => {
                 console.log(error);
@@ -85,7 +86,7 @@ export function useUserverification(id = null) {
         setLoading(true);
         setErrors({});
 
-        return axiosInstance.put(`user-verifications/${userverification.id}/approve`)
+        return axiosInstance.post(`user-verifications/${userverification.id}/approve`)
             .then((response) => {
                 console.log(response);
                 swal.fire({
@@ -111,11 +112,11 @@ export function useUserverification(id = null) {
         setErrors({});
         console.log(userverification)
 
-        return axiosInstance.put(`user-verifications/${userverification.id}/reject`)
+        return axiosInstance.postForm(`user-verifications/reject`, userverification)
             .then((response) => {
                 console.log(response);
                 console.log(userverification)
-                console.log(userverification?.id)
+                // console.log(userverification?.id)
                 swal.fire({
                     text: 'Rejected',
                     color: "#820303",

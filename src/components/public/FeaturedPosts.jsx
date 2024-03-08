@@ -17,8 +17,11 @@ export default function FeaturedPosts() {
     const { posts, getPosts } = useFeaturedPosts();
     console.log(posts?.data);
     console.log(posts);
-    const pageNumber = (posts?.meta?.current_page + 1 > posts?.meta?.last_page) ? posts?.meta?.last_page : posts?.meta?.current_page + 1;
-    console.log(pageNumber);
+    // const pageNumber = (posts?.meta?.current_page + 1 > posts?.meta?.last_page) ? posts?.meta?.last_page : posts?.meta?.current_page + 1;
+    const first_page = 1;
+    const pageNumberForward = (posts?.meta?.current_page + 1 > posts?.meta?.last_page) ? posts?.meta?.last_page : posts?.meta?.current_page + 1;
+    const pageNumberBackward = (posts?.meta?.current_page - 1 < first_page) ? first_page : posts?.meta?.current_page - 1;
+    // console.log(pageNumber);
 
     return (
         <section className="text-bg-light">
@@ -54,29 +57,44 @@ export default function FeaturedPosts() {
                                     </div>
 
                                     <div>
-                                        <span className="text-body-secondary">{ dayjs.utc(post.created_at).fromNow() }</span>
+                                        <span className="text-body-secondary">{ dayjs.utc(post?.created_at).fromNow() }</span>
                                     </div>
                                 </div>
                                 
-                                <p className="card-text">{ post.body }</p>
+                                <p className="card-text">{ post?.body }</p>
                                 {/* <span><a href="" className="text-decoration-none text-faansy-red">Read more</a></span> */}
                             </div>
                             <>
-                                { (post.image_url == null && post.video_url != null) 
+                                { (post?.images?.length <= 0 && post?.video?.video_url?.length > 0) 
                                     ? 
-                                        <video controls width="250" className="card-img-bottom" alt="video title">
-                                            <source src="/media/cc0-videos/flower.webm" type="video/webm" />
-                                        
-                                            <source src={ post.video_url } type="video/mp4" />
-                                        
-                                            Or download the
-                                            <a href={ post.video_url }>WEBM</a>
-                                            or
-                                            <a href={ post.video_url }>MP4</a>
-                                            video.
-                                        </video>
+                                        <div>
+                                            <video controls width="250" height={400} className="card-img-bottom object-fit-cover rounded-0 mb-1" alt={ post?.id }>
+                                                <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/webm" />
+                                                <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/mp4" />
+                                                Download the
+                                                <a href={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` }>video</a>.
+                                            </video>
+                                        </div> 
                                     : 
-                                        <img src={ post.image_url ? `${ Constants.serverURL }/storage/${post.image_url}` : MissingImage } className="card-img-bottom rounded-0" alt="..." />
+                                        <div className="carousel-inner">
+                                            { post?.images?.length > 0 && post?.images?.map((image, index) => {
+                                                    if (index == 0) {
+                                                        return (
+                                                            <div key={ image.id } className={`carousel-item active`}>
+                                                                <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
+                                                            </div>
+                                                        )
+                                                    }
+
+                                                    return (
+                                                        <div key={ image.id } className={`carousel-item`}>
+                                                            <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                        </div>
+                                        
                                 }
                             </>
                         </div>
@@ -93,19 +111,36 @@ export default function FeaturedPosts() {
                                 </section>
                         )}
 
-            { ((posts?.data?.length > 0) && ((posts?.meta?.current_page < posts?.meta?.last_page))) 
-                &&
-                    <div className="d-flex justify-content-center pb-5 text-bg-light">
-                        <button 
-                            type="button"
-                            onClick={ async () => {
-                                await getPosts(pageNumber)
-                            } }
-                            className="btn btn-outline-secondary py-1 px-3 rounded-pill text-faansy-red text-uppercase fw-semibold show-more">
-                                Show More
-                        </button>
-                    </div>
-            }
+
+            <div className='d-flex justify-content-center gap-2 py-4'>
+                { ((posts?.data?.length > 0) && ((posts?.meta?.current_page > first_page))) 
+                    &&
+                        <div className="d-flex justify-content-center">
+                            <button 
+                                type="button"
+                                onClick={ async () => {
+                                    await getPosts(pageNumberBackward)
+                                } }
+                                className="btn btn-outline-secondary py-1 px-3 rounded-pill text-faansy-red text-uppercase fw-semibold show-more">
+                                    Go back
+                            </button>
+                        </div>
+                    }
+
+                { ((posts?.data?.length > 0) && ((posts?.meta?.current_page < posts?.meta?.last_page))) 
+                    &&
+                        <div className="d-flex justify-content-center pb-5 text-bg-light">
+                            <button 
+                                type="button"
+                                onClick={ async () => {
+                                    await getPosts(pageNumberForward)
+                                } }
+                                className="btn btn-outline-secondary py-1 px-3 rounded-pill text-faansy-red text-uppercase fw-semibold show-more">
+                                    Show More
+                            </button>
+                        </div>
+                }
+            </div>
         </section>
     )
 }

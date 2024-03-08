@@ -1,8 +1,10 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useState } from 'react';
 import AuthContext from '@/context/AuthContext.jsx';
 import dayjs from 'dayjs';
 import relativeTime from "dayjs/plugin/relativeTime"; 
+import utc from 'dayjs/plugin/utc';
 dayjs.extend(relativeTime);
+dayjs.extend(utc);
 import { Link, useParams } from 'react-router-dom';
 import { route } from '@/routes';
 import Constants from '@/utils/Constants.jsx';
@@ -75,7 +77,7 @@ export default function Index() {
 
                 <div>
                     <section className="border-top">
-                      {(chats?.data?.length > 0) ? chats?.data?.map(chat => {
+                      {(chats?.data?.length > 0) ? chats?.data?.sort((a, b) => new Date(b?.updated_at) - new Date(a?.updated_at)).map(chat => {
                         console.log(chat)
                         return (
                           <article key={ chat?.id } className='card rounded-0 chat-item'>
@@ -169,7 +171,7 @@ export default function Index() {
                                                     <div className="d-flex flex-column justify-content-center gap-2 p-2">
                                                       { message?.body != "undefined" && 
                                                         <div>
-                                                          <span className='card-text fs-6 fw-semibold'>{ message.body }</span>
+                                                          <span className='card-text fs-6 fw-semibold'>{ message?.body }</span>
                                                           {/* { message.user.id == user.id && 
                                                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-check-all" viewBox="0 0 16 16">
                                                               <path d="M8.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L2.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093L8.95 4.992zm-.92 5.14.92.92a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 1 0-1.091-1.028L9.477 9.417l-.485-.486z"/>
@@ -290,14 +292,14 @@ export default function Index() {
                                                       (<span 
                                                         type="button" 
                                                         onClick={() => setPayPerViewToggle(true)}>
-                                                          <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" class="bi bi-toggle-off" viewBox="0 0 16 16">
+                                                          <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" className="bi bi-toggle-off" viewBox="0 0 16 16">
                                                             <path d="M11 4a4 4 0 0 1 0 8H8a5 5 0 0 0 2-4 5 5 0 0 0-2-4zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8M0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5"/>
                                                           </svg>
                                                       </span>) :
                                                       (<span 
                                                         type="button" 
                                                         onClick={() => setPayPerViewToggle(false)}>
-                                                          <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" class="bi bi-toggle-on" viewBox="0 0 16 16">
+                                                          <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#820303" className="bi bi-toggle-on" viewBox="0 0 16 16">
                                                             <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8"/>
                                                           </svg>
                                                       </span>)

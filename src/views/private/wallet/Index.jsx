@@ -127,36 +127,84 @@ export default function Index() {
                           data-bs-whatever="@mdo"
                           className="card-body d-flex flex-column">
                             <h4 className='card-text fs-6 fw-semibold'>
-                              { transaction.transaction_type == 'tip' 
+                              { transaction.transaction_type == 'pay_per_view_in_chat' 
+                                  ? 'Pay-Per-View in Chat' 
+                                  : transaction.transaction_type == 'commission_on_pay_per_view_in_chat' 
+                                  ? 'Commission (on Pay-Per-View on Chat)' 
+                                  : transaction.transaction_type == 'pay_per_view_on_post' 
+                                  ? 'Pay-Per-View on Post' 
+                                  : transaction.transaction_type == 'commission_on_pay_per_view_on_post' 
+                                  ? 'Commission (on Pay-Per-View on Post)' 
+                                  : transaction.transaction_type == 'subscription' 
+                                  ? 'Subscription' 
+                                  : transaction.transaction_type == 'commission_on_subscription' 
+                                  ? 'Commission (on Subscription)' 
+                                  : transaction.transaction_type == 'stream_tip' 
+                                  ? 'Stream Tip' 
+                                  : transaction.transaction_type == 'commission_on_stream_tip' 
+                                  ? 'Commission (on Stream Tip)'
+                                  : transaction.transaction_type == 'tip' 
                                   ? 'Tip' 
                                   : transaction.transaction_type == 'commission_on_tip' 
                                   ? 'Commission (on Tip)' 
                                   : transaction.transaction_type == 'subscription' 
                                   ? 'Subscription' 
                                   : transaction.transaction_type == 'commission_on_subscription' 
-                                  ? 'Commission (on Subscription)' 
+                                  ? 'Commission (on Subscription)'
                                   : transaction.transaction_type == 'commission' 
                                   ? 'Commission' 
+                                  : transaction.transaction_type == 'vat' 
+                                  ? 'VAT' 
+                                  : transaction.transaction_type == 'others' 
+                                  ? '(Others)' 
                                   : 'Transaction' }
                             </h4>
                             <div className='column-gap-2'>
                                 <p className='card-text fs-6'>
-                                  { transaction.beneficiary.id == user.id && transaction.transaction_type == 'tip'
-                                    ? `You received ${(transaction.amount).toFixed(2)}$ in tip money.` 
-                                    : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_tip' 
-                                    ? `You were charged ${(transaction.amount).toFixed(2)}$ in tip money commission.`  
-                                    : transaction.transactor.id == user.id && transaction.transaction_type == 'tip' 
-                                    ? `You paid ${(transaction.amount).toFixed(2)}$ in tip.` 
-                                    : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_tip' 
-                                    ? `${(transaction.amount).toFixed(2)}$ in tip commission was deducted from the creator you gave a tip.` 
-                                        : transaction.beneficiary.id == user.id && transaction.transaction_type == 'subscription'
-                                        ? `You received ${(transaction.amount).toFixed(2)}$ in subscription fees.` 
-                                        : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_subscription' 
-                                        ? `You were charged ${(transaction.amount).toFixed(2)}$ in subscription fee commission.`  
-                                        : transaction.transactor.id == user.id && transaction.transaction_type == 'subscription' 
-                                        ? `You paid ${(transaction.amount).toFixed(2)}$ in subscription fees.` 
-                                        : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_subscription' 
-                                        ? `${(transaction.amount).toFixed(2)}$ in commission on subscription fee was deducted from the creator you subscribed to.`
+                                  { transaction.beneficiary.id == user.id && transaction.transaction_type == 'pay_per_view_in_chat'
+                                    ? `You received ${(transaction.amount).toFixed(2)}$ on a chat Pay-Per-View.` 
+                                    : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_pay_per_view_in_chat' 
+                                    ? `You were charged ${(transaction.amount).toFixed(2)}$ commission (Pay-Per-View on Chat).`  
+                                    : transaction.transactor.id == user.id && transaction.transaction_type == 'pay_per_view_in_chat' 
+                                    ? `You paid ${(transaction.amount).toFixed(2)}$ on a chat Pay-Per-View.` 
+                                    : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_pay_per_view_in_chat' 
+                                    ? `${(transaction.amount).toFixed(2)}$ commission in Pay-Per-View on Chat was deducted from the creator you viewed their content.` 
+                                        : transaction.beneficiary.id == user.id && transaction.transaction_type == 'pay_per_view_on_post'
+                                        ? `You received ${(transaction.amount).toFixed(2)}$ on a post Pay-Per-View.` 
+                                        : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_pay_per_view_on_post' 
+                                        ? `You were charged ${(transaction.amount).toFixed(2)}$ commission (Pay-Per-View on Post).`  
+                                        : transaction.transactor.id == user.id && transaction.transaction_type == 'pay_per_view_on_post' 
+                                        ? `You paid ${(transaction.amount).toFixed(2)}$ on a post Pay-Per-View.` 
+                                        : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_pay_per_view_on_post' 
+                                        ? `${(transaction.amount).toFixed(2)}$ commission in Pay-Per-View on Post was deducted from the creator you viewed their content.` 
+                                            : transaction.beneficiary.id == user.id && transaction.transaction_type == 'subscription'
+                                            ? `You received ${(transaction.amount).toFixed(2)}$ in subscription fees.` 
+                                            : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_subscription' 
+                                            ? `You were charged ${(transaction.amount).toFixed(2)}$ in subscription fee commission.`  
+                                            : transaction.transactor.id == user.id && transaction.transaction_type == 'subscription' 
+                                            ? `You paid ${(transaction.amount).toFixed(2)}$ in subscription fees.` 
+                                            : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_subscription' 
+                                            ? `${(transaction.amount).toFixed(2)}$ in commission on subscription fee was deducted from the creator you subscribed to.` 
+                                                : transaction.beneficiary.id == user.id && transaction.transaction_type == 'stream_tip'
+                                                ? `You received ${(transaction.amount).toFixed(2)}$ in stream tip money.` 
+                                                : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_stream_tip' 
+                                                ? `You were charged ${(transaction.amount).toFixed(2)}$ commission in stream tip money.`  
+                                                : transaction.transactor.id == user.id && transaction.transaction_type == 'stream_tip' 
+                                                ? `You paid ${(transaction.amount).toFixed(2)}$ in stream tip.` 
+                                                : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_stream_tip' 
+                                                ? `${(transaction.amount).toFixed(2)}$ commission in stream tip was deducted from the creator you gave a stream tip.` 
+                                                    : transaction.beneficiary.id == user.id && transaction.transaction_type == 'tip'
+                                                    ? `You received ${(transaction.amount).toFixed(2)}$ in tip money.` 
+                                                    : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_tip' 
+                                                    ? `You were charged ${(transaction.amount).toFixed(2)}$ in tip money commission.`  
+                                                    : transaction.transactor.id == user.id && transaction.transaction_type == 'tip' 
+                                                    ? `You paid ${(transaction.amount).toFixed(2)}$ in tip.` 
+                                                    : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_tip' 
+                                                    ? `${(transaction.amount).toFixed(2)}$ in tip commission was deducted from the creator you gave a tip.` 
+                                                        : transaction.beneficiary.id == user.id && transaction.transaction_type == 'vat'
+                                                        ? `You received ${(transaction.amount).toFixed(2)}$ in VAT.`   
+                                                        : transaction.transactor.id == user.id && transaction.transaction_type == 'vat' 
+                                                        ? `You paid ${(transaction.amount).toFixed(2)}$ in VAT.` 
                                     : 'Transaction' }
                                 </p>
                             </div>
@@ -167,7 +215,19 @@ export default function Index() {
                             <div className="modal-content position-relative">
                               <div className="modal-header">
                                 <h5 className="modal-title fs-5" id="exampleModalLabel">
-                                  { transaction.transaction_type == 'subscription' 
+                                  { transaction.transaction_type == 'pay_per_view_in_chat' 
+                                      ? 'Pay-Per-View (on Chat)' 
+                                      : transaction.transaction_type == 'commission_on_pay_per_view_in_chat' 
+                                      ? 'Commission (on Pay-Per-View (on Chat))' 
+                                      : transaction.transaction_type == 'pay_per_view_on_post' 
+                                      ? 'Pay-Per-View (on Post)' 
+                                      : transaction.transaction_type == 'commission_on_pay_per_view_on_post' 
+                                      ? 'Commission (on Pay-Per-View (on Post))' 
+                                      : transaction.transaction_type == 'stream_tip' 
+                                      ? 'Stream Tip' 
+                                      : transaction.transaction_type == 'commission_on_stream_tip' 
+                                      ? 'Commission (on Stream Tip)' 
+                                      : transaction.transaction_type == 'subscription' 
                                       ? 'Subscription' 
                                       : transaction.transaction_type == 'commission_on_subscription' 
                                       ? 'Commission (on Subscription)' 
@@ -177,6 +237,8 @@ export default function Index() {
                                       ? 'Commission (on Tip)' 
                                       : transaction.transaction_type == 'commission' 
                                       ? 'Commission' 
+                                      : transaction.transaction_type == 'vat' 
+                                      ? 'VAT' 
                                       : 'Unnamed Transaction' }  
                                 </h5>
                                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -187,32 +249,74 @@ export default function Index() {
                                     <div className="d-flex align-items-center p-2">
                                       <span className='card-text fs-6'>
                                         <small className=''>
-                                          {/* Subscription */}
-                                          { transaction.beneficiary.id == user.id && transaction.transaction_type == 'subscription'
-                                            ? `You received ${(transaction.amount).toFixed(2)}$ in subscription fee from ${transaction.transactor.first_name} ${transaction.transactor.last_name}.` 
+                                          {/* Pay-Per-View on Chat */}
+                                          { transaction.beneficiary.id == user.id && transaction.transaction_type == 'pay_per_view_in_chat'
+                                            ? `You received ${(transaction.amount).toFixed(2)}$ in Pay-Per-View on Chat fee from ${transaction.transactor.first_name} ${transaction.transactor.last_name}.` 
 
-                                            : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_subscription' 
-                                              ? `You were charged ${(transaction.amount).toFixed(2)}$ in subscription fee commission.`  
+                                            : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_pay_per_view_in_chat' 
+                                              ? `You were charged ${(transaction.amount).toFixed(2)}$ commission (on Pay-Per-View (on Chat)).`  
                                             
-                                            : transaction.transactor.id == user.id && transaction.transaction_type == 'subscription' 
-                                              ? `You paid ${(transaction.amount).toFixed(2)}$ in subscription fee to subscribe to ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}` 
+                                            : transaction.transactor.id == user.id && transaction.transaction_type == 'pay_per_view_in_chat' 
+                                              ? `You paid ${(transaction.amount).toFixed(2)}$ to view content by ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}` 
 
-                                            : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_subscription' 
-                                              ? `${(transaction.amount).toFixed(2)}$ in subscription fee commission was deducted from the creator you subscribed to.` 
+                                            : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_pay_per_view_in_chat' 
+                                              ? `${(transaction.amount).toFixed(2)}$ commission was deducted from the creator you viewed their chat Pay-Per-View content.` 
 
 
-                                              /* Tip */
-                                              : transaction.beneficiary.id == user.id && transaction.transaction_type == 'tip'
-                                                ? `You received ${(transaction.amount).toFixed(2)}$ in tip money from ${transaction.transactor.first_name} ${transaction.transactor.last_name}.` 
+                                              /* Pay-Per-View on Post */
+                                              : transaction.beneficiary.id == user.id && transaction.transaction_type == 'pay_per_view_on_post'
+                                                ? `You received ${(transaction.amount).toFixed(2)}$ in Pay-Per-View on Post fee from ${transaction.transactor.first_name} ${transaction.transactor.last_name}.` 
 
-                                                : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_tip' 
-                                                  ? `You were charged ${(transaction.amount).toFixed(2)}$ in tip money commission.`  
+                                                : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_pay_per_view_on_post' 
+                                                  ? `You were charged ${(transaction.amount).toFixed(2)}$ commission (on Pay-Per-View (on Post)).`  
                                                 
-                                                : transaction.transactor.id == user.id && transaction.transaction_type == 'tip' 
-                                                  ? `You paid ${(transaction.amount).toFixed(2)}$ in tip money to ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}` 
+                                                : transaction.transactor.id == user.id && transaction.transaction_type == 'pay_per_view_on_post' 
+                                                  ? `You paid ${(transaction.amount).toFixed(2)}$ to view content by ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}` 
 
-                                                : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_tip' 
-                                                  ? `${(transaction.amount).toFixed(2)}$ in tip commission was deducted from the creator you gave a tip.` 
+                                                : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_pay_per_view_on_post' 
+                                                  ? `${(transaction.amount).toFixed(2)}$ commission was deducted from the creator you viewed their post Pay-Per-View content.` 
+
+
+                                                  /* Stream Tip */
+                                                  : transaction.beneficiary.id == user.id && transaction.transaction_type == 'stream_tip'
+                                                    ? `You received ${(transaction.amount).toFixed(2)}$ in stream tip money from ${transaction.transactor.first_name} ${transaction.transactor.last_name}.` 
+
+                                                    : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_stream_tip' 
+                                                      ? `You were charged ${(transaction.amount).toFixed(2)}$ in stream tip money commission.`  
+                                                    
+                                                    : transaction.transactor.id == user.id && transaction.transaction_type == 'stream_tip' 
+                                                      ? `You paid ${(transaction.amount).toFixed(2)}$ in stream tip money to ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}` 
+
+                                                    : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_stream_tip' 
+                                                      ? `${(transaction.amount).toFixed(2)}$ in stream tip commission was deducted from the creator you gave a stream tip.` 
+
+
+                                                    /* Subscription */
+                                                    : transaction.beneficiary.id == user.id && transaction.transaction_type == 'subscription'
+                                                      ? `You received ${(transaction.amount).toFixed(2)}$ in subscription fee from ${transaction.transactor.first_name} ${transaction.transactor.last_name}.` 
+
+                                                      : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_subscription' 
+                                                        ? `You were charged ${(transaction.amount).toFixed(2)}$ in subscription fee commission.`  
+                                                      
+                                                      : transaction.transactor.id == user.id && transaction.transaction_type == 'subscription' 
+                                                        ? `You paid ${(transaction.amount).toFixed(2)}$ in subscription fee to subscribe to ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}` 
+
+                                                      : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_subscription' 
+                                                        ? `${(transaction.amount).toFixed(2)}$ in subscription fee commission was deducted from the creator you subscribed to.` 
+
+
+                                                        /* Tip */
+                                                        : transaction.beneficiary.id == user.id && transaction.transaction_type == 'tip'
+                                                          ? `You received ${(transaction.amount).toFixed(2)}$ in tip money from ${transaction.transactor.first_name} ${transaction.transactor.last_name}.` 
+
+                                                          : transaction.beneficiary.id == user.id && transaction.transaction_type == 'commission_on_tip' 
+                                                            ? `You were charged ${(transaction.amount).toFixed(2)}$ in tip money commission.`  
+                                                          
+                                                          : transaction.transactor.id == user.id && transaction.transaction_type == 'tip' 
+                                                            ? `You paid ${(transaction.amount).toFixed(2)}$ in tip money to ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}` 
+
+                                                          : transaction.transactor.id == user.id && transaction.transaction_type == 'commission_on_tip' 
+                                                            ? `${(transaction.amount).toFixed(2)}$ in tip commission was deducted from the creator you gave a tip.` 
                                             
                                             : 'Unnamed Transaction' }
                                         </small>

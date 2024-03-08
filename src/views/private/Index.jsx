@@ -249,7 +249,7 @@ export default function Index() {
                                 
                                                 <div className="d-flex column-gap-3">
                                                     <small className="text-body-secondary">
-                                                        <span>reposted</span> { dayjs.utc(post.created_at).fromNow() }
+                                                        <span>reposted</span> { dayjs.utc(post?.created_at).fromNow() }
                                                     </small>
                                                     <span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
@@ -267,7 +267,7 @@ export default function Index() {
                                                 to={ route('home.users.show', {'username': post.user.username})}
                                                 className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
                                                 <div className="rounded-circle">
-                                                    <img src={ post.user.user_image_url ? `${ Constants.serverURL }/storage/${ post.user.user_image_url }` : Logo } alt="" width="65" />
+                                                    <img src={ post?.user?.user_image_url ? `${ Constants.serverURL }/storage/${ post?.user?.user_image_url }` : Logo } alt="" width="65" height='65' className='object-fit-cover rounded' />
                                                 </div>
                                                 <div className="d-flex flex-column">
                                                     <h3 className="card-title fs-6 text-dark">

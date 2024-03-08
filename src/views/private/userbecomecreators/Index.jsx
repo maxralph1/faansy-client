@@ -5,40 +5,40 @@ dayjs.extend(relativeTime);
 import { Link } from 'react-router-dom';
 import { route } from '@/routes';
 import Constants from '@/utils/Constants.jsx';
-import { useUserverifications } from '@/hooks/useUserverifications.jsx';
-import { useUserverification } from '@/hooks/useUserverification.jsx';
+import { useUserbecomecreators } from '@/hooks/useUserbecomecreators.jsx';
+import { useUserbecomecreator } from '@/hooks/useUserbecomecreator.jsx';
 import Layout from '@/components/private/Layout.jsx';
 import Loading from '@/components/Loading.jsx';
 
 
 export default function Index() {
-    const { userVerifications, getUserVerifications } = useUserverifications();
-    const { userverification, approveUserverification, rejectUserverification } = useUserverification();
+    const { userBecomecreators, getUserBecomecreators } = useUserbecomecreators();
+    const { userbecomecreator, approveUserbecomecreator, rejectUserbecomecreator } = useUserbecomecreator();
     const [additionalFormVisible, setAdditionalFormVisible] = useState(false);
 
     async function rejection (event) {
         event.preventDefault();
 
-        console.log(event.target.id.value);
+        console.log(userbecomecreator.data.reason_for_rejection);
 
-        userverification.data.id = event.target.id.value;
+        userbecomecreator.data.id = event.target.id.value;
 
         const formData = new FormData();
-        formData.append('id', userverification.data.id);
-        userverification.data.reason_for_rejection && formData.append('reason_for_rejection', userverification.data.reason_for_rejection);
+        formData.append('id', userbecomecreator.data.id);
+        userbecomecreator.data.reason_for_rejection && formData.append('reason_for_rejection', userbecomecreator.data.reason_for_rejection);
 
-        await rejectUserverification(formData);
+        await rejectUserbecomecreator(formData);
 
-        userverification.data.reason_for_rejection = '';
+        userbecomecreator.data.reason_for_rejection = '';
 
-        await getUserVerifications();
+        await getUserBecomecreators();
     }
 
     return (
         <Layout>
             <section className="col-sm-10 col-md-9 card rounded-0 main-content">
                 <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
-                    <h2 className="text-uppercase fs-5 fw-bold">User Verifications</h2>
+                    <h2 className="text-uppercase fs-5 fw-bold">Become Creator Requests</h2>
                     <span className="mb-2">
                         {/* <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-three-dots-vertical"
                             viewBox="0 0 16 16">
@@ -50,38 +50,38 @@ export default function Index() {
 
                 <div className=''>
                     <section className="border-top">
-                    {(userVerifications?.data?.length > 0) ? userVerifications?.data?.map(userVerification => {
+                    {(userBecomecreators?.data?.length > 0) ? userBecomecreators?.data?.map(userBecomecreator => {
                         
                         return (
-                            <article key={ userVerification?.id } className='card rounded-0 user-verification-item w-100'>
+                            <article key={ userBecomecreator?.id } className='card rounded-0 user-becomecreator-item w-100'>
                                 <div
                                     type="button" 
                                     data-bs-toggle="modal" 
-                                    data-bs-target={`#userVerificationModal${ userVerification?.id }`}
+                                    data-bs-target={`#userBecomecreatorModal${ userBecomecreator?.id }`}
                                     data-bs-whatever="@mdo"
                                     className="card-body d-flex flex-column">
                                     <div className='d-flex justify-content-between'>
                                         <h2 className='card-text fs-6 fw-semibold'>
-                                            User Verification — { userVerification.requester.first_name } { userVerification.requester.last_name }
+                                            User Become Creator Request — { userBecomecreator.requester.first_name } { userBecomecreator.requester.last_name }
                                         </h2>
                                     </div>
                                     <div className='column-gap-2'>
                                         <p className='card-text fs-6'>
-                                            { userVerification.requester.first_name } { userVerification.requester.last_name } (@{ userVerification.requester.username }) requested to be verified
+                                            { userBecomecreator.requester.first_name } { userBecomecreator.requester.last_name } (@{ userBecomecreator.requester.username }) requested to become a creator
                                         </p>
                                     </div>
                                 </div>
 
                                 <div 
                                     className="modal fade" 
-                                    id={`userVerificationModal${ userVerification?.id }`} 
+                                    id={`userBecomecreatorModal${ userBecomecreator?.id }`} 
                                     tabIndex="-1" aria-labelledby="exampleModalLabel" 
                                     aria-hidden="true">
                                     <div className="modal-dialog">
                                     <div className="modal-content position-relative">
                                         <div className="modal-header">
                                         <h3 className="modal-title fs-5" id="exampleModalLabel">
-                                            User Verification
+                                            User Become Creator Request
                                         </h3>
                                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
@@ -89,18 +89,18 @@ export default function Index() {
                                             <div className="messages overflow-y-auto d-flex flex-column row-gap-2" style={{ maxHeight: '50vh' }}>
                                                 <div className='w-100 rounded'>
                                                     <div className='d-flex justify-content-end pe-3'>
-                                                        <small><small>{ dayjs.utc(userVerification?.created_at).fromNow() }</small></small>
+                                                        <small><small>{ dayjs.utc(userBecomecreator?.created_at).fromNow() }</small></small>
                                                     </div>
                                                     <div className="d-flex align-items-center justify-content-center p-2">
                                                         <figure>
-                                                            <img src={ userVerification.verification_material_image_url ? `${ Constants.serverURL }/storage/${userVerification.verification_material_image_url}` : MissingImage } className="card-img-bottom rounded-0" alt={ userVerification.requester.username } />
+                                                            <img src={ userBecomecreator.verification_material_image_url ? `${ Constants.serverURL }/storage/${userBecomecreator.verification_material_image_url}` : MissingImage } className="card-img-bottom rounded-0" alt={ userBecomecreator.requester.username } />
                                                             <figcaption>
                                                                 <small>
-                                                                    <small>Verification ID provided by { userVerification.requester.first_name } { userVerification.requester.last_name }&nbsp;
-                                                                        <Link target='_blank' to={ route('home.users.show', {username:  userVerification.requester.username })} className='text-decoration-none text-faansy-red'>
-                                                                            (@{ userVerification.requester.username })
+                                                                    <small>Verification ID provided by { userBecomecreator.requester.first_name } { userBecomecreator.requester.last_name }&nbsp;
+                                                                        <Link target='_blank' to={ route('home.users.show', {username:  userBecomecreator.requester.username })} className='text-decoration-none text-faansy-red'>
+                                                                            (@{ userBecomecreator.requester.username })
                                                                         </Link>
-                                                                        {/* (@{ userVerification.requester.username }) */}
+                                                                        {/* (@{ userBecomecreator.requester.username }) */}
                                                                     </small>
                                                                 </small>
                                                             </figcaption>
@@ -109,8 +109,8 @@ export default function Index() {
                                                     <div className='d-flex justify-content-between px-3'>
                                                         {/* <button 
                                                             onClick={ async () => {
-                                                                await rejectUserverification(userVerification);
-                                                                await getUserVerifications();
+                                                                await rejectUserbecomecreator(userBecomecreator);
+                                                                await getUserBecomecreators();
                                                             } } 
                                                             type='button'
                                                             className='btn btn-sm btn-secondary'>Reject</button> */}
@@ -131,12 +131,12 @@ export default function Index() {
                                                                             <input 
                                                                                 name="id"
                                                                                 id="id" 
-                                                                                value={ userVerification?.id }
+                                                                                value={ userBecomecreator?.id }
                                                                                 row={2} 
                                                                                 className="form-control fs-6" 
                                                                                 style={{ height: '7.5vh' }} 
-                                                                                onChange={ event => userverification.setData({
-                                                                                    ...userverification.data,
+                                                                                onChange={ event => userbecomecreator.setData({
+                                                                                    ...userbecomecreator.data,
                                                                                     id: event.target.value,
                                                                                 }) }
                                                                                 hidden />
@@ -148,10 +148,10 @@ export default function Index() {
                                                                                             type="text" 
                                                                                             name="reason_for_rejection" 
                                                                                             id="reason_for_rejection" 
-                                                                                            value={ userverification.data.reason_for_rejection ?? '' }
+                                                                                            value={ userbecomecreator.data.reason_for_rejection ?? '' }
                                                                                             className='form-control' 
-                                                                                            onChange={ event => userverification.setData({
-                                                                                                ...userverification.data,
+                                                                                            onChange={ event => userbecomecreator.setData({
+                                                                                                ...userbecomecreator.data,
                                                                                                 reason_for_rejection: event.target.value,
                                                                                             }) } 
                                                                                             placeholder='Reason for rejection (if any)'></textarea>
@@ -166,8 +166,8 @@ export default function Index() {
                                                         <div>
                                                             <button 
                                                                 onClick={ async () => {
-                                                                    await approveUserverification(userVerification);
-                                                                    await getUserVerifications();
+                                                                    await approveUserbecomecreator(userBecomecreator);
+                                                                    await getUserBecomecreators();
                                                                 } } 
                                                                 type='button'
                                                                 className='btn btn-sm btn-faansy-red text-light'>
@@ -187,9 +187,9 @@ export default function Index() {
                                     </div>
                                 </div>
                             </article>
-                        )}) : (userVerifications?.data?.length < 1) ? (
+                        )}) : (userBecomecreators?.data?.length < 1) ? (
                             <section className='vh-100 d-flex justify-content-center align-items-center px-5'>
-                                <span className='h-50 text-center fw-semibold px-5'>No user verifications yet.</span>
+                                <span className='h-50 text-center fw-semibold px-5'>No user becomecreators yet.</span>
                             </section>
                         ) : (
                             <section className='vh-100 pt-5 mt-2 px-5'>
@@ -201,7 +201,6 @@ export default function Index() {
 
                     </section>
                 </div>
-
             </section>
         </Layout>
     )

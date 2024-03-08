@@ -72,7 +72,10 @@ export function useMessage(id = null) {
         setLoading(true);
 
         return axiosInstance.get(`messages/${id}`, { signal })
-            .then(response => setData(response.data))
+            .then(response => {
+                setData(response?.data);
+                console.log(response?.data);
+            })
             .catch((error) => {console.log(error)})
             .finally(() => setLoading(false));
     }

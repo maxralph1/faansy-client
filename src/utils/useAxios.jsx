@@ -11,7 +11,7 @@ const baseURL = `${ Constants.serverURL }/api`;
 
 
 const useAxios = () => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const { authTokens, setUser, setAuthTokens } = useContext(AuthContext);
 
     const axiosInstance = axios.create({
@@ -24,23 +24,23 @@ const useAxios = () => {
         },
     });
     
-    async function refreshFunc() {
-        const response = await axiosInstance.post(`${baseURL}/refresh`, {
-            headers: {
-                // 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                "Content-Type": "multipart/form-data",
-                'Authorization': `Bearer ${authTokens?.authorization.token}`,
-            },
-        });
-        console.log(response.data)
-        console.log('refreshed');
+    // async function refreshFunc() {
+    //     const response = await axiosInstance.post(`${baseURL}/refresh`, {
+    //         headers: {
+    //             // 'Content-Type': 'application/json',
+    //             'Access-Control-Allow-Origin': '*',
+    //             "Content-Type": "multipart/form-data",
+    //             'Authorization': `Bearer ${authTokens?.authorization.token}`,
+    //         },
+    //     });
+    //     console.log(response.data)
+    //     console.log('refreshed');
 
-        localStorage.setItem('authTokens', JSON.stringify(response.data))
+    //     localStorage.setItem('authTokens', JSON.stringify(response.data))
 
-        setAuthTokens(response.data);
-        setUser(jwtDecode(response.data.authorization.token));
-    };
+    //     setAuthTokens(response.data);
+    //     setUser(jwtDecode(response.data.authorization.token));
+    // };
 
     axiosInstance.interceptors.request.use(async req => {
         const user = jwtDecode(authTokens?.authorization?.token);
@@ -48,29 +48,29 @@ const useAxios = () => {
 
         if (!isExpired) return req;
 
-        refreshFunc();
+        // refreshFunc();
 
-        // // // modify this navigate before usage
-        // // // if (isExpired) navigate(route('index'));
+        // // modify this navigate before usage
+        // // if (isExpired) navigate(route('index'));
 
-        // const response = await axios.post(`${baseURL}/refresh`, {
-        //     headers: {
-        //         // 'Content-Type': 'application/json',
-        //         'Access-Control-Allow-Origin': '*',
-        //         "Content-Type": "multipart/form-data",
-        //         'Authorization': `Bearer ${authTokens?.authorization.token}`,
-        //     },
-        // });
-        // console.log(response.data)
-        // console.log('refreshed');
+        const response = await axios.post(`${baseURL}/refresh`, {
+            headers: {
+                // 'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                "Content-Type": "multipart/form-data",
+                // 'Authorization': `Bearer ${authTokens?.authorization?.token}`,
+            },
+        });
+        console.log(response?.data)
+        console.log('refreshed');
 
-        // localStorage.setItem('authTokens', JSON.stringify(response.data))
+        localStorage.setItem('authTokens', JSON.stringify(response?.data))
 
-        // setAuthTokens(response.data);
-        // setUser(jwtDecode(response.data.authorization.token));
+        setAuthTokens(response?.data);
+        setUser(jwtDecode(response?.data?.authorization?.token));
 
-        // // Update user's last seen here
-        // // await ...
+        // Update user's last seen here
+        // await ...
 
         req.headers.Authorization = `Bearer ${response?.data?.authorization?.token}`;
         return req;

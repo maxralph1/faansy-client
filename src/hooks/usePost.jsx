@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { route } from '@/routes';
 import Constants from '@/utils/Constants.jsx';
-import axios from 'axios';
+// import axios from 'axios';
 import useAxios from '@/utils/useAxios.jsx';
 import swal from 'sweetalert2';
 
@@ -69,7 +69,8 @@ export function usePost(id = null) {
     async function getPost(id, { signal } = {}) {
         setLoading(true);
 
-        return axiosInstance.get(`${ Constants.serverURL }/api/posts/${id}`, { signal })
+        return axiosInstance.get(`posts/${id}`, { signal })
+        // return axios.get(`${ Constants.serverURL }/api/posts/${id}`, { signal })
             .then(response => setData(response?.data?.data))
             .catch((error) => {
                 console.log(error)

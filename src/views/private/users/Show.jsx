@@ -18,6 +18,8 @@ import { usePost } from '@/hooks/usePost.jsx';
 import { usePostcomment } from '@/hooks/usePostcomment.jsx';
 import { useBookmark } from '@/hooks/useBookmark.jsx';
 import { usePostlike } from '@/hooks/usePostlike.jsx';
+import { useRestrict } from '@/hooks/useRestrict.jsx';
+import { useBlock } from '@/hooks/useBlock.jsx';
 import Layout from '@/components/private/Layout.jsx';
 import Loading from '@/components/Loading.jsx';
 import Logo from '@/assets/images/logo.png';
@@ -36,9 +38,11 @@ export default function Show() {
     const { post, createPost, featurePost, destroyPost } = usePost();
     const { createPostcomment, destroyPostcomment } = usePostcomment();
     const { createPostlike, destroyPostlike } = usePostlike();
+    const { createRestrict } = useRestrict();
+    const { createBlock } = useBlock();
     const { createBookmark, destroyBookmark } = useBookmark();
     
-    // console.log(creator);
+    console.log(creator);
     // console.log(creator?.data?.posts);
     // console.log(creator?.data?.subscriptions);
     // console.log(user);
@@ -82,8 +86,7 @@ export default function Show() {
     return (
         <Layout>
             <section className="col-sm-10 col-md-5 card rounded-0 main-content">
-                <div
-                    className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
+                <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
                     <div className="d-flex align-items-center column-gap-2">
                         <div className="d-flex flex-column">
                             <div className="d-flex flex-row align-items-center column-gap-1">
@@ -108,6 +111,53 @@ export default function Show() {
                             </span>
                         </div>
                     </div>
+
+                    { user?.id != creator?.data?.id &&
+                        <div className="d-flex align-items-center column-gap-3">
+                            <span className='mb-2 dropstart'>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                    className="bi bi-three-dots-vertical" style={{ marginTop: '10px' }} viewBox="0 0 16 16" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <path
+                                        d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                                </svg>
+                                <ul className="dropdown-menu">
+                                    <li>
+                                        <div 
+                                            type="button"
+                                            className="dropdown-item fw-bold" 
+                                            onClick={ async () => {
+                                                await createRestrict(creator?.data?.id);
+                                                await getCreator(params.username);
+                                                } }>
+                                                <small>Restrict User&nbsp;
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" class="bi bi-person-exclamation mb-1" viewBox="0 0 16 16">
+                                                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m.256 7a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
+                                                        <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1.5a.5.5 0 0 0 1 0V11a.5.5 0 0 0-.5-.5m0 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
+                                                    </svg>
+                                                </small>
+                                        </div>
+                                    </li>
+                                    
+                                    <li>
+                                        <div 
+                                            type="button"
+                                            className="dropdown-item fw-bold" 
+                                            onClick={ async () => {
+                                                await createBlock(creator?.data?.id);
+                                                await getCreator(params.username);
+                                                } }>
+                                                <small>Block User&nbsp;
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" class="bi bi-person-fill-exclamation mb-1" viewBox="0 0 16 16">
+                                                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
+                                                        <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1.5a.5.5 0 0 0 1 0V11a.5.5 0 0 0-.5-.5m0 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
+                                                    </svg>
+                                                </small>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
+                    }
                 </div>
 
                 <section className="card text-bg-dark border-0 rounded-0">
@@ -395,7 +445,7 @@ export default function Show() {
                                                 to={ route('home.users.show', {'username': post.user.username})}
                                                 className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
                                                 <div className="rounded-circle">
-                                                    <img src={ post.user.user_image_url ? `${ Constants.serverURL }/storage/${ post?.user?.user_image_url }` : Logo } alt="" width="65" />
+                                                    <img src={ post.user.user_image_url ? `${ Constants.serverURL }/storage/${ post?.user?.user_image_url }` : Logo } alt="" width="65" height='65' className='object-fit-cover rounded' />
                                                 </div>
                                                 <div className="d-flex flex-column">
                                                     <h3 className="card-title fs-6 text-dark">
@@ -483,10 +533,13 @@ export default function Show() {
                                                 }
                                             </div>
                                         </div>
-                            
-                                        <p className="card-text">{ post.body }</p>
-                                        <p>
-                                            {/* {
+                                        { (creator?.data?.subscriptions?.find(subscription => (subscription.subscribed.id == creator?.data?.id && subscription.subscriber.id == user.id) || (post.user.id == user?.id))) ? 
+                                            <p className="card-text">{ post?.body }</p> 
+                                            : 
+                                            <p className="card-text">{ (post?.body).substring(0,20) + ' ...' }</p> }
+                                        
+                                        {/* <p>
+                                            {
                                                 function replaceAts() {
                                                 var replacer = function(match) {
                                                     var id = match.substr(1);
@@ -502,61 +555,83 @@ export default function Show() {
                                                 replaceAts();
 
                                                 console.log(list);
-                                            } */}
-                                        </p>
+                                            }
+                                        </p> */}
                                         {/* <span><a href="" className="text-decoration-none text-faansy-red">onlyfans.com/natalie.brooks</a> / <a href="" className="text-decoration-none text-faansy-red">onlyfans.com/natalie.brooks</a></span> */}
                                     </div>
 
                                     { (post?.payperviewamount <= 0) 
                                         ?
                                             <>
-                                                { post?.video?.video_url?.length > 0 && 
-                                                    <video controls width="250" height={400} className="card-img-bottom object-fit-cover rounded-0 mb-1" alt={ post?.id }>
-                                                        <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/webm" />
-                                                        <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/mp4" />
-                                                        Download the
-                                                        <a href={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` }>video</a>.
-                                                    </video> 
-                                                }
-                                                <div id={`carouselIndicators${ post?.id }`} className="carousel slide pb-3">
-                                                    <div className="carousel-indicators">
-                                                        { post?.images?.length > 0 && post?.images?.map((image, index) => {
-                                                            return (
-                                                                <button key={ index } type="button" data-bs-target={`carouselIndicators${ image?.id }`} data-bs-slide-to={index} className="active" aria-current="true" aria-label={ `Slide` + (index+1) }></button>
-                                                            )
-                                                        })}
-                                                    </div>
-                                                    <div className="carousel-inner">
-                                                        { post?.images?.length > 0 && post?.images?.map((image, index) => {
-                                                                if (index == 0) {
+                                            { (creator?.data?.subscriptions?.find(subscription => (subscription.subscribed.id == creator?.data?.id && subscription.subscriber.id == user.id) || (post.user.id == user?.id))) ? 
+                                                <>
+                                                    { post?.video?.video_url?.length > 0 && 
+                                                        <video controls width="250" height={400} className="card-img-bottom object-fit-cover rounded-0 mb-1" alt={ post?.id }>
+                                                            <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/webm" />
+                                                            <source src={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` } type="video/mp4" />
+                                                            Download the
+                                                            <a href={ `${ Constants.serverURL }/storage/${ post?.video?.video_url }` }>video</a>.
+                                                        </video> 
+                                                    }
+                                                    <div id={`carouselIndicators${ post?.id }`} className="carousel slide pb-3">
+                                                        <div className="carousel-indicators">
+                                                            { post?.images?.length > 0 && post?.images?.map((image, index) => {
+                                                                return (
+                                                                    <button key={ index } type="button" data-bs-target={`carouselIndicators${ image?.id }`} data-bs-slide-to={index} className="active" aria-current="true" aria-label={ `Slide` + (index+1) }></button>
+                                                                )
+                                                            })}
+                                                        </div>
+                                                        <div className="carousel-inner">
+                                                            { post?.images?.length > 0 && post?.images?.map((image, index) => {
+                                                                    if (index == 0) {
+                                                                        return (
+                                                                            <div key={ image.id } className={`carousel-item active`}>
+                                                                                <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
+                                                                            </div>
+                                                                        )
+                                                                    }
+
                                                                     return (
-                                                                        <div key={ image.id } className={`carousel-item active`}>
+                                                                        <div key={ image.id } className={`carousel-item`}>
                                                                             <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
                                                                         </div>
                                                                     )
-                                                                }
-
-                                                                return (
-                                                                    <div key={ image.id } className={`carousel-item`}>
-                                                                        <img src={ `${ Constants.serverURL }/storage/${ image?.image_url }` } className="card-img-bottom object-fit-cover rounded-0" height={400} />
-                                                                    </div>
-                                                                )
-                                                            })
+                                                                })
+                                                            }
+                                                        </div>
+                                                        { post?.images?.length > 1 && 
+                                                            <>
+                                                                <button className="carousel-control-prev" type="button" data-bs-target={`#carouselIndicators${ post?.id }`} data-bs-slide="prev">
+                                                                    <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                                    <span className="visually-hidden">Previous</span>
+                                                                </button>
+                                                                <button className="carousel-control-next" type="button" data-bs-target={`#carouselIndicators${ post?.id }`} data-bs-slide="next">
+                                                                    <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                                                                    <span className="visually-hidden">Next</span>
+                                                                </button>
+                                                            </>
                                                         }
                                                     </div>
-                                                    { post?.images?.length > 1 && 
-                                                        <>
-                                                            <button className="carousel-control-prev" type="button" data-bs-target={`#carouselIndicators${ post?.id }`} data-bs-slide="prev">
-                                                                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                                <span className="visually-hidden">Previous</span>
+                                                </>
+                                                : 
+                                                    <span className="card-img-bottom rounded d-flex justify-content-center align-items-center pb-3">
+                                                        <span className="w-100 px-3">
+                                                            <button 
+                                                                type="button" 
+                                                                onClick={ async () => {
+                                                                    await createSubscription(creator?.data?.id);
+                                                                    await getCreator(params.username);
+                                                                } }
+                                                                className="btn btn-faansy-red rounded-pill d-flex justify-content-between px-3 text-light fw-semibold py-2 w-100">
+                                                                <small className="text-uppercase">Subscribe To View</small>
+                                                                { creator?.data?.subscription_amount >= 0 && creator?.data?.free_subscription == false
+                                                                    ? <small className="text-uppercase">For { (creator?.data?.subscription_amount).toFixed(2) }$</small>
+                                                                    : <small className="text-uppercase">For Free</small>
+                                                                }
                                                             </button>
-                                                            <button className="carousel-control-next" type="button" data-bs-target={`#carouselIndicators${ post?.id }`} data-bs-slide="next">
-                                                                <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                                                                <span className="visually-hidden">Next</span>
-                                                            </button>
-                                                        </>
-                                                    }
-                                                </div>
+                                                        </span>
+                                                    </span>
+                                            }
                                             </>
                                         : 
                                             <span className="card-img-bottom rounded d-flex justify-content-center align-items-center pb-3">

@@ -107,7 +107,7 @@ export default function Index() {
                                                 to={ route('home.users.show', {'username': bookmark.post.user.username})}
                                                 className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
                                                 <div className="rounded-circle">
-                                                    <img src={ bookmark.post.user.user_image_url ? `${ Constants.serverURL }/storage/${ bookmark?.post?.user?.user_image_url }` : Logo } alt="" width="65" />
+                                                    <img src={ bookmark.post.user.user_image_url ? `${ Constants.serverURL }/storage/${ bookmark?.post?.user?.user_image_url }` : Logo } alt="" width="65" height='65' className='object-fit-cover rounded' />
                                                 </div>
                                                 <div className="d-flex flex-column">
                                                     <h3 className="card-title fs-6 text-dark">

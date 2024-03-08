@@ -3,21 +3,23 @@ import { Link } from 'react-router-dom';
 import { route } from '@/routes';
 import AuthContext from '@/context/AuthContext.jsx';
 import Layout from '@/components/public/Layout.jsx';
+import Logo from '@/assets/images/logo.png';
 
 
 export default function PasswordlessSigninRequest() {
     const { passwordlessSigninRequest } = useContext(AuthContext);
 
-    const handleSubmit = e => {
+    const handleSubmit = event => {
         e.preventDefault();
-        const username = e.target.username.value;
+        const username = event.target.username.value;
 
         username.length > 0 && passwordlessSigninRequest(username);
     }
 
     return (
         <Layout>
-            <div className="col-md-6 col-sm-12 px-5 min-h-100 d-flex flex-column justify-content-center">
+            <div className="col-md-6 col-sm-12 px-3 min-h-100 d-flex flex-column justify-content-center">
+                <span className='position-absolute top-0 px-5 pt-3 mb-2 d-block d-md-none'><img src={ Logo } alt="Faansy Logo" width="95" /></span>
                 <h2 className="fs-6 px-5 text-end">Passwordless Sign-in Token Request</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="d-flex flex-column px-5">
