@@ -31,7 +31,7 @@ import MissingUserImage from '@/assets/images/faansy_icon_non_transparent.png';
 
 export default function MyProfile() {
     const { user } = useContext(AuthContext);
-    const { creator, getCreator, updateCreator } = useCreator(user.username);
+    const { creator, getCreator, updateCreator, updateProfilePhotoCreator, updateBackgroundPhotoCreator } = useCreator(user.username);
     const { posts, getPosts } = useMyPosts();
     const { post, createPost, featurePost, destroyPost } = usePost();
     // const { polls, getPolls } = usePolls();
@@ -107,8 +107,8 @@ export default function MyProfile() {
         formData.append('last_name', creator.data.last_name);
         formData.append('username', creator.data.username);
         formData.append('email', creator.data.email);
-        event.target.user_image_url.files[0] && formData.append('user_image_url', event.target.user_image_url.files[0]);
-        event.target.user_background_image_url.files[0] && formData.append('user_background_image_url', event.target.user_background_image_url.files[0]);
+        event.target.user_image_url.files[0] != null && formData.append('user_image_url', event.target.user_image_url.files[0]);
+        event.target.user_background_image_url.files[0] != null && formData.append('user_background_image_url', event.target.user_background_image_url.files[0]);
         showActivityStatus == false ? formData.append('show_activity_status', 0) : formData.append('show_activity_status', 1);
         usersMustBeSubscribedToViewMyContent == false ? formData.append('users_must_be_subscribed_to_view_my_content', 0) : formData.append('users_must_be_subscribed_to_view_my_content', 1);
         freeSubscription == false ? formData.append('free_subscription', 0) : formData.append('free_subscription', 1);
@@ -125,6 +125,28 @@ export default function MyProfile() {
         darkMode == false ? formData.append('dark_mode', 0) : formData.append('dark_mode', 1);
 
         await updateCreator(formData);
+
+        await getCreator(user.username);
+    }
+
+    async function updateProfilePhoto(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        event.target.user_image_url.files[0] != null && formData.append('user_image_url', event.target.user_image_url.files[0]);
+
+        await updateProfilePhotoCreator(formData);
+
+        await getCreator(user.username);
+    }
+
+    async function updateBackgroundPhoto(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        event.target.user_background_image_url.files[0] != null && formData.append('user_background_image_url', event.target.user_background_image_url.files[0]);
+
+        await updateBackgroundPhotoCreator(formData);
 
         await getCreator(user.username);
     }
@@ -223,6 +245,37 @@ export default function MyProfile() {
                                     d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
                             </svg>
                             <ul className="dropdown-menu">
+                                <li>
+                                    <div 
+                                        type="button"
+                                        className="dropdown-item fw-bold" 
+                                        href="#profilePhoto" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#profilePhotoModal" 
+                                        data-bs-whatever="profilePhoto">
+                                            <small>Update Profile Photo&nbsp;
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" class="bi bi-file-image" viewBox="0 0 16 16">
+                                                    <path d="M8.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                                                    <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M3 2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v8l-2.083-2.083a.5.5 0 0 0-.76.063L8 11 5.835 9.7a.5.5 0 0 0-.611.076L3 12z"/>
+                                                </svg>
+                                            </small>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div 
+                                        type="button"
+                                        className="dropdown-item fw-bold" 
+                                        href="#backgroundPhoto" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#backgroundPhotoModal" 
+                                        data-bs-whatever="backgroundPhoto">
+                                            <small>Update Background Photo&nbsp;
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#820303" class="bi bi-image-fill" viewBox="0 0 16 16">
+                                                    <path d="M.002 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2zm1 9v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062zm5-6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0"/>
+                                                </svg>
+                                            </small>
+                                    </div>
+                                </li>
                                 <li>
                                     <div 
                                         type="button"
@@ -990,6 +1043,92 @@ export default function MyProfile() {
 
 
                 <section className='modal-section'>
+                    <div 
+                        className="modal fade" 
+                        id="profilePhotoModal" 
+                        tabIndex="-1" 
+                        aria-labelledby="profilePhotoModalLabel" 
+                        aria-hidden="true">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="profilePhotoModalLabel">Update Profile Photo</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div className="modal-body">
+                                    <form onSubmit={ updateProfilePhoto } encType='multipart/form-data'>
+                                        <div className="mb-3 d-flex flex-column row-gap-2">
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*" 
+                                                        name="user_image_url" 
+                                                        id="user_image_url" 
+                                                        className='form-control'
+                                                        // value={ creator.data.user_image_url ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            user_image_url: event.target.files[0],
+                                                        }) }
+                                                        placeholder="User Image" />
+                                                </div>
+                                                <small style={{ marginTop: '-7px' }}><small>*Upload profile photo</small></small>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <div className='d-flex justify-content-end'>
+                                            <button type="submit" className="btn btn-sm btn-faansy-red text-light">Update Profile Photo</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div 
+                        className="modal fade" 
+                        id="backgroundPhotoModal" 
+                        tabIndex="-1" 
+                        aria-labelledby="backgroundPhotoModalLabel" 
+                        aria-hidden="true">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3 className="modal-title fs-5" id="backgroundPhotoModalLabel">Update Background Photo</h3>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div className="modal-body">
+                                    <form onSubmit={ updateBackgroundPhoto } encType='multipart/form-data'>
+                                        <div className="mb-3 d-flex flex-column row-gap-2">
+                                            <div className='row row-gap-2'>
+                                                <div className='col-md'>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*"
+                                                        name="user_background_image_url" 
+                                                        id="user_background_image_url" 
+                                                        className='form-control'
+                                                        // value={ creator.data.user_background_image_url ?? '' } 
+                                                        onChange={ event => creator.setData({
+                                                            ...creator.data,
+                                                            user_background_image_url: event.target.files[0],
+                                                        }) }
+                                                        placeholder="User Profile Background Image" />
+                                                </div>
+                                                <small style={{ marginTop: '-7px' }}><small>*Upload background photo</small></small>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <div className='d-flex justify-content-end'>
+                                            <button type="submit" className="btn btn-sm btn-faansy-red text-light">Update Background Photo</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div 
                         className="modal fade" 
                         id="pollsModal" 

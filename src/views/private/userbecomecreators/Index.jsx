@@ -189,7 +189,7 @@ export default function Index() {
                             </article>
                         )}) : (userBecomecreators?.data?.length < 1) ? (
                             <section className='vh-100 d-flex justify-content-center align-items-center px-5'>
-                                <span className='h-50 text-center fw-semibold px-5'>No user becomecreators yet.</span>
+                                <span className='h-50 text-center fw-semibold px-5'>No user requests to become creator yet.</span>
                             </section>
                         ) : (
                             <section className='vh-100 pt-5 mt-2 px-5'>

@@ -10,7 +10,7 @@ export default function PasswordlessSigninRequest() {
     const { passwordlessSigninRequest } = useContext(AuthContext);
 
     const handleSubmit = event => {
-        e.preventDefault();
+        event.preventDefault();
         const username = event.target.username.value;
 
         username.length > 0 && passwordlessSigninRequest(username);

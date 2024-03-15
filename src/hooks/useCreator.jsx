@@ -23,24 +23,24 @@ export function useCreator(username = null) {
         }
     }, [username]);
 
-    async function createCreator(user_id, post_id) {
-        setLoading(true);
-        setErrors({});
+    // async function createCreator(user_id, post_id) {
+    //     setLoading(true);
+    //     setErrors({});
 
-        console.log(user_id, post_id)
-        return axiosInstance.post('creators', {user_id, post_id})
-            .then(() => navigate(route('home.index')))
-            .catch(error => {
-                console.log(error.response);
-                // console.log(error.response.data.errors);
-                setErrors(error.response);
+    //     console.log(user_id, post_id)
+    //     return axiosInstance.post('creators', {user_id, post_id})
+    //         .then(() => navigate(route('home.index')))
+    //         .catch(error => {
+    //             console.log(error.response);
+    //             // console.log(error.response.data.errors);
+    //             setErrors(error.response);
 
-                if (error.response.status == 401) {
-                    navigate(route('index'))
-                }
-            })
-            .finally(() => setLoading(false));
-    }
+    //             if (error.response.status == 401) {
+    //                 navigate(route('index'))
+    //             }
+    //         })
+    //         .finally(() => setLoading(false));
+    // }
 
     async function getCreator(username, { signal } = {}) {
         setLoading(true);
@@ -84,6 +84,56 @@ export function useCreator(username = null) {
             .finally(() => setLoading(false));
     }
 
+    async function updateProfilePhotoCreator(creator) {
+        setLoading(true);
+        setErrors({});
+
+        return axiosInstance.postForm(`creators/${username}/update-profile-photo`, creator)
+            .then(() => {})
+            .catch(error => {
+                console.log(error);
+                setErrors(error.response);
+                if (error?.response?.status == 401) {
+                    navigate(route('index'))
+                }
+                if (error?.response?.status == 403) {
+                    swal.fire({
+                        text: 'You can only update your details.',
+                        color: "#820303",
+                        width: 350,
+                        position: 'top',
+                        showConfirmButton: false,
+                    });
+                }
+            })
+            .finally(() => setLoading(false));
+    }
+
+    async function updateBackgroundPhotoCreator(creator) {
+        setLoading(true);
+        setErrors({});
+
+        return axiosInstance.postForm(`creators/${username}/update-background-photo`, creator)
+            .then(() => {})
+            .catch(error => {
+                console.log(error);
+                setErrors(error.response);
+                if (error?.response?.status == 401) {
+                    navigate(route('index'))
+                }
+                if (error?.response?.status == 403) {
+                    swal.fire({
+                        text: 'You can only update your details.',
+                        color: "#820303",
+                        width: 350,
+                        position: 'top',
+                        showConfirmButton: false,
+                    });
+                }
+            })
+            .finally(() => setLoading(false));
+    }
+
     async function destroyCreator(creator) {
         return axiosInstance.delete(`creators/${creator.username}/`)
             .then(() => navigate(route('home.index')))
@@ -100,8 +150,10 @@ export function useCreator(username = null) {
     return {
         creator: { data, setData, errors, loading }, 
         getCreator, 
-        createCreator, 
+        // createCreator, 
         updateCreator, 
+        updateProfilePhotoCreator, 
+        updateBackgroundPhotoCreator, 
         destroyCreator
     }
 }

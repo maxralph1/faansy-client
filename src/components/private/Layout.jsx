@@ -24,7 +24,9 @@ export default function Layout({ children }) {
                         ? ''
                             : (location.pathname == route('home.user-become-creators.index'))
                             ? '' 
-                                : <Aside />}
+                                : (location.pathname == route('public.users.show'))
+                                ? '' 
+                                    : <Aside />}
             </main>
         </>
     )

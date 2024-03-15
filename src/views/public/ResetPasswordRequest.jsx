@@ -10,7 +10,7 @@ export default function ResetPasswordRequest() {
     const { resetPasswordRequest } = useContext(AuthContext);
 
     const handleSubmit = event => {
-        e.preventDefault();
+        event.preventDefault();
         const email = event.target.email.value;
 
         email.length > 0 && resetPasswordRequest(email);

@@ -123,34 +123,58 @@ export const AuthProvider = ({children}) => {
 
 
     
-    const passwordlessSigninRequest = async (username) => {
-        const response = await fetch(`${ Constants.serverURL }/api/passwordless-signin-request`, {
-            method: 'POST', 
-            headers: {
-                'Content-Type': 'application/json'
-            }, 
-            body: JSON.stringify({
-                username 
-            })
-        })
+    // const passwordlessSigninRequest = async (username) => {
+    //     const response = await fetch(`${ Constants.serverURL }/api/passwordless-signin-request`, {
+    //         method: 'POST', 
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         }, 
+    //         body: JSON.stringify({
+    //             username 
+    //         })
+    //     })
 
-        if (response.status == 200) {
-            swal.fire({
-                text: 'Email notification with sign in token sent to your email.',
-                color: "#820303",
-                width: 350,
-                position: 'top',
-                showConfirmButton: false,
-            });
-        } else {
-            swal.fire({
-                text: 'Error: Something went wrong.',
-                color: "#820303",
-                width: 300,
-                position: 'top',
-                showConfirmButton: false,
-            });
-        }
+    //     if (response.status == 200) {
+    //         swal.fire({
+    //             text: 'Email notification with sign in token sent to your email.',
+    //             color: "#820303",
+    //             width: 350,
+    //             position: 'top',
+    //             showConfirmButton: false,
+    //         });
+    //     } else {
+    //         swal.fire({
+    //             text: 'Error: Something went wrong.',
+    //             color: "#820303",
+    //             width: 300,
+    //             position: 'top',
+    //             showConfirmButton: false,
+    //         });
+    //     }
+    // }
+
+
+    const passwordlessSigninRequest = async (username) => {
+        await axios.post(`${ Constants.serverURL }/api/passwordless-signin-request`, {username})
+            .then(() => {
+                swal.fire({
+                    text: 'Email notification with sign in token sent to your email.',
+                    color: "#820303",
+                    width: 350,
+                    position: 'top',
+                    showConfirmButton: false,
+                });
+            })
+            .catch(error => {
+                console.log(error);
+                swal.fire({
+                    text: 'Error: Something went wrong.',
+                    color: "#820303",
+                    width: 300,
+                    position: 'top',
+                    showConfirmButton: false,
+                });
+            })
     }
 
 

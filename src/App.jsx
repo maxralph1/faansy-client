@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-// import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { route } from '@/routes';
 import PrivateRoute from '@/utils/PrivateRoute.jsx';
@@ -10,6 +11,8 @@ import ResetPasswordRequest from '@/views/public/ResetPasswordRequest.jsx';
 import ResetPassword from '@/views/public/ResetPassword.jsx';
 import PasswordlessSigninRequest from '@/views/public/PasswordlessSigninRequest.jsx';
 import PasswordlessSignin from '@/views/public/PasswordlessSignin.jsx';
+import PostShow from '@/views/public/posts/Show.jsx';
+import UserShow from '@/views/public/users/Show.jsx';
 
 import PrivateUserCreate from '@/views/private/users/Create.jsx';
 import PrivateUser from '@/views/private/users/Show.jsx';
@@ -67,7 +70,6 @@ import NotFound from '@/views/NotFound.jsx';
 function App() {
   return (
     <BrowserRouter>
-    {/* <HashRouter> */}
       <AuthProvider>
         <Routes>
           {/* Public routes */}
@@ -76,6 +78,8 @@ function App() {
           <Route element={<ResetPassword />} path={ route('reset-password') } />
           <Route element={<PasswordlessSigninRequest />} path={ route('passwordless-signin-request') } />
           <Route element={<PasswordlessSignin />} path={ route('passwordless-signin') } />
+          <Route element={<PostShow />} path={ route('public.posts.show') } />
+          <Route element={<UserShow />} path={ route('public.users.show') } />
           <Route element={<Index />} path={ route('index') } />
           {/* End of Public routes */}
 
@@ -137,7 +141,6 @@ function App() {
           <Route path='*' element={<NotFound />} />
         </Routes>
       </AuthProvider>
-    {/* </HashRouter> */}
     </BrowserRouter>
   )
 }

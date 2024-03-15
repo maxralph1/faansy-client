@@ -37,6 +37,8 @@ const routeNames = {
     'reset-password': '/reset-password/:email/:token',
     'passwordless-signin-request': '/passwordless-signin-request',
     'passwordless-signin': '/passwordless-signin/:username/:token',
+    'public.posts.show': '/posts/:id',
+    'public.users.show': '/:username',
     'index': '/',
 }
 
