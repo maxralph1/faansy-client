@@ -342,21 +342,24 @@ export default function Index() {
                                                                     {(bookmark?.post?.likes?.length > 0) ? bookmark?.post?.likes?.sort((a, b) => new Date(b?.created_at) - new Date(a?.created_at)).map(sortedLike => {
                                                                         if (sortedLike?.post?.id == bookmark?.post?.id){
                                                                         return (
-                                                                            <div 
+                                                                            <article 
                                                                                 key={ sortedLike.id } 
-                                                                                className='border-bottom d-flex flex-column'>
-                                                                                <span>{ sortedLike?.body }</span>
-                                                                                <span className='align-self-end'>by&nbsp;
-                                                                                    <a 
-                                                                                        href={ route('home.users.show', { username: sortedLike?.user?.username })} 
-                                                                                        className='text-decoration-none text-faansy-red'>
-                                                                                        { `${ sortedLike?.user?.first_name } ${ sortedLike?.user?.last_name }` }
-                                                                                    </a>,&nbsp;
-                                                                                    { dayjs.utc(sortedLike.created_at).fromNow() }</span>
-                                                                            </div>
+                                                                                className='border-bottom py-2 d-flex flex-wrap justify-content-between align-items-center gap-2'>
+                                                                                    <span className=''>
+                                                                                        <a 
+                                                                                            href={ route('home.users.show', { username: sortedLike?.user?.username })} 
+                                                                                            className='text-decoration-none text-faansy-red d-flex align-items-center column-gap-2'>
+                                                                                                <img src={ sortedLike?.user?.user_image_url ? `${ Constants.serverURL }/storage/${ sortedLike?.user?.user_image_url }` : '' } alt="" width="30" height="30" className='object-fit-cover border border-light border-1 rounded-circle d-block' />
+                                                                                                <span>{ `${ sortedLike?.user?.first_name } ${ sortedLike?.user?.last_name }` }</span>
+                                                                                        </a>
+                                                                                    </span>
+                                                                                    <span>
+                                                                                        <small><small>{ dayjs.utc(sortedLike.created_at).fromNow() }</small></small>
+                                                                                    </span>
+                                                                            </article>
                                                                         )}}) : (
-                                                                            <div>
-                                                                                <span>No likes</span>
+                                                                            <div className='py-3'>
+                                                                                <span>No like</span>
                                                                             </div>
                                                                     )}
                                                                 </div>
@@ -430,21 +433,25 @@ export default function Index() {
                                                                     {(bookmark?.post?.comments?.length > 0) ? bookmark?.post.comments?.sort((a, b) => new Date(b?.created_at) - new Date(a?.created_at)).map(sortedComment => {
                                                                         if (sortedComment?.post?.id == bookmark?.post?.id){
                                                                         return (
-                                                                            <div 
+                                                                            <article 
                                                                                 key={ sortedComment.id } 
-                                                                                className='border-bottom d-flex flex-column'>
-                                                                                <span>{ sortedComment?.body }</span>
-                                                                                <span className='align-self-end'>by&nbsp;
-                                                                                    <a 
-                                                                                        href={ route('home.users.show', { username: sortedComment?.user?.username })} 
-                                                                                        className='text-decoration-none text-faansy-red'>
-                                                                                        { `${ sortedComment?.user?.first_name } ${ sortedComment?.user?.last_name }` }
-                                                                                    </a>,&nbsp;
-                                                                                    { dayjs.utc(sortedComment.created_at).fromNow() }</span>
-                                                                            </div>
+                                                                                className='border-bottom d-flex flex-column pb-3'>
+                                                                                    <span className='align-self-start justify-self-start'>&nbsp;
+                                                                                        <a 
+                                                                                            href={ route('home.users.show', { username: sortedComment?.user?.username })} 
+                                                                                            className='text-decoration-none text-faansy-red d-flex align-items-center gap-2'>
+                                                                                                <img src={ sortedComment?.user?.user_image_url ? `${ Constants.serverURL }/storage/${ sortedComment?.user?.user_image_url }` : '' } alt="" width="30" height="30" className='object-fit-cover border border-light border-1 rounded-circle d-block' />
+                                                                                                <span>{ `${ sortedComment?.user?.first_name } ${ sortedComment?.user?.last_name }` }</span>
+                                                                                        </a>
+                                                                                    </span>
+                                                                                    <span>
+                                                                                        <small><small>{ dayjs.utc(sortedComment.created_at).fromNow() }</small></small>
+                                                                                    </span>
+                                                                                    <span className='pt-2'>{ sortedComment?.body }</span>
+                                                                            </article>
                                                                         )}}) : (
-                                                                            <div>
-                                                                                <span>No comments</span>
+                                                                            <div className='py-3'>
+                                                                                <span>No comment</span>
                                                                             </div>
                                                                     )}
                                                                 </div>

@@ -32,6 +32,7 @@ const routeNames = {
     'home.index': '/home',
 
     /** Public Routes */
+    'features': '/features',
     'create-account': '/create-account',
     'reset-password-request': '/reset-password-request',
     'reset-password': '/reset-password/:email/:token',

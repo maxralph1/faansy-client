@@ -208,6 +208,54 @@ export const AuthProvider = ({children}) => {
     }
 
 
+    const redirectToGoogle = async () => {
+        await axios.get(`${ Constants.serverURL }/api/google/auth/redirect`)
+            .then(() => {
+                // swal.fire({
+                //     text: 'Email notification with sign in token sent to your email.',
+                //     color: "#820303",
+                //     width: 350,
+                //     position: 'top',
+                //     showConfirmButton: false,
+                // });
+            })
+            .catch(error => {
+                console.log(error);
+                swal.fire({
+                    text: 'Error: Something went wrong.',
+                    color: "#820303",
+                    width: 300,
+                    position: 'top',
+                    showConfirmButton: false,
+                });
+            })
+    }
+
+
+    const handleGoogleCallback = async () => {
+        await axios.get(`${ Constants.serverURL }/api/google/auth/callback`)
+            .then(() => {
+                // swal.fire({
+                //     text: 'Email notification with sign in token sent to your email.',
+                //     color: "#820303",
+                //     width: 350,
+                //     position: 'top',
+                //     showConfirmButton: false,
+                // });
+            })
+            .catch(error => {
+                console.log(error);
+                swal.fire({
+                    text: 'Error: Something went wrong.',
+                    color: "#820303",
+                    width: 300,
+                    position: 'top',
+                    showConfirmButton: false,
+                });
+            })
+    }
+
+
     const logoutUser = async () => {
         setAuthTokens(null);
         setUser(null);
@@ -300,7 +348,9 @@ export const AuthProvider = ({children}) => {
         passwordlessSignin, 
         registerUser, 
         resetPasswordRequest,
-        resetPassword,
+        resetPassword, 
+        redirectToGoogle, 
+        handleGoogleCallback, 
         logoutUser, 
     }
 

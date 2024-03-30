@@ -5,6 +5,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { route } from '@/routes';
 import PrivateRoute from '@/utils/PrivateRoute.jsx';
 
+import Features from '@/views/public/Features.jsx';
 import Index from '@/views/public/Index.jsx';
 import CreateAccount from '@/views/public/CreateAccount.jsx';
 import ResetPasswordRequest from '@/views/public/ResetPasswordRequest.jsx';
@@ -73,6 +74,7 @@ function App() {
       <AuthProvider>
         <Routes>
           {/* Public routes */}
+          <Route element={<Features />} path={ route('features') } />
           <Route element={<CreateAccount />} path={ route('create-account') } />
           <Route element={<ResetPasswordRequest />} path={ route('reset-password-request') } />
           <Route element={<ResetPassword />} path={ route('reset-password') } />

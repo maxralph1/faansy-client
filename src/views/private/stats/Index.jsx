@@ -8,6 +8,9 @@ dayjs.extend(utc);
 import { Link, useParams } from 'react-router-dom';
 import { route } from '@/routes';
 import Constants from '@/utils/Constants.jsx';
+import { useFanactivities } from '@/hooks/useFanactivities.jsx';
+import { useFanactivity } from '@/hooks/useFanactivity.jsx';
+import { useFanlists } from '@/hooks/useFanlists.jsx';
 import { useCreator } from '@/hooks/useCreator';
 import { useTransactions } from '@/hooks/useTransactions.jsx';
 import Layout from '@/components/private/Layout.jsx';
@@ -36,9 +39,14 @@ export default function Index() {
 
   /* Other initializations */
   const { user } = useContext(AuthContext);
+  const { fanactivities, getFanactivities } = useFanactivities();
+  const { destroyFanactivity } = useFanactivity();
+  const { fanlists } = useFanlists();
   const { transactions } = useTransactions();
 
   console.log(transactions);
+  console.log(fanactivities);
+  console.log(fanlists);
 
   const payPerViewEarningTransactions = transactions?.data?.filter((transaction) => (transaction?.transaction_type == 'pay_per_view_in_chat' || transaction?.transaction_type == 'pay_per_view_on_post') && transaction?.transactor.id != user.id);
   const payPerViewExpenditureTransactions = transactions?.data?.filter((transaction) => (transaction?.transaction_type == 'pay_per_view_in_chat' || transaction?.transaction_type == 'pay_per_view_on_post') && transaction?.transactor.id == user.id);
@@ -134,7 +142,7 @@ export default function Index() {
 
   return (
     <Layout>
-      <section className="col-sm-10 col-md-9 card rounded-0 main-content">
+      <section className="col-sm-10 col-md-9 card rounded-0 main-content pb-5">
         <div className="position-sticky top-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-3 bg-white border-bottom z-3">
             <h2 className="text-uppercase fs-5 fw-bold">Stats</h2>
             <span className="mb-2">
@@ -148,6 +156,150 @@ export default function Index() {
 
         <section>
           {/* <div id="myPlot" style="width:100%;max-width:700px"></div> */}
+        </section>
+
+        <section className='fans-section row px-3 pb-4'>
+            <section className="border-top mt-3 col-12">
+                <h3 className='fs-5 fw-semibold text-underline py-3'>Fans</h3>
+                <div className="row">
+                  <div className="col-sm-6 mb-3 mb-sm-0">
+                    <div className="card">
+                      <div className="card-body">
+                        <h4 className="card-title fs-6 fw-semibold">Top Fans</h4>
+                        <div className='d-flex justify-content-between align-items-center'>
+                          <span className="card-text">{ (fanactivities?.data?.length) } { ((fanactivities?.data?.length) > 1) ? 'fans' : 'fan' }</span>
+                          <span><button type='button' data-bs-toggle="modal" data-bs-target="#topFansModal"  className='btn btn-sm btn-faansy-red text-light'>View List</button></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-sm-6 mb-3">
+                    <div className="card">
+                      <div className="card-body">
+                        <h4 className="card-title fs-6 fw-semibold">Fans</h4>
+                        <div className='d-flex justify-content-between align-items-center'>
+                          <span className="card-text">{ (fanlists?.data?.length) } { ((fanlists?.data?.length) > 1) ? 'fans' : 'fan' }</span>
+                          <span><button type='button' data-bs-toggle="modal" data-bs-target="#fanListsModal"  className='btn btn-sm btn-faansy-red text-light'>View List</button></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </section>
+
+            <section className='fans-modals'>
+                {/* Top Fans Modal */}
+                <div className="modal fade" id="topFansModal" tabIndex="-1" aria-labelledby="topFansModalLabel" aria-hidden="true">
+                  <div className="modal-dialog">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h3 className="modal-title fs-5" id="topFansModalLabel">Top Fans</h3>
+                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div className="modal-body">
+                        {(fanactivities?.data?.length > 0) ? (fanactivities?.data?.map(fanactivity => {
+                          return (
+                            <article key={ fanactivity?.id } className='bg-faansy-red mb-2 border-bottom d-flex justify-content-between align-items-center'>
+                              <div className='d-flex gap-2 flex-wrap'>
+                                  <div className="w-100 d-flex justify-content-between align-items-center py-1 px-1">
+                                      <span>
+                                        <img src={ fanactivity?.fan?.user_image_url ? `${ Constants.serverURL }/storage/${ fanactivity?.fan?.user_image_url }` : MissingUserImage } alt="" width="40" height="40" className='object-fit-cover border border-light border-1 rounded-circle d-block' />
+                                      </span>
+                                      <span className="fw-semibold text-capitalize ms-2 d-flex align-items-center gap-1">
+                                        <Link 
+                                          target='_blank' 
+                                          to={ route('home.users.show', {'username': fanactivity?.fan?.username}) } 
+                                          className='text-dark text-decoration-none'>
+                                          { fanactivity?.fan?.first_name + ' ' + fanactivity?.fan?.last_name } <span className='text-lowercase'>(@{ fanactivity?.fan?.username })</span>
+                                        </Link>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-link-45deg align-self-start" viewBox="0 0 16 16">
+                                          <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                          <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                        </svg>
+                                      </span>
+                                  </div>
+                              </div>
+                              <div>
+                                  <button 
+                                      onClick={ async () => {
+                                          await destroyFanactivity(fanactivity);
+                                          await getFanactivities();
+                                      } }
+                                      type='button' 
+                                      className='border-0 bg-transparent'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#4b4242" className="bi bi-trash2-fill text-secondary" viewBox="0 0 16 16">
+                                          <path d="M2.037 3.225A.7.7 0 0 1 2 3c0-1.105 2.686-2 6-2s6 .895 6 2a.7.7 0 0 1-.037.225l-1.684 10.104A2 2 0 0 1 10.305 15H5.694a2 2 0 0 1-1.973-1.671zm9.89-.69C10.966 2.214 9.578 2 8 2c-1.58 0-2.968.215-3.926.534-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466-.18-.14-.498-.307-.975-.466z"/>
+                                        </svg>
+                                  </button>
+                              </div>
+                            </article>
+                          )
+                        })) : (
+                          <div className='py-2 d-flex justify-content-center'>
+                            <span className='text-center'>You have no fans yet.</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Fans Modal */}
+                <div className="modal fade" id="fanListsModal" tabIndex="-1" aria-labelledby="fanListsModalLabel" aria-hidden="true">
+                  <div className="modal-dialog">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h3 className="modal-title fs-5" id="fanListsModalLabel">Fans</h3>
+                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div className="modal-body">
+                        {(fanactivities?.data?.length > 0) ? (fanactivities?.data?.map(fanactivity => {
+                          return (
+                            <article key={ fanactivity?.id } className='bg-faansy-red mb-2 border-bottom d-flex justify-content-between align-items-center'>
+                              <div className='d-flex gap-2 flex-wrap'>
+                                  <div className="w-100 d-flex justify-content-between align-items-center column-gap-3 py-1 px-1">
+                                      <span>
+                                        <img src={ fanactivity?.fan?.user_image_url ? `${ Constants.serverURL }/storage/${ fanactivity?.fan?.user_image_url }` : MissingUserImage } alt="" width="40" height="40" className='object-fit-cover border border-light border-1 rounded-circle d-block' />
+                                      </span>
+                                      <span className="fw-semibold text-capitalize ms-2 d-flex align-items-center gap-1">
+                                        <Link 
+                                          target='_blank' 
+                                          to={ route('home.users.show', {'username': fanactivity?.fan?.username}) } 
+                                          className='text-dark text-decoration-none'>
+                                          { fanactivity?.fan?.first_name + ' ' + fanactivity?.fan?.last_name } <span className='text-lowercase'>(@{ fanactivity?.fan?.username })</span>
+                                        </Link>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-link-45deg align-self-start" viewBox="0 0 16 16">
+                                          <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                          <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                        </svg>
+                                      </span>
+                                  </div>
+                              </div>
+                              <div>
+                                  <button 
+                                      onClick={ async () => {
+                                          await destroyFanactivity(fanactivity);
+                                          await getFanactivities();
+                                      } }
+                                      type='button' 
+                                      className='border-0 bg-transparent'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#4b4242" className="bi bi-trash2-fill text-secondary" viewBox="0 0 16 16">
+                                          <path d="M2.037 3.225A.7.7 0 0 1 2 3c0-1.105 2.686-2 6-2s6 .895 6 2a.7.7 0 0 1-.037.225l-1.684 10.104A2 2 0 0 1 10.305 15H5.694a2 2 0 0 1-1.973-1.671zm9.89-.69C10.966 2.214 9.578 2 8 2c-1.58 0-2.968.215-3.926.534-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466-.18-.14-.498-.307-.975-.466z"/>
+                                        </svg>
+                                  </button>
+                              </div>
+                            </article>
+                          )
+                        })) : (
+                          <div className='py-2 d-flex justify-content-center'>
+                            <span className='text-center'>You have no fans yet.</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </section>
         </section>
 
         <section className='earnings-section row px-3'>
@@ -169,37 +321,52 @@ export default function Index() {
             
             <section className="border-top mt-3 col-12">
                 <h3 className='fs-5 fw-semibold text-underline py-3'>Cumulative Earnings (in USD)</h3>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th scope="col" colSpan='2'>Activity</th>
-                      <th scope="col">Amount Spent (in USD)</th>
-                      <th scope="col"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row" colSpan='2'>Pay-Per-View</th>
-                      <td>{ (payPerViewEarningSum * 100)?.toFixed(2) }</td>
-                      <td><button type='button' data-bs-toggle="modal" data-bs-target="#payPerViewModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
-                    </tr>
-                    <tr>
-                      <th scope="row" colSpan='2'>Subscription</th>
-                      <td>{ (subscriptionEarningSum * 100)?.toFixed(2) }</td>
-                      <td><button type='button' data-bs-toggle="modal" data-bs-target="#subscriptionModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
-                    </tr>
-                    <tr>
-                      <th scope="row" colSpan='2'>Stream Tips</th>
-                      <td>{ (streamTipEarningSum * 100)?.toFixed(2) }</td>
-                      <td><button type='button' data-bs-toggle="modal" data-bs-target="#streamTipModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
-                    </tr>
-                    <tr>
-                      <th scope="row" colSpan='2'>Tips</th>
-                      <td>{ (tipEarningSum * 100)?.toFixed(2) }</td>
-                      <td><button type='button' data-bs-toggle="modal" data-bs-target="#tipModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div className="row">
+                  <div className="col-sm-6 mb-3 mb-sm-0">
+                    <div className="card">
+                      <div className="card-body">
+                        <h4 className="card-title fs-6 fw-semibold">Pay-Per-View</h4>
+                        <div className='d-flex justify-content-between align-items-center'>
+                          <span className="card-text">{ (payPerViewEarningSum * 100)?.toFixed(2) }$</span>
+                          <span><button type='button' data-bs-toggle="modal" data-bs-target="#payPerViewModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-sm-6 mb-3">
+                    <div className="card">
+                      <div className="card-body">
+                        <h4 className="card-title fs-6 fw-semibold">Subscription</h4>
+                        <div className='d-flex justify-content-between align-items-center'>
+                          <span className="card-text">{ (subscriptionEarningSum * 100)?.toFixed(2) }$</span>
+                          <span><button type='button' data-bs-toggle="modal" data-bs-target="#subscriptionModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-sm-6 mb-3 mb-sm-0">
+                    <div className="card">
+                      <div className="card-body">
+                        <h4 className="card-title fs-6 fw-semibold">Stream Tips</h4>
+                        <div className='d-flex justify-content-between align-items-center'>
+                          <span className="card-text">{ (streamTipEarningSum * 100)?.toFixed(2) }$</span>
+                          <span><button type='button' data-bs-toggle="modal" data-bs-target="#streamTipModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-sm-6">
+                    <div className="card">
+                      <div className="card-body">
+                        <h4 className="card-title fs-6 fw-semibold">Tips</h4>
+                        <div className='d-flex justify-content-between align-items-center'>
+                          <span className="card-text">{ (tipEarningSum * 100)?.toFixed(2) }$</span>
+                          <span><button type='button' data-bs-toggle="modal" data-bs-target="#tipModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
             </section>
 
             <section className='earnings-modals'>
@@ -215,7 +382,33 @@ export default function Index() {
                       {(payPerViewEarningTransactions?.length > 0) ? (payPerViewEarningTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2 border-bottom'>
-                            {`${ (transaction.amount * 100)?.toFixed(2) }$ earned in content pay-per-view from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            <div className='d-flex align-items-center gap-3'>
+                              <span className='flex-shrink-0'>
+                                <small>{ dayjs.utc(transaction?.created_at).fromNow() }</small>
+                              </span>
+                              <span className='flex-grow-1'>
+                                Earning in content view from&nbsp;
+                                <span className="fw-semibold text-capitalize">
+                                  <Link 
+                                    target='_blank' 
+                                    to={ route('home.users.show', {'username': transaction?.beneficiary?.username}) } 
+                                    className='text-dark text-decoration-none'>
+                                    <span>
+                                      { transaction?.beneficiary?.first_name + ' ' + transaction?.beneficiary?.last_name } <span className='text-lowercase'>(@{ transaction?.beneficiary?.username })</span>
+                                    </span>
+                                    <span className='align-top'>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-link-45deg align-self-start" viewBox="0 0 16 16">
+                                        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                      </svg>
+                                    </span>
+                                  </Link>
+                                </span>
+                              </span>
+                              <span className='flex-shrink-0 fw-semibold'>
+                                {`${ (transaction.amount * 100)?.toFixed(2) }$`}
+                              </span>
+                            </div>
                           </article>
                         )
                       })) : (
@@ -240,7 +433,33 @@ export default function Index() {
                       {(subscriptionEarningTransactions?.length > 0) ? (subscriptionEarningTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2 border-bottom'>
-                            {`${ (transaction.amount * 100)?.toFixed(2) }$ earned in subscription fee from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name}, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            <div className='d-flex align-items-center gap-3'>
+                              <span className='flex-shrink-0'>
+                                <small>{ dayjs.utc(transaction?.created_at).fromNow() }</small>
+                              </span>
+                              <span className='flex-grow-1'>
+                                Earning in subscription fee from&nbsp;
+                                <span className="fw-semibold text-capitalize">
+                                  <Link 
+                                    target='_blank' 
+                                    to={ route('home.users.show', {'username': transaction?.beneficiary?.username}) } 
+                                    className='text-dark text-decoration-none'>
+                                    <span>
+                                      { transaction?.beneficiary?.first_name + ' ' + transaction?.beneficiary?.last_name } <span className='text-lowercase'>(@{ transaction?.beneficiary?.username })</span>
+                                    </span>
+                                    <span className='align-top'>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-link-45deg align-self-start" viewBox="0 0 16 16">
+                                        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                      </svg>
+                                    </span>
+                                  </Link>
+                                </span>
+                              </span>
+                              <span className='flex-shrink-0 fw-semibold'>
+                                {`${ (transaction.amount * 100)?.toFixed(2) }$`}
+                              </span>
+                            </div>
                           </article>
                         )
                       })) : (
@@ -265,7 +484,33 @@ export default function Index() {
                       {(streamTipEarningTransactions?.length > 0) ? (streamTipEarningTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2 border-bottom'>
-                            {`${ (transaction.amount * 100)?.toFixed(2) }$ received from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in stream tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            <div className='d-flex align-items-center gap-3'>
+                              <span className='flex-shrink-0'>
+                                <small>{ dayjs.utc(transaction?.created_at).fromNow() }</small>
+                              </span>
+                              <span className='flex-grow-1'>
+                                Earning in stream tip from&nbsp;
+                                <span className="fw-semibold text-capitalize">
+                                  <Link 
+                                    target='_blank' 
+                                    to={ route('home.users.show', {'username': transaction?.beneficiary?.username}) } 
+                                    className='text-dark text-decoration-none'>
+                                    <span>
+                                      { transaction?.beneficiary?.first_name + ' ' + transaction?.beneficiary?.last_name } <span className='text-lowercase'>(@{ transaction?.beneficiary?.username })</span>
+                                    </span>
+                                    <span className='align-top'>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-link-45deg align-self-start" viewBox="0 0 16 16">
+                                        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                      </svg>
+                                    </span>
+                                  </Link>
+                                </span>
+                              </span>
+                              <span className='flex-shrink-0 fw-semibold'>
+                                {`${ (transaction.amount * 100)?.toFixed(2) }$`}
+                              </span>
+                            </div>
                           </article>
                         )
                       })) : (
@@ -290,7 +535,33 @@ export default function Index() {
                       {(tipEarningTransactions?.length > 0) ? (tipEarningTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2 border-bottom'>
-                            {`${ (transaction.amount * 100)?.toFixed(2) }$ received from ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            <div className='d-flex align-items-center gap-3'>
+                              <span className='flex-shrink-0'>
+                                <small>{ dayjs.utc(transaction?.created_at).fromNow() }</small>
+                              </span>
+                              <span className='flex-grow-1'>
+                                Received a tip from&nbsp;
+                                <span className="fw-semibold text-capitalize">
+                                  <Link 
+                                    target='_blank' 
+                                    to={ route('home.users.show', {'username': transaction?.beneficiary?.username}) } 
+                                    className='text-dark text-decoration-none'>
+                                    <span>
+                                      { transaction?.beneficiary?.first_name + ' ' + transaction?.beneficiary?.last_name } <span className='text-lowercase'>(@{ transaction?.beneficiary?.username })</span>
+                                    </span>
+                                    <span className='align-top'>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-link-45deg align-self-start" viewBox="0 0 16 16">
+                                        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                      </svg>
+                                    </span>
+                                  </Link>
+                                </span>
+                              </span>
+                              <span className='flex-shrink-0 fw-semibold'>
+                                {`${ (transaction.amount * 100)?.toFixed(2) }$`}
+                              </span>
+                            </div>
                           </article>
                         )
                       })) : (
@@ -324,37 +595,52 @@ export default function Index() {
             
             <section className="border-top mt-3 col-12">
                 <h3 className='fs-5 fw-semibold text-underline py-3'>Cumulative Expenditures (in USD)</h3>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th scope="col" colSpan='2'>Activity</th>
-                      <th scope="col">Amount Spent (in USD)</th>
-                      <th scope="col"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row" colSpan='2'>Pay-Per-View</th>
-                      <td>{ (payPerViewExpenditureSum * 100)?.toFixed(2) }</td>
-                      <td><button type='button' data-bs-toggle="modal" data-bs-target="#payPerViewExpenditureModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
-                    </tr>
-                    <tr>
-                      <th scope="row" colSpan='2'>Subscription</th>
-                      <td>{ (subscriptionExpenditureSum * 100)?.toFixed(2) }</td>
-                      <td><button type='button' data-bs-toggle="modal" data-bs-target="#subscriptionExpenditureModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
-                    </tr>
-                    <tr>
-                      <th scope="row" colSpan='2'>Stream Tips</th>
-                      <td>{ (streamTipExpenditureSum * 100)?.toFixed(2) }</td>
-                      <td><button type='button' data-bs-toggle="modal" data-bs-target="#streamTipExpenditureModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
-                    </tr>
-                    <tr>
-                      <th scope="row" colSpan='2'>Tips</th>
-                      <td>{ (tipExpenditureSum * 100)?.toFixed(2) }</td>
-                      <td><button type='button' data-bs-toggle="modal" data-bs-target="#tipExpenditureModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div className="row">
+                  <div className="col-sm-6 mb-3 mb-sm-0">
+                    <div className="card">
+                      <div className="card-body">
+                        <h4 className="card-title fs-6 fw-semibold">Pay-Per-View</h4>
+                        <div className='d-flex justify-content-between align-items-center'>
+                          <span className="card-text">{ (payPerViewExpenditureSum * 100)?.toFixed(2) }$</span>
+                          <span><button type='button' data-bs-toggle="modal" data-bs-target="#payPerViewExpenditureModal" className='btn btn-sm btn-faansy-red text-light'>View Details</button></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-sm-6 mb-3">
+                    <div className="card">
+                      <div className="card-body">
+                        <h4 className="card-title fs-6 fw-semibold">Subscription</h4>
+                        <div className='d-flex justify-content-between align-items-center'>
+                          <span className="card-text">{ (subscriptionExpenditureSum * 100)?.toFixed(2) }$</span>
+                          <span><button type='button' data-bs-toggle="modal" data-bs-target="#subscriptionExpenditureModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-sm-6 mb-3 mb-sm-0">
+                    <div className="card">
+                      <div className="card-body">
+                        <h4 className="card-title fs-6 fw-semibold">Stream Tips</h4>
+                        <div className='d-flex justify-content-between align-items-center'>
+                          <span className="card-text">{ (streamTipExpenditureSum * 100)?.toFixed(2) }$</span>
+                          <span><button type='button' data-bs-toggle="modal" data-bs-target="#streamTipExpenditureModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-sm-6">
+                    <div className="card">
+                      <div className="card-body">
+                        <h4 className="card-title fs-6 fw-semibold">Tips</h4>
+                        <div className='d-flex justify-content-between align-items-center'>
+                          <span className="card-text">{ (tipExpenditureSum * 100)?.toFixed(2) }$</span>
+                          <span><button type='button' data-bs-toggle="modal" data-bs-target="#tipExpenditureModal"  className='btn btn-sm btn-faansy-red text-light'>View Details</button></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
             </section>
 
             <section className='expenses-modals'>
@@ -370,7 +656,33 @@ export default function Index() {
                       {(payPerViewExpenditureTransactions?.length) ? (payPerViewExpenditureTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2'>
-                            {`${ (transaction.amount * 100)?.toFixed(2) }$ paid to view ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} content, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            <div className='d-flex align-items-center gap-3'>
+                              <span className='flex-shrink-0'>
+                                <small>{ dayjs.utc(transaction?.created_at).fromNow() }</small>
+                              </span>
+                              <span className='flex-grow-1'>
+                                Paid to view content by&nbsp;
+                                <span className="fw-semibold text-capitalize">
+                                  <Link 
+                                    target='_blank' 
+                                    to={ route('home.users.show', {'username': transaction?.beneficiary?.username}) } 
+                                    className='text-dark text-decoration-none'>
+                                    <span>
+                                      { transaction?.beneficiary?.first_name + ' ' + transaction?.beneficiary?.last_name } <span className='text-lowercase'>(@{ transaction?.beneficiary?.username })</span>
+                                    </span>
+                                    <span className='align-top'>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-link-45deg align-self-start" viewBox="0 0 16 16">
+                                        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                      </svg>
+                                    </span>
+                                  </Link>
+                                </span>
+                              </span>
+                              <span className='flex-shrink-0 fw-semibold'>
+                                {`${ (transaction.amount * 100)?.toFixed(2) }$`}
+                              </span>
+                            </div>
                           </article>
                         )
                       })) : (
@@ -395,7 +707,33 @@ export default function Index() {
                       {(subscriptionExpenditureTransactions?.length > 0) ? (subscriptionExpenditureTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2'>
-                            {`${ (transaction.amount * 100)?.toFixed(2) }$ paid to subscribe to ${transaction.beneficiary.first_name} ${transaction?.beneficiary?.last_name}, ${(dayjs.utc(transaction?.created_at).fromNow())}.`}
+                            <div className='d-flex align-items-center gap-3'>
+                              <span className='flex-shrink-0'>
+                                <small>{ dayjs.utc(transaction?.created_at).fromNow() }</small>
+                              </span>
+                              <span className='flex-grow-1'>
+                                Paid subscription fee to subscribe to creator&nbsp;
+                                <span className="fw-semibold text-capitalize">
+                                  <Link 
+                                    target='_blank' 
+                                    to={ route('home.users.show', {'username': transaction?.beneficiary?.username}) } 
+                                    className='text-dark text-decoration-none'>
+                                    <span>
+                                      { transaction?.beneficiary?.first_name + ' ' + transaction?.beneficiary?.last_name } <span className='text-lowercase'>(@{ transaction?.beneficiary?.username })</span>
+                                    </span>
+                                    <span className='align-top'>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-link-45deg align-self-start" viewBox="0 0 16 16">
+                                        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                      </svg>
+                                    </span>
+                                  </Link>
+                                </span>
+                              </span>
+                              <span className='flex-shrink-0 fw-semibold'>
+                                {`${ (transaction.amount * 100)?.toFixed(2) }$`}
+                              </span>
+                            </div>
                           </article>
                         )
                       })) : (
@@ -420,7 +758,33 @@ export default function Index() {
                       {(streamTipExpenditureTransactions?.length > 0) ? (streamTipExpenditureTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2'>
-                            {`${ (transaction.amount * 100)?.toFixed(2) }$ paid to ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in stream tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            <div className='d-flex align-items-center gap-3'>
+                              <span className='flex-shrink-0'>
+                                <small>{ dayjs.utc(transaction?.created_at).fromNow() }</small>
+                              </span>
+                              <span className='flex-grow-1'>
+                                Gave stream tip to creator,&nbsp;
+                                <span className="fw-semibold text-capitalize">
+                                  <Link 
+                                    target='_blank' 
+                                    to={ route('home.users.show', {'username': transaction?.beneficiary?.username}) } 
+                                    className='text-dark text-decoration-none'>
+                                    <span>
+                                      { transaction?.beneficiary?.first_name + ' ' + transaction?.beneficiary?.last_name } <span className='text-lowercase'>(@{ transaction?.beneficiary?.username })</span>
+                                    </span>
+                                    <span className='align-top'>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-link-45deg align-self-start" viewBox="0 0 16 16">
+                                        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                      </svg>
+                                    </span>
+                                  </Link>
+                                </span>
+                              </span>
+                              <span className='flex-shrink-0 fw-semibold'>
+                                {`${ (transaction.amount * 100)?.toFixed(2) }$`}
+                              </span>
+                            </div>
                           </article>
                         )
                       })) : (
@@ -445,7 +809,33 @@ export default function Index() {
                       {(tipExpenditureTransactions?.length > 0) ? (tipExpenditureTransactions?.map(transaction => {
                         return (
                           <article key={ transaction.id } className='bg-faansy-red mb-2'>
-                            {`${ (transaction.amount * 100)?.toFixed(2) }$ paid to ${transaction.beneficiary.first_name} ${transaction.beneficiary.last_name} in tip, ${ dayjs.utc(transaction?.created_at).fromNow() }.`}
+                            <div className='d-flex align-items-center gap-3'>
+                              <span className='flex-shrink-0'>
+                                <small>{ dayjs.utc(transaction?.created_at).fromNow() }</small>
+                              </span>
+                              <span className='flex-grow-1'>
+                                Gave a tip to&nbsp;
+                                <span className="fw-semibold text-capitalize">
+                                  <Link 
+                                    target='_blank' 
+                                    to={ route('home.users.show', {'username': transaction?.beneficiary?.username}) } 
+                                    className='text-dark text-decoration-none'>
+                                    <span>
+                                      { transaction?.beneficiary?.first_name + ' ' + transaction?.beneficiary?.last_name } <span className='text-lowercase'>(@{ transaction?.beneficiary?.username })</span>
+                                    </span>
+                                    <span className='align-top'>
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-link-45deg align-self-start" viewBox="0 0 16 16">
+                                        <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                                        <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                                      </svg>
+                                    </span>
+                                  </Link>
+                                </span>
+                              </span>
+                              <span className='flex-shrink-0 fw-semibold'>
+                                {`${ (transaction.amount * 100)?.toFixed(2) }$`}
+                              </span>
+                            </div>
                           </article>
                         )
                       })) : (

@@ -356,7 +356,7 @@ export default function Index() {
                                                                         </div>
                                                                     )}}) : (
                                                                         <div>
-                                                                            <span>No likes</span>
+                                                                            <span>No like</span>
                                                                         </div>
                                                                 )}
                                                             </div>
@@ -450,7 +450,7 @@ export default function Index() {
                                                                         </div>
                                                                     )}}) : (
                                                                         <div>
-                                                                            <span>No comments</span>
+                                                                            <span>No comment</span>
                                                                         </div>
                                                                 )}
                                                             </div>

@@ -13,7 +13,7 @@ export default function Layout({ children }) {
             <Header />
 
             <main className="position-relative d-flex w-100">
-                <SideBar />
+                { location.pathname != route('public.posts.show') ? <SideBar /> : '' }
 
                 { children }
 
@@ -24,7 +24,7 @@ export default function Layout({ children }) {
                         ? ''
                             : (location.pathname == route('home.user-become-creators.index'))
                             ? '' 
-                                : (location.pathname == route('public.users.show'))
+                                : (location.pathname == route('public.posts.show'))
                                 ? '' 
                                     : <Aside />}
             </main>

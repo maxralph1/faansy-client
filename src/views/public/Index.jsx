@@ -7,7 +7,7 @@ import Logo from '@/assets/images/logo.png';
 
 
 export default function Index() {
-    const { loginUser } = useContext(AuthContext);
+    const { loginUser, redirectToGoogle } = useContext(AuthContext);
 
     const handleSubmit = event => {
         event.preventDefault();
@@ -51,7 +51,12 @@ export default function Index() {
                 <div className="mt-4 d-flex flex-column px-5 row-gap-3">
                     <span>
                         <a href="" className="btn btn-primary rounded-pill fw-bold py-2 text-uppercase text-decoration-none text-light w-100">
-                            <span className='d-flex align-items-center justify-content-center gap-1'>
+                            <span 
+                                typeof='button'
+                                onClick={ async () => {
+                                    await redirectToGoogle();
+                                } } 
+                                className='d-flex align-items-center justify-content-center gap-1'>
                                 <small>
                                     Sign in with&nbsp; 
                                 </small>
