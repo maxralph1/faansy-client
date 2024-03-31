@@ -31,7 +31,25 @@ export default function Index() {
     const { createBookmark, destroyBookmark } = useBookmark();
     const { createPoll } = usePoll();
 
-    console.log(posts)
+    console.log(posts);
+
+    const [copiedLink, setCopiedLink] = useState();
+    console.log(copiedLink);
+
+    const handleCopyLink = async () => {
+        try {
+            console.log(copiedLink);
+            await navigator.clipboard.writeText(copiedLink);
+            alert("Copied to clipboard!");
+            alert(copiedLink);
+        } catch (err) {
+            console.error(
+                "Unable to copy to clipboard.",
+                err
+            );
+            alert("Copy to clipboard failed.");
+        }
+    };
 
     
     /* Post */
@@ -264,7 +282,7 @@ export default function Index() {
                                     <div className={ `card-body ${ post.repost == true && 'px-5' }` }>
                                         <div className="d-flex justify-content-between mb-3">
                                             <Link 
-                                                to={ route('home.users.show', {'username': post.user.username})}
+                                                to={ route('home.users.show', {'username': post.user.username}) }
                                                 className="d-flex justify-content-start align-items-center column-gap-2 text-decoration-none">
                                                 <div className="rounded-circle">
                                                     <img src={ post?.user?.user_image_url ? `${ Constants.serverURL }/storage/${ post?.user?.user_image_url }` : Logo } alt="" width="65" height='65' className='object-fit-cover rounded' />
@@ -283,72 +301,82 @@ export default function Index() {
                                                         </svg>
                                                         }
                                                     </h3>
-                                                    <span className="text-body-secondary">@{ post.user.username }</span>
+                                                    <span className="text-body-secondary">@{ post?.user?.username }</span>
                                                 </div>
                                             </Link>
                             
                                             <div className="d-flex column-gap-3">
                                                 <span className="text-body-secondary">
-                                                    { post.repost_original_post_timestamp != null 
-                                                        ? dayjs.utc(post.repost_original_post_timestamp).fromNow() 
-                                                        : dayjs.utc(post.created_at).fromNow()}
+                                                    { post?.repost_original_post_timestamp != null 
+                                                        ? dayjs.utc(post?.repost_original_post_timestamp).fromNow() 
+                                                        : dayjs.utc(post?.created_at).fromNow()}
                                                 </span>
-                                                    <span className='mb-1 dropstart z-1'>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
-                                                            viewBox="0 0 16 16" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <path
-                                                                d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
-                                                        </svg>
-                                                        <ul className="dropdown-menu">
-                                                            { ((user.role.title == 'super-admin') || (user.role.title == 'admin')) &&
-                                                                <button 
-                                                                    onClick={ async () => {
-                                                                        await featurePost(post);
-                                                                        await getPosts(posts?.meta?.current_page);
-                                                                    } }
-                                                                    type='button' 
-                                                                    className="dropdown-item fw-bold" href="#make-post-featured"><small>Make Post Featured</small>
-                                                                </button>
-                                                            }
-                                                            { ((post?.payperviewamount <= 0)) &&
+                                                <span 
+                                                    type='button' 
+                                                    onClick={ async () => {
+                                                        await setCopiedLink(`${ Constants?.clientURL }/#/${ post?.id }`);
+                                                        await handleCopyLink();
+                                                    }}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-copy" viewBox="0 0 16 16">
+                                                        <path fillRule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+                                                    </svg>
+                                                </span>
+                                                <span className='mb-1 dropstart z-1'>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#4c5661" className="bi bi-three-dots"
+                                                        viewBox="0 0 16 16" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <path
+                                                            d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3" />
+                                                    </svg>
+                                                    <ul className="dropdown-menu">
+                                                        { ((user.role.title == 'super-admin') || (user.role.title == 'admin')) &&
+                                                            <button 
+                                                                onClick={ async () => {
+                                                                    await featurePost(post);
+                                                                    await getPosts(posts?.meta?.current_page);
+                                                                } }
+                                                                type='button' 
+                                                                className="dropdown-item fw-bold" href="#make-post-featured"><small>Make Post Featured</small>
+                                                            </button>
+                                                        }
+                                                        { ((post?.payperviewamount <= 0)) &&
+                                                            <li>
+                                                                <Link 
+                                                                    to={ route('home.posts.show', { id: post.id})}
+                                                                    className="dropdown-item fw-bold" 
+                                                                    href="#show-post"><small>View Post</small>
+                                                                </Link>
+                                                            </li>
+                                                        }
+                                                        { post?.user?.id == user?.id && 
+                                                            <>
                                                                 <li>
                                                                     <Link 
-                                                                        to={ route('home.posts.show', { id: post.id})}
+                                                                        to={ route('home.posts.repost', { id: post.id})}
                                                                         className="dropdown-item fw-bold" 
-                                                                        href="#show-post"><small>View Post</small>
+                                                                        href="#repost-post"><small>Repost</small>
                                                                     </Link>
                                                                 </li>
-                                                            }
-                                                            { post?.user?.id == user?.id && 
-                                                                <>
-                                                                    <li>
-                                                                        <Link 
-                                                                            to={ route('home.posts.repost', { id: post.id})}
-                                                                            className="dropdown-item fw-bold" 
-                                                                            href="#repost-post"><small>Repost</small>
-                                                                        </Link>
-                                                                    </li>
-                                                                    <li>
-                                                                        <Link 
-                                                                            to={ route('home.posts.edit', { id: post.id})}
-                                                                            className="dropdown-item fw-bold" 
-                                                                            href="#edit-post"><small>Edit Post</small>
-                                                                        </Link>
-                                                                    </li>
-                                                                    <li>
-                                                                        <button 
-                                                                            onClick={ async () => {
-                                                                                await destroyPost(post);
-                                                                                await getPosts(posts?.meta?.current_page);
-                                                                            } }
-                                                                            type='button' 
-                                                                            className="dropdown-item fw-bold text-secondary" href="#delete-post"><small>Delete Post</small>
-                                                                        </button>
-                                                                    </li>
-                                                                </>
-                                                            }
-                                                        </ul>
-                                                    </span>
+                                                                <li>
+                                                                    <Link 
+                                                                        to={ route('home.posts.edit', { id: post.id})}
+                                                                        className="dropdown-item fw-bold" 
+                                                                        href="#edit-post"><small>Edit Post</small>
+                                                                    </Link>
+                                                                </li>
+                                                                <li>
+                                                                    <button 
+                                                                        onClick={ async () => {
+                                                                            await destroyPost(post);
+                                                                            await getPosts(posts?.meta?.current_page);
+                                                                        } }
+                                                                        type='button' 
+                                                                        className="dropdown-item fw-bold text-secondary" href="#delete-post"><small>Delete Post</small>
+                                                                    </button>
+                                                                </li>
+                                                            </>
+                                                        }
+                                                    </ul>
+                                                </span>
                                             </div>
                                         </div>
                             
